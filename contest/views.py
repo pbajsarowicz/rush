@@ -1,3 +1,8 @@
-from django.shortcuts import render
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-# Create your views here.
+from django.views.generic import TemplateView
+
+
+class HomeView(TemplateView):
+    template_name = 'contest/home.html'
