@@ -1,0 +1,16 @@
+{% extends "contest/base.html" %}
+
+{% block container %}
+
+<form id="login_form" method="post" action="/login/">
+    {% csrf_token %}
+    Email: <input type="text" name="username" value="" size="50" required/>
+    <br />
+    Password: <input type="password" name="password" value="" size="50" required/>
+    <input type="submit" value="Zaloguj" />
+    {% if warning %}
+    <p style="color: red;">{{ warning }}</p>
+    {% endif %}
+</form>
+
+{% endblock %}
