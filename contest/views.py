@@ -1,25 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.views.generic import TemplateView
+from .forms import RegistrationForm
 
 from django.shortcuts import render
 
-from .forms import RegistrationForm
+from django.views.generic import TemplateView
 
 
 class HomeView(TemplateView):
     template_name = 'contest/home.html'
 
+
 def register(request):
-	form = RegistrationForm()
-	if request.method == "POST":
-		form = RegistrationForm(request.POST)
-		if form.is_valid():
-			new_user = form.save()
-			new_user.save()
-	else:
-		form = RegistrationForm()
 
-    return render(request, 'contest/register.html', {'form': form})
+    if request.method == "POST":
+        form = RegistrationForm(request.POST, instance = regis)
+        if form.is_valid():
+            RegistrationForm = form.save(commit = False)
+            RegistrationForm.save()
+            return redirect('contest.views.HomeView')
 
+    return render(request, 'contest/register.html', {'form': RegistrationForm})
