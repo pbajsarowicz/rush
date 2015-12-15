@@ -7,6 +7,7 @@ from contest import views
 
 
 urlpatterns = [
-    url(r'^$', views.HomeView.as_view(), name = 'home'),
-    url(r'^register', views.register, name = 'register'),
+    url(r'^$', views.HomeView.as_view(), name='home'),
+    url(r'^register', views.RegisterView.as_view(), name='regisetr'),
+    url(r'^thanks', views.ThanksView.as_view(), name='thanks'),
 ]
