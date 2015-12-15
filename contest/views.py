@@ -10,7 +10,7 @@ from contest.forms import LoginForm
 
 class HomeView(TemplateView):
     """
-    View for main page
+    View for main page.
     """
     template_name = 'contest/home.html'
 

@@ -18,25 +18,17 @@ class UserMethodTests(TestCase):
         """
         Checking if authenticate() returns good values depending
         on input. In this case: correct data, incorrect, empty.
-
         """
-
         self.assertEqual(
-            authenticate(
-                email='xyz@xyz.pl',
-                password='Password'),
+            authenticate(email='xyz@xyz.pl', password='Password'),
             self.user
         )
         self.assertEqual(
-            authenticate(
-                email='xyz@xyz.pl',
-                password='random_pass'),
+            authenticate(email='xyz@xyz.pl', password='random_pass'),
             None
         )
         self.assertEqual(
-            authenticate(
-                email='example@example.pl',
-                password='qwerty'),
+            authenticate(email='example@example.pl',password='qwerty'),
             None
         )
         self.assertEqual(authenticate(email='', password=''), None)
@@ -63,10 +55,7 @@ class UserMethodTests(TestCase):
         form = LoginForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertEqual(
-            form.errors['__all__'],
-            [
-                'Konto nie zostało aktywowane'
-            ]
+            form.errors['__all__'], ['Konto nie zostało aktywowane']
         )
 
         self.user.is_active = True
