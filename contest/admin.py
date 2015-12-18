@@ -8,6 +8,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 
 class RushUserAdmin(admin.ModelAdmin):
+<<<<<<< HEAD
     'What RushUserAdmin can do and how RushUser is displayed.'
 
     def confirm(modeladmin, request, queryset):
@@ -16,6 +17,16 @@ class RushUserAdmin(admin.ModelAdmin):
 
     def cancel(modeladmin, request, queryset):
     	'RushUserAdmin can cancel RushUser.'
+=======
+    """What RushUserAdmin can do and how RushUser is displayed."""
+
+    def confirm(modeladmin, request, queryset):
+    	"""RushUserAdmin can confirm RushUser."""
+        queryset.update(status='Yes')
+
+    def cancel(modeladmin, request, queryset):
+    	"""RushUserAdmin can cancel RushUser."""
+>>>>>>> 9ef8d348399352b46e27b89a0fe195979a252d20
         queryset.update(status='No')
 
     exclude = (
@@ -25,4 +36,8 @@ class RushUserAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name')
     readonly_fields = ('last_login', 'date_joined')
     actions = [confirm, cancel]
+<<<<<<< HEAD
 admin.site.register(RushUser, RushUserAdmin)
+=======
+admin.site.register(RushUser, RushUserAdmin)
+>>>>>>> 9ef8d348399352b46e27b89a0fe195979a252d20
