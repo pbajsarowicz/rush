@@ -1,13 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from django.contrib import admin
-
-from .models import RushUser
-
-
-class PersonAdmin(admin.ModelAdmin):
-    """
-    It filters users by their is_active status
-    """
-    list_filter = ('is_active',)
+from contest.models import RushUser
 
 
 class RushUserAdmin(admin.ModelAdmin):
@@ -15,17 +9,17 @@ class RushUserAdmin(admin.ModelAdmin):
     What RushUserAdmin can do and how RushUser is displayed.
     """
 
-    def confirm(modeladmin, request, queryset):
+    def confirm(self, request, queryset):
         """
         RushUserAdmin can confirm RushUser.
         """
-        queryset.update(status='Yes')
+        queryset.update(is_active=True)
 
-    def cancel(modeladmin, request, queryset):
+    def cancel(self, request, queryset):
         """
         RushUserAdmin can cancel RushUser.
         """
-        queryset.update(status='No')
+        queryset.update(is_active=False)
 
     exclude = (
         'password', 'date_joined', 'last_login', 'status', 'is_superuser',
@@ -34,5 +28,7 @@ class RushUserAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name')
     readonly_fields = ('last_login', 'date_joined')
     actions = [confirm, cancel]
-admin.site.register(RushUser, RushUserAdmin)
+    list_filter = ('is_active',)
 
+
+admin.site.register(RushUser, RushUserAdmin)
