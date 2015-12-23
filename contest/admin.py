@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from unidecode import unidecode
+
 from django.contrib import admin
 
-from .models import RushUser
+from contest.models import RushUser
 
 
 class PersonAdmin(admin.ModelAdmin):
@@ -48,6 +49,7 @@ class RushUserAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name')
     readonly_fields = ('last_login', 'date_joined')
     actions = [create, cancel]
+    list_filter = ('is_active',)
 
 
 admin.site.register(RushUser, RushUserAdmin)
