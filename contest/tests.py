@@ -70,15 +70,15 @@ class UserMethodTests(TestCase):
 
 class AdminMethodTests(TestCase):
     def setUp(self):
-        self.obj_1 = RushUser.objects.create_user(
+        self.user_1 = RushUser.objects.create_user(
             'aaa@aaa.pl', 'Łukasz', 'Ślązak', 'School', 'Address', 'Password',
             'login1'
         )
-        self.obj_2 = RushUser.objects.create_user(
+        self.user_2 = RushUser.objects.create_user(
             'bbb@bbb.pl', 'Adam', 'Ślowacki', 'School', 'Address', 'Password',
             'login2'
         )
-        self.obj_3 = RushUser.objects.create_user(
+        self.user_3 = RushUser.objects.create_user(
             'ccc@ccc.pl', 'Ewa', 'Kowalska', 'School', 'Address', 'Password',
             'random_login'
         )
@@ -87,21 +87,19 @@ class AdminMethodTests(TestCase):
         self.app_admin = RushUserAdmin(RushUser, AdminSite())
 
     def test_creating_user(self):
-        self.assertFalse(self.obj_1.is_active and self.obj_2.is_active)
-        self.assertEqual(self.obj_1.username, 'login1')
-        self.assertEqual(self.obj_2.username, 'login2')
+        self.assertFalse(self.user_1.is_active and self.user_2.is_active)
+        self.assertEqual(self.user_1.username, 'login1')
+        self.assertEqual(self.user_2.username, 'login2')
 
-        queryset = [self.obj_1, self.obj_2]
+        queryset = [self.user_1, self.user_2]
         self.app_admin.create(self.request, queryset)
 
-        self.assertTrue(self.obj_1.is_active and self.obj_2.is_active)
-        self.assertEqual(self.obj_1.username, 'lslazak')
-        self.assertEqual(self.obj_2.username, 'aslowacki')
+        self.assertTrue(self.user_1.is_active and self.user_2.is_active)
+        self.assertEqual(self.user_1.username, 'lslazak')
+        self.assertEqual(self.user_2.username, 'aslowacki')
 
     def test_deleting_user(self):
-        self.assertTrue(RushUser.objects.filter(email='ccc@ccc.pl'))
-
         queryset = RushUser.objects.filter(email='ccc@ccc.pl')
+        self.assertTrue(queryset.exists())
         self.app_admin.cancel(self.request, queryset)
-
-        self.assertFalse(RushUser.objects.filter(email='ccc@ccc.pl'))
+        self.assertFalse(queryset.exists())

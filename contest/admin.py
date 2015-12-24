@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from unidecode import unidecode
 
+from unidecode import unidecode
 from django.contrib import admin
 
 from contest.models import RushUser
-
-
-class PersonAdmin(admin.ModelAdmin):
-    """
-    It filters users by their is_active status
-    """
-    list_filter = ('is_active',)
 
 
 class RushUserAdmin(admin.ModelAdmin):
@@ -21,8 +14,7 @@ class RushUserAdmin(admin.ModelAdmin):
 
     def create(self, request, queryset):
         """
-        RushUserAdmin confirm RushUser requests - changing
-        accounts status to active and setting login name
+        Creating an account (set login, temporary password, active status)
         """
         for obj in queryset:
             obj.is_active = True
@@ -35,8 +27,7 @@ class RushUserAdmin(admin.ModelAdmin):
 
     def cancel(self, request, queryset):
         """
-        RushUserAdmin can decline RushUser requests -
-        deleting accounts from database
+        Canceling requests (deleting user from DB)
         """
         if queryset.count():
             queryset.delete()
