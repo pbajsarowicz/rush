@@ -1,43 +1,50 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.views.generic import TemplateView
-
-from django.views.generic import View
-
+from django.views.generic import (
+	TemplateView,
+	View
+)
 from django.shortcuts import render
-
 from django.http import HttpResponseRedirect
 
 from contest.forms import RegistrationForm
 
 
 class HomeView(TemplateView):
-    template_name='contest/home.html'
-
-class ThanksView(TemplateView):
-    template_name='contest/thanks.html'
+    template_name = 'contest/home.html'
 
 
 class RegisterView(View):
+	"""
+	View for user registration.
+	"""
+	form_class = RegistrationForm
+	template_name = 'contest/register.html'
 
-	def get(self, request):
+	def get(self, request, *args, **kwargs):
+		"""
+		Return registration form on site.
+		"""
+		form = self.form_class()
 
-		return render(request, 'contest/register.html',
-		{'form': RegistrationForm}
+		return render(
+			request, self.template_name, 
+			{'form': form}
 		)
 
-	def post(self, request):
-
-		form = RegistrationForm(request.POST)
+	def post(self, request, *args, **kwargs):
+		"""
+		Send form and check validation.
+		"""
+		form = self.form_class(request.POST)
 		if form.is_valid():
-
-			tmp = form.save(commit = False)
-			tmp.save()
-		else:
-			return render(request, 'contest/register.html',
-			{'form': form}
+			form.save()
+			return render(
+				request, self.template_name,
+				{'success_message': 'Wysłano zapytanie o konto'}
 			)
-
-		return HttpResponseRedirect('/thanks')
-
+		else:
+			return render(
+				request, self.template_name, {'form': form}
+			)
