@@ -16,20 +16,20 @@ class RushUserAdmin(admin.ModelAdmin):
         """
         Creating an account (set login, temporary password, active status)
         """
-        for obj in queryset:
-            obj.is_active = True
-            name = unidecode(obj.first_name[0]).lower()
-            surname = unidecode(obj.last_name).lower()
-            obj.username = name + surname
-            obj.set_password('password123')
-            obj.save()
+        for user in queryset:
+            user.is_active = True
+            name = unidecode(user.first_name[0]).lower()
+            surname = unidecode(user.last_name).lower()
+            user.username = name + surname
+            user.set_password('password123')
+            user.save()
     create.short_description = 'Stwórz konto'
 
     def cancel(self, request, queryset):
         """
         Canceling requests (deleting user from DB)
         """
-        if queryset.count():
+        if queryset.exists():
             queryset.delete()
     cancel.short_description = 'Usuń'
 
