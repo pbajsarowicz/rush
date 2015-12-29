@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
+from unidecode import unidecode
 from django.contrib import admin
+
 from contest.models import RushUser
 
 
@@ -9,17 +12,26 @@ class RushUserAdmin(admin.ModelAdmin):
     What RushUserAdmin can do and how RushUser is displayed.
     """
 
-    def confirm(self, request, queryset):
+    def create(self, request, queryset):
         """
-        RushUserAdmin can confirm RushUser.
+        Creating an account (set login, temporary password, active status)
         """
-        queryset.update(is_active=True)
+        for user in queryset:
+            user.is_active = True
+            name = unidecode(user.first_name[0]).lower()
+            surname = unidecode(user.last_name).lower()
+            user.username = name + surname
+            user.set_password('password123')
+            user.save()
+    create.short_description = 'Stwórz konto'
 
     def cancel(self, request, queryset):
         """
-        RushUserAdmin can cancel RushUser.
+        Canceling requests (deleting user from DB)
         """
-        queryset.update(is_active=False)
+        if queryset.exists():
+            queryset.delete()
+    cancel.short_description = 'Usuń'
 
     exclude = (
         'password', 'date_joined', 'last_login', 'status', 'is_superuser',
@@ -27,7 +39,7 @@ class RushUserAdmin(admin.ModelAdmin):
     )
     list_display = ('first_name', 'last_name')
     readonly_fields = ('last_login', 'date_joined')
-    actions = [confirm, cancel]
+    actions = [create, cancel]
     list_filter = ('is_active',)
 
 
