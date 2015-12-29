@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.contrib import admin
 from contest.models import RushUser
@@ -25,7 +24,9 @@ class RushUserAdmin(admin.ModelAdmin):
         'password', 'date_joined', 'last_login', 'status', 'is_superuser',
         'is_staff', 'is_active',
     )
-    list_display = ('first_name', 'last_name')
+    list_display = ('first_name', 'last_name', 'email',
+                    'organization_name', 'organization_address'
+                    )
     readonly_fields = ('last_login', 'date_joined')
     actions = [confirm, cancel]
     list_filter = ('is_active',)
