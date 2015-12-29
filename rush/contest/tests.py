@@ -22,7 +22,8 @@ class UserMethodTests(TestCase):
                 organization_address='Address'
         )
         superuser = RushUser.objects.create_superuser(
-                email='testsuper@cos.pl'
+                email='testsuper@cos.pl', username='test',
+                password='P@ssw0rd'
         )
 
     def test_user(self):
