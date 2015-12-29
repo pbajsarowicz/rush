@@ -14,8 +14,9 @@ from contest.admin import RushUserAdmin
 class UserMethodTests(TestCase):
     def setUp(self):
         self.user = RushUser.objects.create_user(
-            'xyz@xyz.pl', 'Name', 'Last Name', 'School', 'Address', 'Password',
-            'username'
+            email='xyz@xyz.pl', first_name='Name', last_name='Last Name',
+            organization_name='School', organization_address='Address',
+            password='Password', username='username'
         )
 
     def test_authenticate(self):
@@ -71,16 +72,19 @@ class UserMethodTests(TestCase):
 class AdminMethodTests(TestCase):
     def setUp(self):
         self.user_1 = RushUser.objects.create_user(
-            'aaa@aaa.pl', 'Łukasz', 'Ślązak', 'School', 'Address', 'Password',
-            'login1'
+            email='aaa@aaa.pl', first_name='Łukasz', last_name='Ślązak',
+            organization_name='School', organization_address='Address',
+            password='Password', username='login1'
         )
         self.user_2 = RushUser.objects.create_user(
-            'bbb@bbb.pl', 'Adam', 'Ślowacki', 'School', 'Address', 'Password',
-            'login2'
+            email='bbb@bbb.pl', first_name='Adam', last_name='Ślowacki',
+            organization_name='School', organization_address='Address',
+            password='Password', username='login2'
         )
         self.user_3 = RushUser.objects.create_user(
-            'ccc@ccc.pl', 'Ewa', 'Kowalska', 'School', 'Address', 'Password',
-            'random_login'
+            email='ccc@ccc.pl', first_name='Ewa', last_name='Kowalska',
+            organization_name='School', organization_address='Address',
+            password='Password', username='random_login'
         )
 
         self.request = HttpRequest()
