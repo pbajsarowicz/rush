@@ -132,7 +132,7 @@ AUTH_USER_MODEL = 'contest.RushUser'
 STATIC_URL = '/static/'
 
 
-LOGIN_URL = '/login'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_URL = '/logout'
+LOGOUT_URL = '/logout/'
 AUTH_USER_MODEL = 'contest.RushUser'

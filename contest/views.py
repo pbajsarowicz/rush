@@ -59,7 +59,6 @@ class LoginView(View):
     View for login page. Form is checking for correct input
     and also making sure user is activated.
     """
-
     form_class = LoginForm
     template_name = 'contest/login.html'
 

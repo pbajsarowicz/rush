@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -16,27 +15,25 @@ class RushUser(AbstractBaseUser):
     """
     User model for Rush users.
     """
-
     username = models.CharField(
-        'Nazwa użytkownika', max_length=64, unique=True
+        'nazwa użytkownika', max_length=64, unique=True
     )
-    email = models.EmailField('Adres email', blank=False, unique=True)
-    first_name = models.CharField('Imię', max_length=32, blank=False)
-    last_name = models.CharField('Nazwisko', max_length=32, blank=False)
+    email = models.EmailField('adres email', unique=True)
+    first_name = models.CharField('imię', max_length=32)
+    last_name = models.CharField('nazwisko', max_length=32)
     organization_name = models.CharField(
-        'Nazwa organizacji', max_length=255, blank=False
+        'nazwa organizacji', blank=True, max_length=255
     )
     organization_address = models.CharField(
-        'Adres organizacji', max_length=255, blank=False
+        'adres organizacji', max_length=255
     )
-    date_joined = models.DateTimeField('Data dołączenia', auto_now_add=True)
-    is_active = models.BooleanField(default=False)
+    date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
+    is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
     is_admin = models.BooleanField(default=False)
 
     objects = RushUserManager()
 
     USERNAME_FIELD = 'username'
-
     REQUIRED_FIELDS = ['email']
 
     def __unicode__(self):
@@ -81,14 +78,6 @@ class RushUser(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
-    def _get_username(self):
-        """
-        Returns username for active a user.
-        """
-        return unidecode(
-            '{}{}'.format(self.first_name[0], self.last_name)
-        ).lower()
-
     def create(self, request, queryset):
         """
         Creating an account (set login, temporary password, active status)
@@ -98,9 +87,21 @@ class RushUser(AbstractBaseUser):
             user.set_password('password123')
             user.save()
 
-    def save(self, *args, **kwargs):
+    def _get_username(self):
         """
-        Initialize username.
+        Returns username for an active user.
+        """
+        return unidecode(
+            '{}{}'.format(self.first_name[0], self.last_name)
+        ).lower()
+
+    def _initialize_username(self):
+        """
+        Initialize username:
+        * with the value given by hand (shell),
+        * with the uuid4 value, when somebody asks for an account,
+        * with the value consistent with pattern `first letter
+          of firstname + lastname` when an admin accepts an account.
         """
         if self.is_active:
             self.username = (
@@ -109,5 +110,11 @@ class RushUser(AbstractBaseUser):
             )
         else:
             self.username = self.username if self.username else uuid.uuid4()
+
+    def save(self, *args, **kwargs):
+        """
+        Provide extra RushUser's logic
+        """
+        self._initialize_username()
 
         return super(RushUser, self).save(*args, **kwargs)

@@ -6,13 +6,13 @@
         {% if success_message %}
             {{ success_message }}
         {% else %}
-        <form class="col s6" action="?next={{next}}" role="form" method="post">
-            <div class="row center">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="pull-right btn btn-primary">Wyślij zapytanie o konto</button>
-            </div>
-        </form>
+            <form class="col s6" action="?next={{next}}" role="form" method="post">
+                <div class="row center">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="pull-right btn btn-primary">Wyślij zapytanie o konto</button>
+                </div>
+            </form>
         {% endif %}
     </div>
 </div>
