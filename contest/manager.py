@@ -2,19 +2,16 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import BaseUserManager
-from django.utils import timezone
 
 
 class RushUserManager(BaseUserManager):
     """
     Manager for RushUser creation.
-
     """
 
     def create_user(
-            self, email, username='', password='', first_name='',
-            last_name='', organization_name='',
-            organization_address=''
+            self, username='', password='', email='', first_name='',
+            last_name='', organization_name='', organization_address=''
     ):
         """
         Regular user creation.
@@ -30,7 +27,6 @@ class RushUserManager(BaseUserManager):
             last_name=last_name,
             organization_name=organization_name,
             organization_address=organization_address,
-            date_joined=timezone.now()
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -38,11 +34,11 @@ class RushUserManager(BaseUserManager):
 
     def create_superuser(self, username, password, email):
         """
-        Super user creation.
+        Superuser creation.
         """
 
         user = self.create_user(
-            email=email, username=username, password=password
+            username=username, password=password, email=email
         )
         user.is_admin = True
         user.is_active = True

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.hashers import make_password
 from django.db import models
 from unidecode import unidecode
 
@@ -69,8 +70,16 @@ class RushUser(AbstractBaseUser):
         """
         Initialize password with empty string.
         """
-        self.password = raw_password if self.is_admin else ''
-        self._password = raw_password if self.is_admin else ''
+        self.password = (
+            make_password(raw_password) if self.is_admin or self.is_active
+            else ''
+        )
+        self._password = (
+            raw_password if self.is_admin or self.is_active else ''
+        )
+
+    def is_staff(self):
+        return self.is_admin
 
     def _get_username(self):
         """

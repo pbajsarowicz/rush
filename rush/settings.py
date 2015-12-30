@@ -130,3 +130,9 @@ AUTH_USER_MODEL = 'contest.RushUser'
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_URL = '/logout'
+AUTH_USER_MODEL = 'contest.RushUser'
