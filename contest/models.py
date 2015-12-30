@@ -8,6 +8,10 @@ from django.db import models
 
 from contest.manager import RushUserManager
 
+from unidecode import unidecode
+
+from contest.utils import is_uuid4
+
 
 class RushUser(AbstractBaseUser):
     """
@@ -15,16 +19,16 @@ class RushUser(AbstractBaseUser):
     """
 
     username = models.CharField(
-        'Nazwa użytkownika', max_length=30, unique=True
+        'Nazwa użytkownika', max_length=64, unique=True
     )
     email = models.EmailField('Adres email', blank=False, unique=True)
-    first_name = models.CharField('Imię', max_length=30, blank=False)
-    last_name = models.CharField('Nazwisko', max_length=30, blank=False)
+    first_name = models.CharField('Imię', max_length=32, blank=False)
+    last_name = models.CharField('Nazwisko', max_length=32, blank=False)
     organization_name = models.CharField(
-        'Nazwa organizacji', max_length=30, blank=False
+        'Nazwa organizacji', max_length=255, blank=False
     )
     organization_address = models.CharField(
-        'Adres organizacji', max_length=30, blank=False
+        'Adres organizacji', max_length=255, blank=False
     )
     date_joined = models.DateTimeField('Data dołączenia', auto_now_add=True)
     is_active = models.BooleanField(default=False)
@@ -70,9 +74,33 @@ class RushUser(AbstractBaseUser):
         self.password = raw_password if self.is_admin else ''
         self._password = raw_password if self.is_admin else ''
 
+    def _get_username(self):
+        """
+        Returns username for active a user.
+        """
+        return unidecode(
+            '{}{}'.format(self.first_name[0], self.last_name)
+        ).lower()
+
+    def create(self, request, queryset):
+        """
+        Creating an account (set login, temporary password, active status)
+        """
+        for user in queryset:
+            user.is_active = True
+            user.set_password('password123')
+            user.save()
+
     def save(self, *args, **kwargs):
         """
         Initialize username.
         """
-        self.username = self.username if self.username else uuid.uuid4()
+        if self.is_active:
+            self.username = (
+                self.username if self.username and not is_uuid4(self.username)
+                else self._get_username()
+            )
+        else:
+            self.username = self.username if self.username else uuid.uuid4()
+
         return super(RushUser, self).save(*args, **kwargs)

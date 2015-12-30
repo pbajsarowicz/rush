@@ -12,8 +12,9 @@ class RushUserManager(BaseUserManager):
     """
 
     def create_user(
-            self, email, password='', first_name='', last_name='',
-            organization_name='', organization_address=''
+            self, email, username='', password='', first_name='',
+            last_name='', organization_name='',
+            organization_address=''
     ):
         """
         Regular user creation.
@@ -23,6 +24,7 @@ class RushUserManager(BaseUserManager):
         except ValueError as error:
             raise error('Podaj poprawny adres email')
         user = self.model(
+            username=username,
             email=email,
             first_name=first_name,
             last_name=last_name,
@@ -39,8 +41,9 @@ class RushUserManager(BaseUserManager):
         Super user creation.
         """
 
-        user = self.create_user(email=email, password=password)
-        user.username = username
+        user = self.create_user(
+            email=email, username=username, password=password
+        )
         user.is_admin = True
         user.is_active = True
         user.save(using=self._db)

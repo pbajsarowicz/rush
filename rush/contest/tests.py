@@ -8,6 +8,7 @@ from contest.models import RushUser
 
 
 class UserMethodTests(TestCase):
+
     """
     Test for user creation.
     """
@@ -17,13 +18,13 @@ class UserMethodTests(TestCase):
         Creating test users.
         """
         user = RushUser.objects.create_user(
-                email='test@xyz.pl', first_name='Name',
-                last_name='Last Name', organization_name='Org',
-                organization_address='Address'
+            email='test@xyz.pl', first_name='Name',
+            last_name='Last Name', organization_name='Org',
+            organization_address='Address'
         )
         superuser = RushUser.objects.create_superuser(
-                email='testsuper@cos.pl', username='test',
-                password='P@ssw0rd'
+            email='testsuper@cos.pl', username='test',
+            password='P@ssw0rd'
         )
 
     def test_user(self):
