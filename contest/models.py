@@ -5,11 +5,9 @@ import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
-
-from contest.manager import RushUserManager
-
 from unidecode import unidecode
 
+from contest.manager import RushUserManager
 from contest.utils import is_uuid4
 
 
