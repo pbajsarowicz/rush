@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.views.generic import TemplateView, View
+
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
-
 from contest.forms import LoginForm
+from .models import RushUser
 
 
 class HomeView(TemplateView):
@@ -34,3 +34,16 @@ class LoginView(View):
             login(request, form.get_user())
             return redirect('contest:home')
         return render(request, self.template_name, {'form': form})
+
+
+class AccountsView(View):
+    """
+    Special view for Rush's admin. Displays users whose one can
+    confirm or cancel, and fields 'imie' and 'nazwisko' RushUser.
+    """
+    def get(self, request):
+        posts = RushUser.objects.filter()
+        return render(
+                      request, 'contest/Accounts.html',
+                      {'posts': posts}
+                      )
