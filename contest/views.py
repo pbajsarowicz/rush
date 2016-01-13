@@ -10,7 +10,6 @@ from django.shortcuts import (
     redirect,
     render,
 )
-from django.core.exceptions import ObjectDoesNotExist
 
 from contest.forms import (
     LoginForm,
@@ -96,12 +95,12 @@ class SetPasswordView(View):
         """
         try:
             user = RushUser.objects.get(username=user)
-        except ObjectDoesNotExist:
+        except RushUser.DoesNotExist:
             return redirect('contest:home')
-        if user.check_password('password123') is False:
+        if not user.check_password('password123'):
             return render(
                 request, self.template_name,
-                {'success_message': 'Użytkownik już ma ustawione hasło!'}
+                {'message': 'Użytkownik już ma ustawione hasło!'}
             )
         form = self.form_class(user)
         return render(request, self.template_name, {'form': form})
@@ -116,6 +115,6 @@ class SetPasswordView(View):
             form.save()
             return render(
                 request, self.template_name,
-                {'success_message': 'Hasło ustawione, można się zalogować.'}
+                {'message': 'Hasło ustawione, można się zalogować.'}
             )
         return render(request, self.template_name, {'form': form})

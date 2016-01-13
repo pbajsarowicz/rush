@@ -2,10 +2,11 @@
 from __future__ import unicode_literals
 import uuid
 
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.contrib.auth import authenticate
 from django.contrib.admin.sites import AdminSite
 from django.http import HttpRequest
+from django.core.urlresolvers import reverse
 
 from contest.models import RushUser
 from contest.forms import LoginForm, SettingPasswordForm
@@ -142,41 +143,70 @@ class AdminMethodTests(TestCase):
 
 class PasswordSettingTests(TestCase):
     def setUp(self):
-        self.user_1 = RushUser.objects.create_user(
+        self.user_1 = RushUser(
             email='ddd@ddd.pl', first_name='Łukasz', last_name='Ślązak',
-            username=str(uuid.uuid4())
+            is_active=True
         )
-        self.user_2 = RushUser.objects.create_user(
+        self.user_1.set_password('password123')
+        self.user_1.save()
+
+        self.user_2 = RushUser(
             email='kkk@kkk.pl', first_name='Ewa', last_name='Olczak',
-            username=str(uuid.uuid4())
+            is_active=True
         )
-        self.request = HttpRequest()
-        self.app_admin = RushUserAdmin(RushUser, AdminSite())
-        queryset = [self.user_1, self.user_2]
-        self.app_admin.create(self.request, queryset)
         self.user_2.set_password('Password_already_set')
         self.user_2.save()
-        self.client = Client()
 
     def test_correct_url(self):
-        response = self.client.get('/set_password/lslazak/')
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={'user': 'lslazak'}
+            )
+        )
         self.assertEqual(response.status_code, 200)
-        response = self.client.get('/set_password/eolczak/')
-        self.assertContains(response, 'Użytkownik już ma ustawione hasło!')
-        response = self.client.get('/set_password/invalidlogin/')
+        self.assertTrue(
+            isinstance(response.context['form'], SettingPasswordForm)
+        )
+
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={'user': 'eolczak'}
+            )
+        )
+        expected_message = 'Użytkownik już ma ustawione hasło!'
+        self.assertEqual(response.context['message'], expected_message)
+
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={'user': 'invalidlogin'}
+            )
+        )
         self.assertEqual(response.status_code, 302)
 
     def test_setting_password(self):
-        form_data = {'new_password1': 'pass123', 'new_password2': 'wrong'}
-        form = SettingPasswordForm(self.user_1, data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors['new_password2'], ['Hasła nie są identyczne.']
+        form_data = {'new_password1': 'pass1234', 'new_password2': 'sad_panda'}
+        response = self.client.post(
+            reverse(
+                'contest:set-password',
+                kwargs={'user': 'lslazak'}
+            ),
+            data=form_data,
         )
-        form_data = {'new_password1': 'pass_123', 'new_password2': 'pass_123'}
-        form = SettingPasswordForm(self.user_1, data=form_data)
-        self.assertTrue(form.is_valid())
-        form.save()
-        self.assertTrue(self.user_1.check_password('pass_123'))
-        response = self.client.post('/set_password/lslazak/', form_data)
-        self.assertContains(response, 'Hasło ustawione, można się zalogować.')
+        self.assertEqual(response.status_code, 200)
+        expected_message = 'Hasła nie są identyczne.'
+        self.assertContains(response, expected_message)
+
+        form_data = {'new_password1': 'pass1234', 'new_password2': 'pass1234'}
+        response = self.client.post(
+            reverse(
+                'contest:set-password',
+                kwargs={'user': 'lslazak'}
+            ),
+            data=form_data,
+        )
+        self.assertEqual(response.status_code, 200)
+        expected_message = 'Hasło ustawione, można się zalogować.'
+        self.assertEqual(response.context['message'], expected_message)
