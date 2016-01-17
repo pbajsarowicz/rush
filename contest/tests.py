@@ -181,7 +181,7 @@ class PasswordSettingTests(TestCase):
     def test_setting_password(self):
         form_data = {'new_password1': 'pass1234', 'new_password2': 'sad_panda'}
         response = self.client.post(
-            reverse('contest:set-password',e kwargs={'user': 'lslazak'}),
+            reverse('contest:set-password', kwargs={'user': 'lslazak'}),
             data=form_data,
         )
         self.assertEqual(response.status_code, 200)
