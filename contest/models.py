@@ -78,15 +78,6 @@ class RushUser(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
-    def create(self, request, queryset):
-        """
-        Creating an account (set login, temporary password, active status)
-        """
-        for user in queryset:
-            user.is_active = True
-            user.set_password('password123')
-            user.save()
-
     def _get_username(self):
         """
         Returns username for an active user.
