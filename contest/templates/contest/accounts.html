@@ -1,0 +1,34 @@
+{% extends "contest/base.html" %}
+{% block container %}
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+<div class="margins">
+    <font size='5'>Zarządzanie kontami</font>
+    <table>
+</div>
+        <thead>
+            <tr>
+                <th data-field="first_name">Imie</th>
+                <th data-field="last_name">Nazwisko</th>
+                <th data-field="status">Akcja</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in users%}
+                <tr>
+                        <td>{{ post.first_name }}</td>
+                        <td>{{ post.last_name }}</td>
+                <div class="left">
+                    <td>
+                        <a href="#"><button class="myButton" type="submit" value="Submit">Akceptuj konta</button></a>
+                        <a href="#"><button class="myButton" type="submit" form="form1" value="Submit">Odrzuć</button></a>
+                    </td>
+                </div>
+                </tr>
+           {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="nomargin">
+    {% endblock %}
+</div>
