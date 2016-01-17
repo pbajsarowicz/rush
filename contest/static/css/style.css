@@ -1,7 +1,4 @@
-.left{
-float: left;
-}
-.myButton {
+.rush-button {
     -moz-box-shadow:inset 0px 1px 0px 0px #009687;
     -webkit-box-shadow:inset 0px 1px 0px 0px #009687;
     box-shadow:inset 0px 1px 0px 0px #009687;
@@ -19,17 +16,16 @@ float: left;
     text-decoration:none;
     text-shadow:0px 1px 0px #009687;
 }
-.myButton:hover {
+
+.rush-button:hover {
     background-color:#009687;
 }
-.myButton:active {
+
+.rush-button:active {
     position:relative;
     top:1px;
 }
-.margins{
-	margin-left:50px;
-	margin-right:50px;
-}
+
 .nomargins{
 	margin-left: auto;
 	margin-left: auto;
