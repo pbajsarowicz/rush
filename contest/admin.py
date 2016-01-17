@@ -2,6 +2,11 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.tokens import default_token_generator
+from django.template import loader
+from django.core.mail import EmailMultiAlternatives
 
 from contest.models import RushUser
 
@@ -18,6 +23,21 @@ class RushUserAdmin(admin.ModelAdmin):
             user.is_active = True
             user.set_password('password123')
             user.save()
+
+            context = {
+                'email': user.email,
+                'user': user.get_full_name(),
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user),
+            }
+            body = loader.render_to_string(
+                'admin/password_reset_email.html', context
+            )
+
+            email_message = EmailMultiAlternatives(
+                'Rush - ustawienie hasła', body, None, [user.email]
+            )
+            email_message.send()
     create.short_description = 'Stwórz konto'
 
     def cancel(self, request, queryset):

@@ -5,8 +5,12 @@ import uuid
 from django.test import TestCase
 from django.contrib.auth import authenticate
 from django.contrib.admin.sites import AdminSite
-from django.http import HttpRequest
 from django.core.urlresolvers import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.tokens import default_token_generator
+from django.core import mail
+from mock import Mock
 
 from contest.models import RushUser
 from contest.forms import LoginForm, SettingPasswordForm
@@ -119,16 +123,22 @@ class AdminMethodTests(TestCase):
             password='Password', username='random_login'
         )
 
-        self.request = HttpRequest()
+        self.request = Mock()
         self.app_admin = RushUserAdmin(RushUser, AdminSite())
 
-    def test_creating_user(self):
+    def test_creating_user_and_sending_mail(self):
         self.assertFalse(self.user_1.is_active and self.user_2.is_active)
         self.assertEqual(self.user_1.username, self.initial_user1_username)
         self.assertEqual(self.user_2.username, self.initial_user_2_username)
 
         queryset = [self.user_1, self.user_2]
         self.app_admin.create(self.request, queryset)
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].to, [self.user_1.email])
+        uid = urlsafe_base64_encode(force_bytes(self.user_1.pk))
+        token = default_token_generator.make_token(self.user_1)
+        self.assertIn('/set_password/'+uid+'/'+token+'/', mail.outbox[0].body)
 
         self.assertTrue(self.user_1.is_active and self.user_2.is_active)
         self.assertEqual(self.user_1.username, 'lslazak')
@@ -156,32 +166,46 @@ class PasswordSettingTests(TestCase):
         )
         self.user_2.set_password('Password_already_set')
         self.user_2.save()
+        self.uid_1 = urlsafe_base64_encode(force_bytes(self.user_1.pk))
+        self.token_1 = default_token_generator.make_token(self.user_1)
 
     def test_correct_url(self):
         response = self.client.get(
-            reverse('contest:set-password', kwargs={'user': 'lslazak'})
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': self.uid_1, 'token': self.token_1}
+            )
         )
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
             isinstance(response.context['form'], SettingPasswordForm)
         )
 
+        wrong_token = default_token_generator.make_token(self.user_2)
         response = self.client.get(
-            reverse('contest:set-password', kwargs={'user': 'eolczak'})
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': self.uid_1, 'token': wrong_token}
+            )
         )
-        self.assertEqual(
-            response.context['message'], 'Użytkownik już ma ustawione hasło!'
-        )
+        self.assertEqual(response.status_code, 302)
 
+        wrong_uid = urlsafe_base64_encode(force_bytes(self.user_2.pk))
         response = self.client.get(
-            reverse('contest:set-password', kwargs={'user': 'invalidlogin'})
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': wrong_uid, 'token': self.token_1}
+            )
         )
         self.assertEqual(response.status_code, 302)
 
     def test_setting_password(self):
         form_data = {'new_password1': 'pass1234', 'new_password2': 'sad_panda'}
         response = self.client.post(
-            reverse('contest:set-password', kwargs={'user': 'lslazak'}),
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': self.uid_1, 'token': self.token_1}
+            ),
             data=form_data,
         )
         self.assertEqual(response.status_code, 200)
@@ -192,10 +216,22 @@ class PasswordSettingTests(TestCase):
 
         form_data = {'new_password1': 'pass1234', 'new_password2': 'pass1234'}
         response = self.client.post(
-            reverse('contest:set-password', kwargs={'user': 'lslazak'}),
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': self.uid_1, 'token': self.token_1}
+            ),
             data=form_data,
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.context['message'], 'Hasło ustawione, można się zalogować.'
+            response.context['message'],
+            'Hasło ustawione, można się zalogować.'
         )
+
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': self.uid_1, 'token': self.token_1}
+            )
+        )
+        self.assertEqual(response.status_code, 302)
