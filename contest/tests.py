@@ -6,9 +6,10 @@ from django.test import TestCase
 from django.contrib.auth import authenticate
 from django.contrib.admin.sites import AdminSite
 from django.http import HttpRequest
+from django.core.urlresolvers import reverse
 
 from contest.models import RushUser
-from contest.forms import LoginForm
+from contest.forms import LoginForm, SettingPasswordForm
 from contest.admin import RushUserAdmin
 
 
@@ -39,16 +40,16 @@ class UserMethodTests(TestCase):
         self.assertEqual(user_test.last_name, 'Last Name')
         self.assertEqual(user_test.organization_name, 'Org')
         self.assertEqual(user_test.organization_address, 'Address')
-        self.assertEqual(user_test.is_active, False)
-        self.assertEqual(user_test.is_admin, False)
+        self.assertFalse(user_test.is_active)
+        self.assertFalse(user_test.is_admin)
 
     def test_superuser(self):
         """
         Checking status and informations for super user.
         """
         superuser_test = RushUser.objects.get(email='testsuper@cos.pl')
-        self.assertEqual(superuser_test.is_active, True)
-        self.assertEqual(superuser_test.is_admin, True)
+        self.assertTrue(superuser_test.is_active)
+        self.assertTrue(superuser_test.is_admin)
 
     def test_authenticate(self):
         """
@@ -63,15 +64,13 @@ class UserMethodTests(TestCase):
             authenticate(username='username', password='Password'),
             self.user
         )
-        self.assertEqual(
-            authenticate(username='username', password='random_pass'),
-            None
+        self.assertIsNone(
+            authenticate(username='username', password='random_pass')
         )
-        self.assertEqual(
-            authenticate(username='example@example.pl', password='qwerty'),
-            None
+        self.assertIsNone(
+            authenticate(username='example@example.pl', password='qwerty')
         )
-        self.assertEqual(authenticate(username='', password=''), None)
+        self.assertIsNone(authenticate(username='', password=''))
 
     def test_login_form(self):
         """
@@ -140,3 +139,63 @@ class AdminMethodTests(TestCase):
         self.assertTrue(queryset.exists())
         self.app_admin.cancel(self.request, queryset)
         self.assertFalse(queryset.exists())
+
+
+class PasswordSettingTests(TestCase):
+    def setUp(self):
+        self.user_1 = RushUser(
+            email='ddd@ddd.pl', first_name='Łukasz', last_name='Ślązak',
+            is_active=True
+        )
+        self.user_1.set_password('password123')
+        self.user_1.save()
+
+        self.user_2 = RushUser(
+            email='kkk@kkk.pl', first_name='Ewa', last_name='Olczak',
+            is_active=True
+        )
+        self.user_2.set_password('Password_already_set')
+        self.user_2.save()
+
+    def test_correct_url(self):
+        response = self.client.get(
+            reverse('contest:set-password', kwargs={'user': 'lslazak'})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            isinstance(response.context['form'], SettingPasswordForm)
+        )
+
+        response = self.client.get(
+            reverse('contest:set-password', kwargs={'user': 'eolczak'})
+        )
+        self.assertEqual(
+            response.context['message'], 'Użytkownik już ma ustawione hasło!'
+        )
+
+        response = self.client.get(
+            reverse('contest:set-password', kwargs={'user': 'invalidlogin'})
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_setting_password(self):
+        form_data = {'new_password1': 'pass1234', 'new_password2': 'sad_panda'}
+        response = self.client.post(
+            reverse('contest:set-password', kwargs={'user': 'lslazak'}),
+            data=form_data,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['form'].errors,
+            {'new_password2': [u'Hasła nie są identyczne.']}
+        )
+
+        form_data = {'new_password1': 'pass1234', 'new_password2': 'pass1234'}
+        response = self.client.post(
+            reverse('contest:set-password', kwargs={'user': 'lslazak'}),
+            data=form_data,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'], 'Hasło ustawione, można się zalogować.'
+        )

@@ -14,7 +14,9 @@ from django.shortcuts import (
 from contest.forms import (
     LoginForm,
     RegistrationForm,
+    SettingPasswordForm,
 )
+from contest.models import RushUser
 
 
 class HomeView(TemplateView):
@@ -64,19 +66,55 @@ class LoginView(View):
 
     def get(self, request):
         """
-        Displaying clear LoginForm on page without any errors.
+        Displaying clear LoginForm on page.
         """
         form = self.form_class()
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
         """
-        Checking if form is valid (correct login, password, account
-        activated). If everything is okay logs user in and redirects to home
-        page, if not - returns form with errors.
+        Log an user into app.
         """
         form = self.form_class(request, data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
             return redirect('contest:home')
+        return render(request, self.template_name, {'form': form})
+
+
+class SetPasswordView(View):
+    """
+    View for setting user's password.
+    """
+    form_class = SettingPasswordForm
+    template_name = 'contest/set_password.html'
+
+    def get(self, request, user):
+        """
+        Return clear form for setting password.
+        """
+        try:
+            user = RushUser.objects.get(username=user)
+        except RushUser.DoesNotExist:
+            return redirect('contest:home')
+        if not user.check_password('password123'):
+            return render(
+                request, self.template_name,
+                {'message': 'Użytkownik już ma ustawione hasło!'}
+            )
+        form = self.form_class(user)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, user):
+        """
+        Set user's password.
+        """
+        user = RushUser.objects.get(username=user)
+        form = self.form_class(user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return render(
+                request, self.template_name,
+                {'message': 'Hasło ustawione, można się zalogować.'}
+            )
         return render(request, self.template_name, {'form': form})
