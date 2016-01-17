@@ -15,7 +15,15 @@ from contest.forms import (
     LoginForm,
     RegistrationForm,
 )
+
 from contest.models import RushUser
+
+
+class HomeView(TemplateView):
+    """
+    View for main page.
+    """
+    template_name = 'contest/home.html'
 
 
 class RegisterView(View):
@@ -48,19 +56,11 @@ class RegisterView(View):
             return render(request, self.template_name, {'form': form})
 
 
-class HomeView(TemplateView):
-    """
-    View for main page.
-    """
-    template_name = 'contest/home.html'
-
-
 class LoginView(View):
     """
     View for login page. Form is checking for correct input
     and also making sure user is activated.
     """
-
     form_class = LoginForm
     template_name = 'contest/login.html'
 
