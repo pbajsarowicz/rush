@@ -8,6 +8,7 @@ from contest import views
 urlpatterns = [
     url(r'^$', login_required(views.HomeView.as_view()), name='home'),
     url(r'^register/$', views.RegisterView.as_view(), name='register'),
+    url(r'^$', views.HomeView.as_view(), name='home'),
     url(r'^login/$', views.LoginView.as_view(), name='login'),
     url(
         r'^administrator/konta/$',

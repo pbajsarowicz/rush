@@ -15,6 +15,7 @@ from contest.forms import (
     LoginForm,
     RegistrationForm,
 )
+<<<<<<< HEAD
 
 from contest.models import RushUser
 
@@ -24,6 +25,9 @@ class HomeView(TemplateView):
     View for main page.
     """
     template_name = 'contest/home.html'
+=======
+from contest.models import RushUser
+>>>>>>> 004484012a156d600e722bbf8123922676ec216a
 
 
 class RegisterView(View):
@@ -56,11 +60,19 @@ class RegisterView(View):
             return render(request, self.template_name, {'form': form})
 
 
+class HomeView(TemplateView):
+    """
+    View for main page.
+    """
+    template_name = 'contest/home.html'
+
+
 class LoginView(View):
     """
     View for login page. Form is checking for correct input
     and also making sure user is activated.
     """
+
     form_class = LoginForm
     template_name = 'contest/login.html'
 
@@ -94,4 +106,9 @@ class AccountsView(View):
         Transfer RushUser model and render pages 'administratorzy/konta'.
         """
         users = RushUser.objects.filter()
+<<<<<<< HEAD
         return render(request, 'contest/accounts.html', {'users': users})
+=======
+        return render(request, 'contest/Accounts.html', {'users': users})
+   
+>>>>>>> 004484012a156d600e722bbf8123922676ec216a
