@@ -27,6 +27,7 @@ class RushUserAdmin(admin.ModelAdmin):
             context = {
                 'email': user.email,
                 'user': user.get_full_name(),
+                'username': user.username,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': default_token_generator.make_token(user),
             }
