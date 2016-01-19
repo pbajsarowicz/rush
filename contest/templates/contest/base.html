@@ -18,9 +18,14 @@
         {% block nav %}
             <nav class="white" role="navigation">
                 <div class="nav-wrapper container">
-                    <a id="logo-container" href="#" class="brand-logo">Rush</a>
+                    <a id="logo-container" href="/" class="brand-logo">Rush</a>
                     <ul class="right hide-on-med-and-down">
-                        <li><a href="#">Zaloguj się</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'contest:logout' %}">Wyloguj się</a></li>
+                        {% else %}
+                            <li><a href="{% url 'contest:login' %}">Zaloguj się</a></li>
+                            <li><a href="{% url 'contest:register' %}">Rejestracja</a></li>
+                        {% endif %}
                     </ul>
 
                     <ul id="nav-mobile" class="side-nav">
