@@ -16,7 +16,7 @@ function manageUser(userId, create) {
         },
         url: '/administrator/konta/' + userId,
         error: function(){
-            Materialize.toast('Ups... wystąpił problem', 4000,'',function(){});
+            Materialize.toast('Ups... wystąpił problem', 4000);
         },
         success: function(){
             userRow.remove();

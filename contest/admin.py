@@ -11,13 +11,11 @@ class RushUserAdmin(admin.ModelAdmin):
     What RushUserAdmin can do and how RushUser is displayed.
     """
     def create(self, request, queryset):
-        """
-        Creating an account (set login, temporary password, active status).
-        """
-        for user in queryset:
-            user.is_active = True
-            user.set_password('password123')
-            user.save()
+            """
+            Creating an account (set login, temporary password, active status).
+            """
+            for user in queryset:
+                user.activate()
     create.short_description = 'Stwórz konto'
 
     def cancel(self, request, queryset):

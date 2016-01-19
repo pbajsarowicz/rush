@@ -109,3 +109,17 @@ class RushUser(AbstractBaseUser):
         self._initialize_username()
 
         return super(RushUser, self).save(*args, **kwargs)
+
+    def activate(self):
+        """
+        Activates a user and sets a password.
+        """
+        self.is_active = True
+        self.set_password('password123')
+        self.save()
+
+    def discard(self):
+        """
+        Discards an account request.
+        """
+        self.delete()

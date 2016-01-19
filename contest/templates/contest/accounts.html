@@ -1,35 +1,38 @@
 {% extends "contest/base.html" %}
 {% block container %}
-{% load staticfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
-<div class="margins">
-    <font size='5'>Zarządzanie kontami</font>
-</div>
-<div>
-    <table>
-        <thead>
-            <tr>
-                <th data-field="first_name">Imie</th>
-                <th data-field="last_name">Nazwisko</th>
-                <th data-field="status">Akcja</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for post in users%}
-                <tr>
-                        <td>{{ post.first_name }}</td>
-                        <td>{{ post.last_name }}</td>
-                <div class="left">
-                    <td>
-                        <a href="#"><button class="myButton" type="submit" value="Submit">Akceptuj konta</button></a>
-                        <a href="#"><button class="myButton" type="submit" form="form1" value="Submit">Odrzuć</button></a>
-                    </td>
+    <div class="container">
+        <div class="row">
+            <h5>Zarządzanie kontami</h5>
+        </div>
+        <div class="row col s12">
+            {% if users %}
+                {% csrf_token %}
+                <table class="striped">
+                    <thead>
+                        <tr>
+                            <th data-field="first_name">Imie</th>
+                            <th data-field="last_name">Nazwisko</th>
+                            <th data-field="status">Akcja</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users%}
+                            <tr id="user-{{ user.id }}">
+                                <td>{{ user.first_name }}</td>
+                                <td>{{ user.last_name }}</td>
+                                <td>
+                                    <a href="#" class="waves-effect waves-light btn" onclick="manageUser({{ user.id }}, true)">Akceptuj konta</a>
+                                    <a href="#" class="waves-effect waves-light btn" onclick="manageUser({{ user.id }}, false)">Odrzuć</a>
+                                </td>
+                            </tr>
+                      {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="valign-wrapper">
+                    <h5 class="valign">Brak nowych zgłoszeń</h5>
                 </div>
-                </tr>
-           {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div class="nomargin">
-    {% endblock %}
-</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
