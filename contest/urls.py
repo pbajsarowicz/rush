@@ -15,4 +15,9 @@ urlpatterns = [
         name='accounts'
         ),
     url(r'^logout/$', auth_views.logout_then_login, name='logout'),
+    url(
+        r'^set_password/(?P<user>[a-z]+)/$',
+        views.SetPasswordView.as_view(),
+        name='set-password'
+    )
 ]
