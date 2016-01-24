@@ -1,13 +1,14 @@
 Django==1.9
-Pygments==2.0.2
 fancycompleter==0.4
 flake8==2.5.0
 mccabe==0.3.1
+MySQL-python==1.2.5
 ordereddict==1.1
 pdbpp==0.8.3
 pep8==1.5.7
 pyflakes==1.0.0
+Pygments==2.0.2
 pyrepl==0.8.4
+Unidecode==0.04.18
 wmctrl==0.3
 wsgiref==0.1.2
-Unidecode==0.04.18
