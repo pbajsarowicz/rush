@@ -1,4 +1,6 @@
+coverage==4.0.3
 Django==1.9
+Fabric==1.10.2
 fancycompleter==0.4
 flake8==2.5.0
 mccabe==0.3.1
