@@ -18,9 +18,21 @@ def cov():
 
     e.g. fab cov
     """
-    local('coverage run --source="." manage.py test')
+    local(
+        'coverage run --source="." manage.py test '
+        '--settings=rush.local_settings'
+    )
     local('coverage html')
     local('open htmlcov/index.html')
+
+
+def runserver():
+    """
+    Runs server with `local_settings`.
+
+    e.g. fab runserver
+    """
+    local('./manage.py runserver --settings=rush.local_settings')
 
 
 def pip(reinstall='N'):
