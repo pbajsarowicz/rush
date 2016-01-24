@@ -63,3 +63,10 @@ target/
 
 # Temporary files and directories
 .DS_Store
+
+# local settings
+local_settings.py
+
+# pip coverage
+.coverage
+htmlcov/
