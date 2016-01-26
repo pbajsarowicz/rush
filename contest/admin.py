@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from urlparse import urljoin
 
 from django.contrib import admin
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.template import loader
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMessage
+from django.core.urlresolvers import reverse
+
 
 from contest.models import RushUser
 
@@ -20,25 +23,38 @@ class RushUserAdmin(admin.ModelAdmin):
         Creating an account (set login, temporary password, active status).
         """
         for user in queryset:
+            if user.is_active:
+                continue
             user.is_active = True
             user.set_password('password123')
             user.save()
 
+            reset_url = urljoin(
+                'http://{}'.format(request.get_host()),
+                reverse(
+                    'contest:set-password',
+                    kwargs={
+                        'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
+                        'token': default_token_generator.make_token(user)
+                    }
+                )
+            )
             context = {
-                'email': user.email,
                 'user': user.get_full_name(),
                 'username': user.username,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user),
+                'url': reset_url,
             }
-            body = loader.render_to_string(
-                'admin/password_reset_email.html', context
+            text = loader.render_to_string(
+                'email/password_reset_email.html', context
             )
-
-            email_message = EmailMultiAlternatives(
-                'Rush - ustawienie hasła', body, None, [user.email]
+            msg = EmailMessage(
+                'Rush - ustawienie hasła',
+                text,
+                'email_from@rush.pl',
+                [user.email],
             )
-            email_message.send()
+            msg.content_subtype = 'html'
+            msg.send()
     create.short_description = 'Stwórz konto'
 
     def cancel(self, request, queryset):

@@ -1,3 +1,5 @@
+
+
 """
 Django settings for rush project.
 
@@ -138,9 +140,4 @@ STATIC_URL = '/static/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_URL = '/logout/'
-AUTH_USER_MODEL = 'contest.RushUser'
-<<<<<<< HEAD
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-=======
 SUPPORT_EMAIL = 'Sample@email.com'
->>>>>>> 49b8540482ea168092545fbbaca9d65766d24657
