@@ -93,15 +93,23 @@ class SetPasswordView(View):
     form_class = SettingPasswordForm
     template_name = 'contest/set_password.html'
 
+    @staticmethod
+    def _get_user(uid):
+        """
+        Returns user for given uuid64
+        """
+        try:
+            user_id = force_text(urlsafe_base64_decode(uid))
+            user = RushUser.objects.get(pk=user_id)
+        except (TypeError, ValueError, OverflowError, RushUser.DoesNotExist):
+            user = None
+        return user
+
     def get(self, request, uidb64=None, token=None):
         """
         Return clear form for setting password.
         """
-        try:
-            uid = force_text(urlsafe_base64_decode(uidb64))
-            user = RushUser.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, RushUser.DoesNotExist):
-            user = None
+        user = self._get_user(uidb64)
 
         if user and default_token_generator.check_token(user, token):
             form = self.form_class(user)
@@ -112,11 +120,7 @@ class SetPasswordView(View):
         """
         Set user's password.
         """
-        try:
-            uid = force_text(urlsafe_base64_decode(uidb64))
-            user = RushUser.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, RushUser.DoesNotExist):
-            user = None
+        user = self._get_user(uidb64)
 
         if user and default_token_generator.check_token(user, token):
             form = self.form_class(user, data=request.POST)

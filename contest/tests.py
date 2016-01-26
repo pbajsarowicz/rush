@@ -140,10 +140,14 @@ class AdminMethodTests(TestCase):
 
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(mail.outbox[0].to, [self.user_1.email])
+        self.assertEqual(mail.outbox[1].to, [self.user_2.email])
         uid = urlsafe_base64_encode(force_bytes(self.user_1.pk))
         token = default_token_generator.make_token(self.user_1)
-        reset_url = '/set_password/{}/{}/'.format(uid, token)
-        self.assertIn(str(reset_url), mail.outbox[0].body)
+        reset_url = reverse(
+            'contest:set-password',
+            kwargs={'uidb64': uid, 'token': token}
+        )
+        self.assertIn(reset_url, mail.outbox[0].body)
 
         self.assertTrue(self.user_1.is_active and self.user_2.is_active)
         self.assertEqual(self.user_1.username, 'lslazak')

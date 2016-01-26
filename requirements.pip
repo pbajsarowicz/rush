@@ -14,8 +14,3 @@ pyrepl==0.8.4
 Unidecode==0.04.18
 wmctrl==0.3
 wsgiref==0.1.2
-<<<<<<< HEAD
-Unidecode==0.04.18
-mock==1.3.0
-=======
->>>>>>> 49b8540482ea168092545fbbaca9d65766d24657
