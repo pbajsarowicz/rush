@@ -76,10 +76,10 @@ class RushUser(AbstractBaseUser):
         )
 
     def is_staff(self):
-            """
-            Return True if user has admin privileges.
-            """
-            return self.is_admin
+        """
+        Return True if user has admin privileges.
+        """
+        return self.is_admin
 
     def _get_username(self):
         """
