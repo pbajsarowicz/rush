@@ -5,6 +5,9 @@ db:
         - MYSQL_DATABASE=rush_db
         - MYSQL_USER=rush
         - MYSQL_PASSWORD=rush
+    restart: always
+    volumes:
+    - "./mysql.conf.d:/etc/mysql/conf.d"
 
 rush:
     build: .

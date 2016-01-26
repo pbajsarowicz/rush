@@ -197,5 +197,6 @@ class PasswordSettingTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.context['message'], 'Hasło ustawione, można się zalogować.'
+            response.context['message'],
+            'Hasło ustawione, można się zalogować.'
         )
