@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from contest.models import RushUser
 from contest.forms import LoginForm, SettingPasswordForm
 from contest.admin import RushUserAdmin
+from contest.views import AccountsView
 
 
 class UserMethodTests(TestCase):
@@ -197,5 +198,53 @@ class PasswordSettingTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.context['message'], 'Hasło ustawione, można się zalogować.'
+            response.context['message'],
+            'Hasło ustawione, można się zalogować.'
         )
+
+
+class AccountsViewTestCase(TestCase):
+
+    def test_post(self):
+        user = RushUser(
+            email='test@user.pl', first_name='Test', last_name='Anonymous',
+            is_active=False
+        )
+        user.set_password('password123')
+        user.save()
+
+        response = self.client.post(
+            reverse('contest:accounts', kwargs={'user_id': user.id}),
+            data={}
+        )
+
+        user = RushUser.objects.get(pk=user.id)
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(user.is_active)
+
+        response = self.client.post(
+            reverse('contest:accounts', kwargs={'user_id': 0}),
+            data={}
+        )
+        self.assertEqual(response.status_code, 500)
+
+    def test_delete(self):
+        user = RushUser(
+            email='test@user.pl', first_name='Test', last_name='Anonymous',
+            is_active=False
+        )
+        user.set_password('password123')
+        user.save()
+
+        response = self.client.delete(
+            reverse('contest:accounts', kwargs={'user_id': user.id}),
+            data={}
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        response = self.client.delete(
+            reverse('contest:accounts', kwargs={'user_id': 0}),
+            data={}
+        )
+        self.assertEqual(response.status_code, 500)
