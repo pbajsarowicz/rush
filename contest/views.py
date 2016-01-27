@@ -5,6 +5,7 @@ from django.views.generic import (
     TemplateView,
     View,
 )
+from django.conf import settings
 from django.contrib.auth import login
 from django.http import HttpResponse
 from django.shortcuts import (
@@ -50,8 +51,8 @@ class RegisterView(View):
         if form.is_valid():
             form.save()
             return render(
-                request, self.template_name,
-                {'success_message': 'Wysłano zapytanie o konto'}
+                request, 'contest/confirmation.html',
+                {'email': settings.SUPPORT_EMAIL}
             )
         else:
             return render(request, self.template_name, {'form': form})
