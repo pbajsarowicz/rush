@@ -244,3 +244,68 @@ class PasswordSettingTests(TestCase):
             )
         )
         self.assertEqual(response.status_code, 302)
+
+
+class AccountsViewTestCase(TestCase):
+
+    def setUp(self):
+        user = RushUser(
+            email='auth@user.pl', first_name='auth', last_name='auth',
+            is_active=True, username='auth'
+        )
+        user.set_password('password123')
+        user.save()
+
+        self.client.login(username='auth', password='password123')
+
+    def test_get(self):
+        inactive_user = RushUser.objects.create(
+            email='inactive_user@user.pl', first_name='Test',
+            last_name='Anonymous', is_active=False, username='inactive_user'
+        )
+
+        response = self.client.get(reverse('contest:accounts'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['users']), 1)
+        self.assertEqual(response.context['users'][0], inactive_user)
+
+    def test_post(self):
+        user = RushUser(
+            email='test@user.pl', first_name='Test', last_name='Anonymous',
+            is_active=False
+        )
+        user.set_password('password123')
+        user.save()
+
+        response = self.client.post(
+            reverse('contest:accounts', kwargs={'user_id': user.id})
+        )
+
+        user = RushUser.objects.get(pk=user.id)
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(user.is_active)
+
+        response = self.client.post(
+            reverse('contest:accounts', kwargs={'user_id': 0})
+        )
+        self.assertEqual(response.status_code, 500)
+
+    def test_delete(self):
+        user = RushUser(
+            email='test@user.pl', first_name='Test', last_name='Anonymous',
+            is_active=False
+        )
+        user.set_password('password123')
+        user.save()
+
+        response = self.client.delete(
+            reverse('contest:accounts', kwargs={'user_id': user.id})
+        )
+        self.assertFalse(RushUser.objects.filter(pk=user.id).exists())
+        self.assertEqual(response.status_code, 204)
+
+        response = self.client.delete(
+            reverse('contest:accounts', kwargs={'user_id': user.id})
+        )
+        self.assertEqual(response.status_code, 500)
