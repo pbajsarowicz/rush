@@ -11,7 +11,6 @@ from django.core.urlresolvers import reverse
 from contest.models import RushUser
 from contest.forms import LoginForm, SettingPasswordForm
 from contest.admin import RushUserAdmin
-from contest.views import AccountsView
 
 
 class UserMethodTests(TestCase):
@@ -205,6 +204,28 @@ class PasswordSettingTests(TestCase):
 
 class AccountsViewTestCase(TestCase):
 
+    def setUp(self):
+        user = RushUser(
+            email='auth@user.pl', first_name='auth', last_name='auth',
+            is_active=True, username='auth'
+        )
+        user.set_password('password123')
+        user.save()
+
+        self.client.login(username='auth', password='password123')
+
+    def test_get(self):
+        inactive_user = RushUser.objects.create(
+            email='inactive_user@user.pl', first_name='Test',
+            last_name='Anonymous', is_active=False, username='inactive_user'
+        )
+
+        response = self.client.get(reverse('contest:accounts'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['users']), 1)
+        self.assertEqual(response.context['users'][0], inactive_user)
+
     def test_post(self):
         user = RushUser(
             email='test@user.pl', first_name='Test', last_name='Anonymous',
@@ -214,8 +235,7 @@ class AccountsViewTestCase(TestCase):
         user.save()
 
         response = self.client.post(
-            reverse('contest:accounts', kwargs={'user_id': user.id}),
-            data={}
+            reverse('contest:accounts', kwargs={'user_id': user.id})
         )
 
         user = RushUser.objects.get(pk=user.id)
@@ -223,8 +243,7 @@ class AccountsViewTestCase(TestCase):
         self.assertTrue(user.is_active)
 
         response = self.client.post(
-            reverse('contest:accounts', kwargs={'user_id': 0}),
-            data={}
+            reverse('contest:accounts', kwargs={'user_id': 0})
         )
         self.assertEqual(response.status_code, 500)
 
@@ -237,14 +256,12 @@ class AccountsViewTestCase(TestCase):
         user.save()
 
         response = self.client.delete(
-            reverse('contest:accounts', kwargs={'user_id': user.id}),
-            data={}
+            reverse('contest:accounts', kwargs={'user_id': user.id})
         )
-
+        self.assertFalse(RushUser.objects.filter(pk=user.id).exists())
         self.assertEqual(response.status_code, 204)
 
         response = self.client.delete(
-            reverse('contest:accounts', kwargs={'user_id': 0}),
-            data={}
+            reverse('contest:accounts', kwargs={'user_id': user.id})
         )
         self.assertEqual(response.status_code, 500)

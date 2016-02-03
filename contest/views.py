@@ -63,7 +63,6 @@ class LoginView(View):
     View for login page. Form is checking for correct input
     and also making sure user is activated.
     """
-
     form_class = LoginForm
     template_name = 'contest/login.html'
 
@@ -90,7 +89,6 @@ class AccountsView(View):
     Special view for Rush's admin. Displays users whose one can
     confirm or cancel, and fields 'imie' and 'nazwisko' RushUser.
     """
-
     template_name = 'contest/accounts.html'
 
     def get(self, request, user_id):
@@ -101,25 +99,25 @@ class AccountsView(View):
         return render(request, self.template_name, {'users': users})
 
     def post(self, request, user_id):
-            """
-            Creates a user, with temporary password.
-            """
-            try:
-                user = RushUser.objects.get(pk=user_id)
-                user.activate()
-            except RushUser.DoesNotExist:
-                return HttpResponse(status=500)
-            return HttpResponse(status=201)
+        """
+        Creates a user, with temporary password.
+        """
+        try:
+            user = RushUser.objects.get(pk=user_id)
+            user.activate()
+        except RushUser.DoesNotExist:
+            return HttpResponse(status=500)
+        return HttpResponse(status=201)
 
     def delete(self, request, user_id):
-            """
-            Deletes a user.
-            """
-            try:
-                RushUser.objects.get(pk=user_id).delete()
-            except RushUser.DoesNotExist:
-                return HttpResponse(status=500)
-            return HttpResponse(status=204)
+        """
+        Deletes a user.
+        """
+        try:
+            RushUser.objects.get(pk=user_id).delete()
+        except RushUser.DoesNotExist:
+            return HttpResponse(status=500)
+        return HttpResponse(status=204)
 
 
 class SetPasswordView(View):

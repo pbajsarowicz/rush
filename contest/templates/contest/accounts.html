@@ -21,8 +21,8 @@
                                 <td>{{ user.first_name }}</td>
                                 <td>{{ user.last_name }}</td>
                                 <td>
-                                    <a href="#" class="waves-effect waves-light btn" onclick="manageUser({{ user.id }}, true)">Akceptuj konta</a>
-                                    <a href="#" class="waves-effect waves-light btn" onclick="manageUser({{ user.id }}, false)">Odrzuć</a>
+                                    <a href="#" class="waves-effect waves-light btn" onclick="manageUser('{{ user|to_json }}', true)">Utwórz konto</a>
+                                    <a href="#" class="waves-effect waves-light btn" onclick="manageUser('{{ user|to_json }}', false)">Odrzuć zgłoszenie</a>
                                 </td>
                             </tr>
                       {% endfor %}
