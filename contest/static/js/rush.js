@@ -6,7 +6,8 @@ function manageUser(user, create) {
     var action = create ? 'POST' : 'DELETE';
     var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
     var message = '';
-    var userData = JSON.parse(user)
+    var userData = JSON.parse(user);
+    var userName = userData['first_name'] + ' ' + userData['last_name'];
     var userRow = $('#user-' + userData['id']);
 
     $.ajax({
@@ -20,7 +21,6 @@ function manageUser(user, create) {
         },
         success: function(){
             userRow.remove();
-            var userName = userData['first_name'] + ' ' + userData['last_name']
 
             message = create ? userName + ': utworzono konto ' : userName + ': odrzucono zgłoszenie';
             Materialize.toast(message, 4000);
