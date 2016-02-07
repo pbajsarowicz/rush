@@ -11,9 +11,11 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.http import HttpRequest
+from django.conf import settings
 
 from contest.models import RushUser
-from contest.forms import LoginForm, SettingPasswordForm
+from contest.forms import LoginForm, SettingPasswordForm, RegistrationForm
+from contest.views import SetPasswordView
 from contest.admin import RushUserAdmin
 
 
@@ -42,13 +44,14 @@ class UserMethodTests(TestCase):
         Checking status and informations for user.
         """
         user_test = RushUser.objects.get(email='test@xyz.pl')
-        self.assertEqual(user_test.email, 'test@xyz.pl')
-        self.assertEqual(user_test.first_name, 'Name')
-        self.assertEqual(user_test.last_name, 'Last Name')
-        self.assertEqual(user_test.organization_name, 'Org')
-        self.assertEqual(user_test.organization_address, 'Address')
-        self.assertFalse(user_test.is_active)
-        self.assertFalse(user_test.is_admin)
+        self.assertEqual(user_test.get_full_name(), 'Name Last Name')
+        self.assertEqual(user_test.get_short_name(), 'Last Name')
+        self.assertTrue(user_test.has_perm(None))
+        self.assertTrue(user_test.has_module_perms(None))
+        self.assertFalse(user_test.is_staff())
+        self.assertEqual(user_test.__unicode__(), 'test@xyz.pl')
+        user_test.discard()
+        self.assertFalse(RushUser.objects.filter(email='test@xyz.pl'))
 
     def test_superuser(self):
         """
@@ -57,6 +60,18 @@ class UserMethodTests(TestCase):
         superuser_test = RushUser.objects.get(email='testsuper@cos.pl')
         self.assertTrue(superuser_test.is_active)
         self.assertTrue(superuser_test.is_admin)
+
+
+class LoginViewTests(TestCase):
+    def setUp(self):
+        self.user = RushUser.objects.create_user(
+            email='xyz@xyz.pl', first_name='Name', last_name='LastName',
+            organization_name='School', organization_address='Address',
+            username='username'
+        )
+        self.user.is_active = True
+        self.user.set_password('Password')
+        self.user.save()
 
     def test_authenticate(self):
         """
@@ -171,7 +186,7 @@ class PasswordSettingTests(TestCase):
 
         self.user_2 = RushUser(
             email='kkk@kkk.pl', first_name='Ewa', last_name='Olczak',
-            is_active=True
+            is_active=True, username='username_taken'
         )
         self.user_2.set_password('Password_already_set')
         self.user_2.save()
@@ -207,9 +222,13 @@ class PasswordSettingTests(TestCase):
             )
         )
         self.assertEqual(response.status_code, 302)
+        self.assertFalse(SetPasswordView._get_user('00'))
 
     def test_setting_password(self):
-        form_data = {'new_password1': 'pass1234', 'new_password2': 'sad_panda'}
+        form_data = {
+            'new_password1': 'pass1234', 'new_password2': 'sad_panda',
+            'username': 'username_taken'
+        }
         response = self.client.post(
             reverse(
                 'contest:set-password',
@@ -220,10 +239,16 @@ class PasswordSettingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context['form'].errors,
-            {'new_password2': [u'Hasła nie są identyczne.']}
+            {
+                'username': [u'Podana nazwa użytkownika jest już zajęta.'],
+                'new_password2': [u'Hasła nie są identyczne.']
+            }
         )
 
-        form_data = {'new_password1': 'pass1234', 'new_password2': 'pass1234'}
+        form_data = {
+            'new_password1': 'pass1234', 'new_password2': 'pass1234',
+            'username': 'username123'
+        }
         response = self.client.post(
             reverse(
                 'contest:set-password',
@@ -237,17 +262,8 @@ class PasswordSettingTests(TestCase):
             'Hasło ustawione, można się zalogować.'
         )
 
-        response = self.client.get(
-            reverse(
-                'contest:set-password',
-                kwargs={'uidb64': self.user1_uid, 'token': self.user1_token}
-            )
-        )
-        self.assertEqual(response.status_code, 302)
-
 
 class AccountsViewTestCase(TestCase):
-
     def setUp(self):
         user = RushUser(
             email='auth@user.pl', first_name='auth', last_name='auth',
@@ -309,3 +325,36 @@ class AccountsViewTestCase(TestCase):
             reverse('contest:accounts', kwargs={'user_id': user.id})
         )
         self.assertEqual(response.status_code, 500)
+
+
+class RegisterViewTests(TestCase):
+    def test_register_view(self):
+        response = self.client.get(reverse('contest:register'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            isinstance(response.context['form'], RegistrationForm)
+        )
+
+        response = self.client.post(reverse('contest:register'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['form'].errors,
+            {
+                u'first_name': [u'To pole jest wymagane.'],
+                u'last_name': [u'To pole jest wymagane.'],
+                u'organization_address': [u'To pole jest wymagane.'],
+                u'email': [u'To pole jest wymagane.']
+            }
+        )
+
+        response = self.client.post(
+            reverse('contest:register'),
+            data={
+                'email': 'abc@tmp.com', 'first_name': 'Imie',
+                'last_name': 'Nazwisko', 'organization_name': 'School',
+                'organization_address': 'Address'
+            }
+        )
+        self.assertEqual(
+            list(response.context[0])[0], {u'email': settings.SUPPORT_EMAIL}
+        )
