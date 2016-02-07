@@ -41,9 +41,7 @@ def cov():
         '--settings=rush.local_settings'
     )
     local('coverage html')
-    path = urlparse.urljoin(
-      'file:', os.path.abspath('htmlcov/index.html')
-    )
+    path = urlparse.urljoin('file:', os.path.abspath('htmlcov/index.html'))
     webbrowser.open(path, new=2)
 
 
