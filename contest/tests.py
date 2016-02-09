@@ -14,7 +14,11 @@ from django.http import HttpRequest
 from django.conf import settings
 
 from contest.models import RushUser
-from contest.forms import LoginForm, SettingPasswordForm, RegistrationForm
+from contest.forms import (
+    LoginForm,
+    SettingPasswordForm,
+    RegistrationForm
+)
 from contest.views import SetPasswordView
 from contest.admin import RushUserAdmin
 

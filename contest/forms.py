@@ -59,17 +59,16 @@ class SettingPasswordForm(SetPasswordForm):
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
-        if username:
-            if RushUser.objects.filter(username=username):
-                raise forms.ValidationError(
-                    self.error_messages['username_appears'],
-                    code='username_appears',
-                )
+        if RushUser.objects.filter(username=username).exists():
+            raise forms.ValidationError(
+                self.error_messages['username_appears'],
+                code='username_appears',
+            )
         return username
 
     def save(self, commit=True):
         password = self.cleaned_data['new_password1']
-        username = self.cleaned_data.get('username')
+        username = self.cleaned_data['username']
         self.user.set_password(password)
         self.user.username = username
         if commit:
