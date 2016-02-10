@@ -29,8 +29,8 @@ function manageUser(userId, create) {
 
 function hide() {
     if (document.register_form.club_checkbox.checked == true) {
-        document.getElementById('id_club').style.display = "inline";
+        document.getElementById('id_club_code').style.display = "inline";
     } else {
-        document.getElementById('id_club').style.display = 'none';
+        document.getElementById('id_club_code').style.display = 'none';
     }
 }

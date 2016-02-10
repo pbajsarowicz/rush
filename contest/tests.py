@@ -12,9 +12,21 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.http import HttpRequest
 
-from contest.models import RushUser
+from contest.models import RushUser, Club
 from contest.forms import LoginForm, SettingPasswordForm
 from contest.admin import RushUserAdmin
+
+
+class RegistrationPageTest(TestCase):
+    def setUp(self):
+        club = Club(
+            name='Klub', code=55555
+        )
+        club.save()
+
+    def test_get(self):
+        club_test = Club.objects.get(code=55555)
+
 
 
 class UserMethodTests(TestCase):

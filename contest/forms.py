@@ -9,25 +9,35 @@ from django.contrib.auth.forms import (
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import RegexValidator
 
-from contest.models import RushUser
+from contest.models import RushUser, Club
 
 
 class RegistrationForm(forms.ModelForm):
     """
     Form for new user registration.
     """
+    club_code = forms.CharField(
+        validators=[
+            RegexValidator(r'^\d{5}$', 'Kod klubowy musi zwierać 5 cyfr')
+        ]
+    )
 
     class Meta:
         model = RushUser
-        club = forms.IntegerField(
-            validators=[RegexValidator(
-                r'^\d[0-9]{5}$',
-                'Kod klubowy musi zwierać 5 cyfr')]
-        )
-        fields = [
+        fields = (
             'email', 'first_name', 'last_name', 'organization_name',
-            'organization_address', 'club',
-        ]
+            'organization_address', 'club_code',
+        )
+
+    def save(self, commit=True):
+        """
+        Handles assigning club to a user.
+        """
+        user = super(RegistrationForm, self).save(commit=False)
+        club_code = self.cleaned_data['club_code']
+        club, __ = Club.objects.get_or_create(code=club_code)
+        user.club = club
+        user.save()
 
 
 class LoginForm(AuthenticationForm):
