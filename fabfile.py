@@ -1,3 +1,7 @@
+import os
+import urlparse
+import webbrowser
+
 from fabric.api import local
 
 
@@ -12,6 +16,20 @@ def pep8():
     local('flake8 --exclude={} .'.format(','.join(exclude)))
 
 
+def test(test_path=''):
+    """
+    Runs unit tests using `local_settings`.
+
+    e.g.
+    [all] fab test
+    [single] fab test:"contest.tests.AccountsViewTestCase.test_post"
+
+    """
+    local(
+        './manage.py test {} --settings=rush.local_settings'.format(test_path)
+    )
+
+
 def cov():
     """
     Measures unittests coverage and prints report.
@@ -23,7 +41,10 @@ def cov():
         '--settings=rush.local_settings'
     )
     local('coverage html')
-    local('open htmlcov/index.html')
+    path = urlparse.urljoin(
+      'file:', os.path.abspath('htmlcov/index.html')
+    )
+    webbrowser.open(path, new=2)
 
 
 def runserver():
@@ -33,6 +54,15 @@ def runserver():
     e.g. fab runserver
     """
     local('./manage.py runserver --settings=rush.local_settings')
+
+
+def rush(command):
+    """
+    Runs any Django command using `local_settings`.
+
+    e.g. fab rush:runserver
+    """
+    local('./manage.py {} --settings=rush.local_settings'.format(command))
 
 
 def pip(reinstall='N'):

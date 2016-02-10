@@ -9,10 +9,10 @@
             <form class="col s6" action="?next={{next}}" role="form" method="post">
                 <div class="row center">
                     {% csrf_token %}
-                    {{ form.as_p }}                   
+                    {{ form.as_p }}
                     <input type="checkbox" class="filled-in" id="filled-in-box" checked="checked"/>
-      <label for="filled-in-box">Filled in</label><br>
-      
+                    <label for="filled-in-box">Filled in</label><br>
+
                     <button type="submit" class="pull-right btn btn-primary">Wyślij zapytanie o konto</button>
                 </div>
             </form>

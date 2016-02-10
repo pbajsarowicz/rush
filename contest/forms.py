@@ -21,7 +21,7 @@ class RegistrationForm(forms.ModelForm):
             'email', 'first_name', 'last_name', 'organization_name',
             'organization_address', 'club',
         ]
-    
+
 
 class LoginForm(AuthenticationForm):
     """
