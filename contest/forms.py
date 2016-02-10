@@ -7,6 +7,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 from django.utils.translation import ugettext_lazy as _
+from django.core.validators import RegexValidator
 
 from contest.models import RushUser
 
@@ -15,8 +16,14 @@ class RegistrationForm(forms.ModelForm):
     """
     Form for new user registration.
     """
+
     class Meta:
         model = RushUser
+        club = forms.IntegerField(
+            validators=[RegexValidator(
+                r'^\d[0-9]{5}$',
+                'Kod klubowy musi zwierać 5 cyfr')]
+        )
         fields = [
             'email', 'first_name', 'last_name', 'organization_name',
             'organization_address', 'club',

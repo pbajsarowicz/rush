@@ -23,6 +23,10 @@ class Club(models.Model):
     Stores sport clubs data
     """
     name = models.CharField('nazwa klubu, max_length=255', max_length=255)
+    code = models.IntegerField('kod klubu', default=0)
+
+    def __unicode__(self):
+        return str(self.code)
 
 
 class RushUser(AbstractBaseUser):
