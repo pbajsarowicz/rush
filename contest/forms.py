@@ -60,12 +60,33 @@ class SettingPasswordForm(SetPasswordForm):
     """
     error_messages = {
         'password_mismatch': _('Hasła nie są identyczne.'),
+        'username_appears': _('Podana nazwa użytkownika jest już zajęta.')
     }
+    username = forms.CharField(label=_('Nazwa użytkownika'))
     new_password1 = forms.CharField(
-        label=_('Nowe hasło'),
+        label=_('Hasło'),
         widget=forms.PasswordInput
     )
     new_password2 = forms.CharField(
         label=_('Powtórz hasło'),
         widget=forms.PasswordInput
     )
+    field_order = ['username', 'new_password1', 'new_password2']
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if RushUser.objects.filter(username=username).exists():
+            raise forms.ValidationError(
+                self.error_messages['username_appears'],
+                code='username_appears',
+            )
+        return username
+
+    def save(self, commit=True):
+        password = self.cleaned_data['new_password1']
+        username = self.cleaned_data['username']
+        self.user.set_password(password)
+        self.user.username = username
+        if commit:
+            self.user.save()
+        return self.user
