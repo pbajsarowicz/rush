@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import datetime
+import json
 import uuid
 
 from django.test import TestCase
@@ -13,14 +15,18 @@ from django.core import mail
 from django.http import HttpRequest
 from django.conf import settings
 
-from contest.models import RushUser
+from contest.admin import RushUserAdmin
 from contest.forms import (
     LoginForm,
+    RegistrationForm,
     SettingPasswordForm,
-    RegistrationForm
+)
+from contest.models import RushUser
+from contest.templatetags.to_json import (
+    DatetimeEncoder,
+    to_json,
 )
 from contest.views import SetPasswordView
-from contest.admin import RushUserAdmin
 
 
 class UserMethodTests(TestCase):
@@ -244,8 +250,8 @@ class PasswordSettingTests(TestCase):
         self.assertEqual(
             response.context['form'].errors,
             {
-                'username': [u'Podana nazwa użytkownika jest już zajęta.'],
-                'new_password2': [u'Hasła nie są identyczne.']
+                'username': ['Podana nazwa użytkownika jest już zajęta.'],
+                'new_password2': ['Hasła nie są identyczne.']
             }
         )
 
@@ -344,10 +350,10 @@ class RegisterViewTests(TestCase):
         self.assertEqual(
             response.context['form'].errors,
             {
-                u'first_name': [u'To pole jest wymagane.'],
-                u'last_name': [u'To pole jest wymagane.'],
-                u'organization_address': [u'To pole jest wymagane.'],
-                u'email': [u'To pole jest wymagane.']
+                'first_name': ['To pole jest wymagane.'],
+                'last_name': ['To pole jest wymagane.'],
+                'organization_address': ['To pole jest wymagane.'],
+                'email': ['To pole jest wymagane.']
             }
         )
 
@@ -359,6 +365,45 @@ class RegisterViewTests(TestCase):
                 'organization_address': 'Address'
             }
         )
+        self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
+
+
+class ToJSONTestCase(TestCase):
+
+    def setUp(self):
+        self.user = RushUser(
+            email='test@user.pl', first_name='Test', last_name='Anonymous',
+            is_active=True
+        )
+        self.user.set_password('password123')
+        self.user.save()
+
+    def test_datetime_encoder(self):
+        encoder = DatetimeEncoder()
+        example_datetime = datetime.datetime(day=1, month=1, year=2000)
+        encoded_datetime = encoder.default(example_datetime)
+        self.assertEqual(encoded_datetime, '01-01-2000 00:00:00')
+
+        example_date = datetime.date(day=1, month=1, year=2000)
+        encoded_date = encoder.default(example_date)
+        self.assertEqual(encoded_date, '01-01-2000')
+
+    def test_to_json(self):
+        result = to_json(self.user)
+        result_json = json.loads(result)
+        result_json.pop('password')
         self.assertEqual(
-            list(response.context[0])[0], {u'email': settings.SUPPORT_EMAIL}
+            result_json,
+            {
+                'email': 'test@user.pl',
+                'first_name': 'Test',
+                'id': 1,
+                'is_active': True,
+                'is_admin': False,
+                'last_login': None,
+                'last_name': 'Anonymous',
+                'organization_address': '',
+                'organization_name': '',
+                'username': 'tanonymous'
+            }
         )
