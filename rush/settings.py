@@ -1,3 +1,5 @@
+
+
 """
 Django settings for rush project.
 
@@ -65,6 +67,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'builtins': ['contest.templatetags.to_json'],
         },
     },
 ]
@@ -138,5 +141,4 @@ STATIC_URL = '/static/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_URL = '/logout/'
-AUTH_USER_MODEL = 'contest.RushUser'
 SUPPORT_EMAIL = 'Sample@email.com'
