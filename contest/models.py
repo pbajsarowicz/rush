@@ -164,3 +164,20 @@ class RushUser(AbstractBaseUser):
         )
         msg.content_subtype = 'html'
         msg.send()
+
+
+class Contestant(models.Model):
+    """
+    Model for Rush Contestant.
+    """
+    GENDERS = (('F', 'Kobieta'), ('M', 'Mężczyzna'))
+    moderator = models.ForeignKey(RushUser)
+    first_name = models.CharField('imię', max_length=32)
+    last_name = models.CharField('nazwisko', max_length=32)
+    gender = models.CharField('płeć', max_length=2, choices=GENDERS)
+    age = models.IntegerField('wiek')
+    school = models.CharField('szkoła', max_length=254)
+    styles_distances = models.CharField('styl i dystans', max_length=254)
+
+    def __unicode__(self):
+        return '{} {}'.format(self.first_name, self.last_name)

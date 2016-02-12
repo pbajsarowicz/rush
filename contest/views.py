@@ -20,6 +20,7 @@ from contest.forms import (
     LoginForm,
     RegistrationForm,
     SettingPasswordForm,
+    ContestantForm,
 )
 from contest.models import RushUser
 
@@ -167,5 +168,34 @@ class SetPasswordView(View):
                 return render(
                     request, self.template_name,
                     {'message': 'Hasło ustawione, można się zalogować.'}
+                )
+        return render(request, self.template_name, {'form': form})
+
+
+
+class AddContestantView(View):
+    """
+    View for  contestant assigning  .
+    """
+    form_class = ContestantForm
+    template_name = 'contest/assign_contestant.html'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Return adding contestant form on site.
+        """
+        form = self.form_class()
+
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        """
+        Send, check validation and return adding page.
+        """
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save(user=request.user)
+            return render(
+                request, self.template_name, {'form': self.form_class}
                 )
         return render(request, self.template_name, {'form': form})

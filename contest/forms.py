@@ -8,7 +8,7 @@ from django.contrib.auth.forms import (
 )
 from django.utils.translation import ugettext_lazy as _
 
-from contest.models import RushUser
+from contest.models import RushUser, Contestant
 
 
 class RegistrationForm(forms.ModelForm):
@@ -74,3 +74,23 @@ class SettingPasswordForm(SetPasswordForm):
         if commit:
             self.user.save()
         return self.user
+
+
+class ContestantForm(forms.ModelForm):
+    """
+    Form for contestatn creation.
+    """
+
+    class Meta:
+        model = Contestant
+        fields = [
+            'first_name', 'last_name', 'gender',
+            'age', 'school', 'styles_distances',
+        ]
+
+    def save(self, user, commit=True):
+        form = super(ContestantForm, self).save(commit=False)
+        form.moderator = user
+        if commit:
+            form.save()
+        return form

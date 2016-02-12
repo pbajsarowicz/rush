@@ -20,8 +20,9 @@ from contest.forms import (
     LoginForm,
     RegistrationForm,
     SettingPasswordForm,
+    ContestantForm,
 )
-from contest.models import RushUser
+from contest.models import RushUser, Contestant
 from contest.templatetags.to_json import (
     DatetimeEncoder,
     to_json,
@@ -407,3 +408,31 @@ class ToJSONTestCase(TestCase):
                 'username': 'tanonymous'
             }
         )
+
+
+class AddingContestatnsTest(TestCase):
+    def setUp(self):
+        self.user = RushUser.objects.create_user(
+            email='test@cos.pl', username='test_test',
+            password='P@ssw0rd'
+        )
+        test_data = {
+            'first_name': 'test',
+            'last_name': 'zxqcv',
+            'gender': 'F',
+            'age': 12,
+            'school': 'Jakaś szkoła',
+            'styles_distances': '1000m klasycznie',
+        }
+        self.contestant = ContestantForm(data=test_data)
+        if self.contestant.is_valid():
+            self.contestant.save(user=self.user)
+
+    def test_contestant(self):
+        queryset = Contestant.objects.get(moderator=self.user)
+        self.assertEqual(queryset.first_name, 'test')
+        self.assertEqual(queryset.gender, 'F')
+        self.assertEqual(queryset.age, 12)
+        self.assertEqual(queryset.school, 'Jakaś szkoła')
+        self.assertEqual(queryset.styles_distances, '1000m klasycznie')
+        self.assertEqual(queryset.moderator, self.user)
