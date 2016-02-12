@@ -172,10 +172,9 @@ class SetPasswordView(View):
         return render(request, self.template_name, {'form': form})
 
 
-
 class AddContestantView(View):
     """
-    View for  contestant assigning  .
+    View for contestant assigning.
     """
     form_class = ContestantForm
     template_name = 'contest/assign_contestant.html'
