@@ -20,8 +20,9 @@ from contest.forms import (
     LoginForm,
     RegistrationForm,
     SettingPasswordForm,
+    ContestantForm,
 )
-from contest.models import RushUser
+from contest.models import RushUser, Contestant
 from contest.templatetags.to_json import (
     DatetimeEncoder,
     to_json,
@@ -407,3 +408,44 @@ class ToJSONTestCase(TestCase):
                 'username': 'tanonymous'
             }
         )
+
+
+class AddingContestatnsTest(TestCase):
+    def setUp(self):
+        self.user = RushUser.objects.create_user(
+            email='test@cos.pl', username='test_test',
+            password='P@ssw0rd'
+        )
+        self.client.login(username='test_test', password='P@ssw0rd')
+
+    def test_get(self):
+        response = self.client.get(reverse('contest:assign-contestant'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_post(self):
+        test_data = {
+            'first_name': 'test',
+            'last_name': 'zxqcv',
+            'gender': 'F',
+            'age': 12,
+            'school': 'Jakaś szkoła',
+            'styles_distances': '1000m klasycznie',
+        }
+        contestant = ContestantForm(data=test_data)
+        self.assertEqual(contestant.is_valid(), True)
+        form = contestant.save(commit=False)
+        form.moderator = self.user
+        form.save()
+
+        response = self.client.post(
+            reverse('contest:assign-contestant')
+        )
+        self.assertEqual(response.status_code, 200)
+
+        queryset = Contestant.objects.get(moderator=self.user)
+        self.assertEqual(queryset.first_name, 'test')
+        self.assertEqual(queryset.gender, 'F')
+        self.assertEqual(queryset.age, 12)
+        self.assertEqual(queryset.school, 'Jakaś szkoła')
+        self.assertEqual(queryset.styles_distances, '1000m klasycznie')
+        self.assertEqual(queryset.moderator, self.user)

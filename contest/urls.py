@@ -22,5 +22,10 @@ urlpatterns = [
         ),
         views.SetPasswordView.as_view(),
         name='set-password'
-    )
+    ),
+    url(
+        r'^assign_contestant/$',
+        views.AddContestantView.as_view(),
+        name='assign-contestant'
+    ),
 ]

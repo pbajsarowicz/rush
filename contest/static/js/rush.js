@@ -27,3 +27,8 @@ function manageUser(user, create) {
         }
     });
 }
+
+$(document).ready(function() {
+    $('select').material_select();
+});
+
