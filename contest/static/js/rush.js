@@ -28,9 +28,11 @@ function manageUser(userId, create) {
 
 
 function hide() {
-    if (document.register_form.club_checkbox.checked == true) {
+    if (document.register_form.club_checkbox.checked) {
         document.getElementById('id_club_code').style.display = "inline";
+        document.getElementById('id_club_code').required = true;
     } else {
         document.getElementById('id_club_code').style.display = 'none';
+        document.getElementById('id_club_code').required = false;
     }
 }

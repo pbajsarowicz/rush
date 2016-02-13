@@ -17,6 +17,7 @@ class RegistrationForm(forms.ModelForm):
     Form for new user registration.
     """
     club_code = forms.CharField(
+        required=False,
         validators=[
             RegexValidator(r'^\d{5}$', 'Kod klubowy musi zwierać 5 cyfr')
         ]

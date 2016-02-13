@@ -16,7 +16,7 @@ from django.http import HttpRequest
 from django.conf import settings
 
 
-from contest.models import RushUser, Club
+from contest.models import RushUser
 from contest.admin import RushUserAdmin
 from contest.forms import (
     LoginForm,
