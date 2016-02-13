@@ -20,7 +20,7 @@ from contest.utils import is_uuid4
 
 class Club(models.Model):
     """
-    Stores sport clubs data
+    Stores sport clubs data.
     """
     name = models.CharField('nazwa klubu', max_length=255)
     code = models.IntegerField('kod klubu', default=0)

@@ -392,7 +392,6 @@ class RegisterViewTests(TestCase):
         self.assertEqual(
             response.context['form'].errors,
             {
-                'club_code': ['To pole jest wymagane.'],
                 'first_name': ['To pole jest wymagane.'],
                 'last_name': ['To pole jest wymagane.'],
                 'organization_address': ['To pole jest wymagane.'],
