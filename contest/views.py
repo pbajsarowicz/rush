@@ -93,13 +93,14 @@ class AccountsView(View):
     confirm or cancel, and fields 'imie' and 'nazwisko' RushUser.
     """
     template_name = 'contest/accounts.html'
-    users = RushUser.objects.filter(is_active=False)
 
     def get(self, request, user_id):
         """
         Transfer RushUser model and render pages 'administratorzy/konta'.
         """
-        return render(request, self.template_name, {'users': self.users})
+        users = RushUser.objects.filter(is_active=False)
+
+        return render(request, self.template_name, {'users': users})
 
     def post(self, request, user_id):
         """
