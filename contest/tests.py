@@ -30,23 +30,12 @@ from contest.templatetags.to_json import (
 from contest.views import SetPasswordView
 
 
-class RegistrationPageTest(TestCase):
-    def setUp(self):
-        club = Club(
-            name='Klub', code=55555
-        )
-        club.save()
-
-    def test_get(self):
-        club_test = Club.objects.get(code=55555)
-
-
 class UserMethodTests(TestCase):
     def setUp(self):
         self.user = RushUser.objects.create_user(
-            email='xyz@xyz.pl', first_name='Name', last_name='LastName',
+            email='xyz@xyz.pl', first_name='Name', last_name='Last Name',
             organization_name='School', organization_address='Address',
-            username='username'
+            password='Password', username='username'
         )
         RushUser.objects.create_user(
             email='test@xyz.pl', first_name='Name',
@@ -57,23 +46,19 @@ class UserMethodTests(TestCase):
             email='testsuper@cos.pl', username='test',
             password='P@ssw0rd'
         )
-        self.user.is_active = True
-        self.user.set_password('Password')
-        self.user.save()
 
     def test_user(self):
         """
         Checking status and informations for user.
         """
         user_test = RushUser.objects.get(email='test@xyz.pl')
-        self.assertEqual(user_test.get_full_name(), 'Name Last Name')
-        self.assertEqual(user_test.get_short_name(), 'Last Name')
-        self.assertTrue(user_test.has_perm(None))
-        self.assertTrue(user_test.has_module_perms(None))
-        self.assertFalse(user_test.is_staff())
-        self.assertEqual(user_test.__unicode__(), 'test@xyz.pl')
-        user_test.discard()
-        self.assertFalse(RushUser.objects.filter(email='test@xyz.pl'))
+        self.assertEqual(user_test.email, 'test@xyz.pl')
+        self.assertEqual(user_test.first_name, 'Name')
+        self.assertEqual(user_test.last_name, 'Last Name')
+        self.assertEqual(user_test.organization_name, 'Org')
+        self.assertEqual(user_test.organization_address, 'Address')
+        self.assertFalse(user_test.is_active)
+        self.assertFalse(user_test.is_admin)
 
     def test_superuser(self):
         """
@@ -82,6 +67,52 @@ class UserMethodTests(TestCase):
         superuser_test = RushUser.objects.get(email='testsuper@cos.pl')
         self.assertTrue(superuser_test.is_active)
         self.assertTrue(superuser_test.is_admin)
+
+    def test_authenticate(self):
+        """
+        Checking if authenticate() returns good values depending
+        on input. In this case: correct data, incorrect, empty.
+        """
+        self.user.is_active = True
+        self.user.set_password('Password')
+        self.user.save()
+
+        self.assertEqual(
+            authenticate(username='username', password='Password'),
+            self.user
+        )
+        self.assertIsNone(
+            authenticate(username='username', password='random_pass')
+        )
+        self.assertIsNone(
+            authenticate(username='example@example.pl', password='qwerty')
+        )
+        self.assertIsNone(authenticate(username='', password=''))
+
+    def test_login_form(self):
+        """
+        Checking if form is valid for correct data and invalid for
+        wrong data or inactive user
+        """
+        self.assertEqual(list(LoginForm.base_fields), ['username', 'password'])
+
+        form_data = {'username': 'username', 'password': 'wrong_password'}
+        form = LoginForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors['__all__'],
+            [
+                'Wprowadź poprawny login oraz hasło. '
+                'Uwaga: wielkość liter ma znaczenie.'
+            ]
+        )
+
+        form_data = {'username': 'username', 'password': 'Password'}
+        self.user.is_active = True
+        self.user.set_password('Password')
+        self.user.save()
+        form = LoginForm(data=form_data)
+        self.assertTrue(form.is_valid())
 
 
 class LoginViewTests(TestCase):
@@ -356,12 +387,12 @@ class RegisterViewTests(TestCase):
         self.assertTrue(
             isinstance(response.context['form'], RegistrationForm)
         )
-
         response = self.client.post(reverse('contest:register'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context['form'].errors,
             {
+                'club_code': ['To pole jest wymagane.'],
                 'first_name': ['To pole jest wymagane.'],
                 'last_name': ['To pole jest wymagane.'],
                 'organization_address': ['To pole jest wymagane.'],
@@ -374,7 +405,7 @@ class RegisterViewTests(TestCase):
             data={
                 'email': 'abc@tmp.com', 'first_name': 'Imie',
                 'last_name': 'Nazwisko', 'organization_name': 'School',
-                'organization_address': 'Address'
+                'organization_address': 'Address', 'club_code': 12345,
             }
         )
         self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
@@ -416,6 +447,7 @@ class ToJSONTestCase(TestCase):
                 'last_name': 'Anonymous',
                 'organization_address': '',
                 'organization_name': '',
-                'username': 'tanonymous'
+                'username': 'tanonymous',
+                'club': None
             }
         )
