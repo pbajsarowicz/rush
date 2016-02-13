@@ -9,16 +9,14 @@ class RushUserManager(BaseUserManager):
     Manager for RushUser creation.
     """
     def create_user(
-        self, username='', password='', email='', first_name='', last_name='',
+        self, email, username='', password='', first_name='', last_name='',
         organization_name='', organization_address=''
     ):
         """
         Regular user creation.
         """
-        try:
-            email = self.normalize_email(email)
-        except ValueError as error:
-            raise error('Podaj poprawny adres email')
+
+        email = self.normalize_email(email)
         user = self.model(
             username=username,
             email=email,

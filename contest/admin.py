@@ -15,9 +15,11 @@ class RushUserAdmin(admin.ModelAdmin):
         Creating an account (set login, temporary password, active status).
         """
         for user in queryset:
-            user.is_active = True
-            user.set_password('password123')
-            user.save()
+            if user.is_active:
+                continue
+            user.activate()
+            user.send_reset_email(request)
+
     create.short_description = 'Stwórz konto'
 
     def cancel(self, request, queryset):
