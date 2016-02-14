@@ -1,0 +1,11 @@
+.banner h5 {
+    color: #212121;
+}
+
+.invisible {
+    display: none;
+}
+
+.visible {
+    display: inherit;
+}

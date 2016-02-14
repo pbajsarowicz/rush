@@ -18,6 +18,17 @@ from contest.manager import RushUserManager
 from contest.utils import is_uuid4
 
 
+class Club(models.Model):
+    """
+    Stores sport clubs data.
+    """
+    name = models.CharField('nazwa klubu', max_length=255)
+    code = models.IntegerField('kod klubu', default=0)
+
+    def __unicode__(self):
+        return str(self.code)
+
+
 class RushUser(AbstractBaseUser):
     """
     User model for Rush users.
@@ -37,6 +48,7 @@ class RushUser(AbstractBaseUser):
     date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
     is_admin = models.BooleanField(default=False)
+    club = models.ForeignKey(Club, blank=True, null=True)
 
     objects = RushUserManager()
 
