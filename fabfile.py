@@ -13,7 +13,7 @@ def pep8():
     """
     exclude = ['migrations', 'example_local_settings.py', 'local_settings.py']
 
-    local('flake8 --exclude={} .'.format(','.join(exclude)))
+    local('flake8 --exclude={} --ignore=F403 .'.format(','.join(exclude)))
 
 
 def test(test_path=''):

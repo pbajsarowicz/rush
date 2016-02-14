@@ -1,3 +1,5 @@
+var clubCodeInput = document.getElementById('id_club_code');
+
 /*
  * Creates an account.
  */
@@ -27,3 +29,36 @@ function manageUser(user, create) {
         }
     });
 }
+
+/*
+ * Hides club code input.
+ */
+function hideClubCode() {
+    if (document.register_form.club_checkbox.checked) {
+        clubCodeInput.className = 'visible';
+        clubCodeInput.required = true;
+    } else {
+        clubCodeInput.className = 'invisible';
+        clubCodeInput.required = false;
+        clubCodeInput.value = '';
+    }
+}
+
+/*
+ * Supports initialization of club code in case of validation errors appear.
+ */
+    function onClubCodeValidation() {
+        if (clubCodeInput && clubCodeInput.value) {
+            document.register_form.club_checkbox.checked = true;
+            clubCodeInput.className = 'visible';
+            clubCodeInput.required = true;
+        }
+    }
+
+/*
+ * Action on document ready.
+ */
+$(document).ready(function() {
+    onClubCodeValidation();
+    $('select').material_select();
+});
