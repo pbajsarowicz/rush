@@ -20,8 +20,9 @@ from contest.forms import (
     LoginForm,
     RegistrationForm,
     SettingPasswordForm,
+    ContestantForm,
 )
-from contest.models import RushUser
+from contest.models import RushUser, Contestant
 from contest.templatetags.to_json import (
     DatetimeEncoder,
     to_json,
@@ -406,4 +407,66 @@ class ToJSONTestCase(TestCase):
                 'organization_name': '',
                 'username': 'tanonymous'
             }
+        )
+
+
+class ContestantAddViewTestCase(TestCase):
+    def setUp(self):
+        self.user = RushUser(
+            email='test@cos.pl', username='test_test',
+            password='P@ssw0rd', is_active=True
+        )
+        self.user.set_password('P@ssw0rd')
+        self.user.save()
+
+        self.client.login(username='test_test', password='P@ssw0rd')
+
+        self.form_data = {
+            'first_name': 'test',
+            'last_name': 'zxqcv',
+            'gender': 'F',
+            'age': 12,
+            'school': 'Jakaś szkoła',
+            'styles_distances': '1000m klasycznie',
+        }
+
+    def test_get(self):
+        response = self.client.get(reverse('contest:contestant-add'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(isinstance(response.context['form'], ContestantForm))
+
+    def test_post_with_success(self):
+        response = self.client.post(
+            reverse('contest:contestant-add'), data=self.form_data
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        contestant = Contestant.objects.get(moderator=self.user)
+        self.assertEqual(contestant.first_name, 'test')
+        self.assertEqual(contestant.gender, 'F')
+        self.assertEqual(contestant.age, 12)
+        self.assertEqual(contestant.school, 'Jakaś szkoła')
+        self.assertEqual(contestant.styles_distances, '1000m klasycznie')
+        self.assertEqual(contestant.moderator, self.user)
+
+    def test_post_with_validation_error(self):
+        self.form_data['gender'] = 'WRONG'
+        response = self.client.post(
+            reverse('contest:contestant-add'), data=self.form_data
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context['form'].is_valid())
+        self.assertEqual(
+            response.context['form'].errors,
+            {
+                'gender': [(
+                    'Wybierz poprawną wartość. WRONG nie jest jednym z '
+                    'dostępnych wyborów.'
+                )]
+            }
+        )
+        self.assertFalse(
+            Contestant.objects.filter(moderator=self.user).exists()
         )

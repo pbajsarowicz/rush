@@ -2,7 +2,7 @@
 
 {% block container %}
 <div class="container">
-    <div class="row center">
+    <div class="center">
         {% if message %}
             {{ message }}
         {% else %}
@@ -10,10 +10,11 @@
                 <div class="row center">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <button type="submit" class="pull-right btn btn-primary">Gotowe</button>
+                    <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Anuluj</a>
+                    <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
                 </div>
             </form>
         {% endif %}
     </div>
 </div>
-{% endblock %}
+{% endblock container %}

@@ -3,7 +3,10 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 
-from contest.models import RushUser
+from contest.models import (
+    Contestant,
+    RushUser,
+)
 
 
 class RushUserAdmin(admin.ModelAdmin):
@@ -41,3 +44,4 @@ class RushUserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(RushUser, RushUserAdmin)
+admin.site.register(Contestant)
