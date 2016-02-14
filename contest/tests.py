@@ -4,24 +4,27 @@ import datetime
 import json
 import uuid
 
-from django.test import TestCase
-from django.contrib.auth import authenticate
+from django.conf import settings
 from django.contrib.admin.sites import AdminSite
-from django.core.urlresolvers import reverse
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
+from django.core.urlresolvers import reverse
 from django.http import HttpRequest
-from django.conf import settings
+from django.test import TestCase
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
-
-from contest.models import RushUser
 from contest.admin import RushUserAdmin
+from contest.models import (
+    Contestant,
+    RushUser,
+)
 from contest.forms import (
     LoginForm,
     RegistrationForm,
     SettingPasswordForm,
+    ContestantForm,
 )
 from contest.templatetags.to_json import (
     DatetimeEncoder,
@@ -46,12 +49,23 @@ class UserMethodTests(TestCase):
             email='testsuper@cos.pl', username='test',
             password='P@ssw0rd'
         )
+        self.user.is_active = True
+        self.user.set_password('Password')
+        self.user.save()
 
     def test_user(self):
         """
         Checking status and informations for user.
         """
         user_test = RushUser.objects.get(email='test@xyz.pl')
+        self.assertEqual(user_test.get_full_name(), 'Name Last Name')
+        self.assertEqual(user_test.get_short_name(), 'Last Name')
+        self.assertTrue(user_test.has_perm(None))
+        self.assertTrue(user_test.has_module_perms(None))
+        self.assertFalse(user_test.is_staff())
+        self.assertEqual(user_test.__unicode__(), 'test@xyz.pl')
+        user_test.discard()
+        self.assertFalse(RushUser.objects.filter(email='test@xyz.pl').exists())
         self.assertEqual(user_test.email, 'test@xyz.pl')
         self.assertEqual(user_test.first_name, 'Name')
         self.assertEqual(user_test.last_name, 'Last Name')
@@ -449,4 +463,66 @@ class ToJSONTestCase(TestCase):
                 'username': 'tanonymous',
                 'club': None
             }
+        )
+
+
+class ContestantAddViewTestCase(TestCase):
+    def setUp(self):
+        self.user = RushUser(
+            email='test@cos.pl', username='test_test',
+            password='P@ssw0rd', is_active=True
+        )
+        self.user.set_password('P@ssw0rd')
+        self.user.save()
+
+        self.client.login(username='test_test', password='P@ssw0rd')
+
+        self.form_data = {
+            'first_name': 'test',
+            'last_name': 'zxqcv',
+            'gender': 'F',
+            'age': 12,
+            'school': 'Jakaś szkoła',
+            'styles_distances': '1000m klasycznie',
+        }
+
+    def test_get(self):
+        response = self.client.get(reverse('contest:contestant-add'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(isinstance(response.context['form'], ContestantForm))
+
+    def test_post_with_success(self):
+        response = self.client.post(
+            reverse('contest:contestant-add'), data=self.form_data
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        contestant = Contestant.objects.get(moderator=self.user)
+        self.assertEqual(contestant.first_name, 'test')
+        self.assertEqual(contestant.gender, 'F')
+        self.assertEqual(contestant.age, 12)
+        self.assertEqual(contestant.school, 'Jakaś szkoła')
+        self.assertEqual(contestant.styles_distances, '1000m klasycznie')
+        self.assertEqual(contestant.moderator, self.user)
+
+    def test_post_with_validation_error(self):
+        self.form_data['gender'] = 'WRONG'
+        response = self.client.post(
+            reverse('contest:contestant-add'), data=self.form_data
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context['form'].is_valid())
+        self.assertEqual(
+            response.context['form'].errors,
+            {
+                'gender': [(
+                    'Wybierz poprawną wartość. WRONG nie jest jednym z '
+                    'dostępnych wyborów.'
+                )]
+            }
+        )
+        self.assertFalse(
+            Contestant.objects.filter(moderator=self.user).exists()
         )

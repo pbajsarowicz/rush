@@ -1,38 +1,64 @@
+var clubCodeInput = document.getElementById('id_club_code');
+
 /*
  * Creates an account.
  */
-function manageUser(userId, create) {
+function manageUser(user, create) {
     'use strict';
     var action = create ? 'POST' : 'DELETE';
     var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
-    var data = {'csrfmiddlewaretoken': csrfToken};
     var message = '';
-    var userRow = $('#user-' + userId);
+    var userData = JSON.parse(user);
+    var userName = userData['first_name'] + ' ' + userData['last_name'];
+    var userRow = $('#user-' + userData['id']);
 
     $.ajax({
         type: action,
         beforeSend: function(xhr, settings) {
             xhr.setRequestHeader('X-CSRFToken', csrfToken);
         },
-        url: '/administrator/konta/' + userId,
+        url: '/administrator/konta/' + userData['id'],
         error: function(){
             Materialize.toast('Ups... wystąpił problem', 4000);
         },
         success: function(){
             userRow.remove();
-            message = create ? 'Utworzono konto' : 'Odrzucono zgłoszenie';
+
+            message = create ? userName + ': utworzono konto ' : userName + ': odrzucono zgłoszenie';
             Materialize.toast(message, 4000);
         }
     });
 }
 
-
-function hide() {
+/*
+ * Hides club code input.
+ */
+function hideClubCode() {
     if (document.register_form.club_checkbox.checked) {
-        document.getElementById('id_club_code').style.display = "inline";
-        document.getElementById('id_club_code').required = true;
+        clubCodeInput.className = 'visible';
+        clubCodeInput.required = true;
     } else {
-        document.getElementById('id_club_code').style.display = 'none';
-        document.getElementById('id_club_code').required = false;
+        clubCodeInput.className = 'invisible';
+        clubCodeInput.required = false;
+        clubCodeInput.value = '';
     }
 }
+
+/*
+ * Supports initialization of club code in case of validation errors appear.
+ */
+    function onClubCodeValidation() {
+        if (clubCodeInput && clubCodeInput.value) {
+            document.register_form.club_checkbox.checked = true;
+            clubCodeInput.className = 'visible';
+            clubCodeInput.required = true;
+        }
+    }
+
+/*
+ * Action on document ready.
+ */
+$(document).ready(function() {
+    onClubCodeValidation();
+    $('select').material_select();
+});

@@ -9,7 +9,11 @@ from django.contrib.auth.forms import (
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import RegexValidator
 
-from contest.models import RushUser, Club
+from contest.models import (
+    Contestant,
+    Club,
+    RushUser,
+)
 
 
 class RegistrationForm(forms.ModelForm):
@@ -17,18 +21,14 @@ class RegistrationForm(forms.ModelForm):
     Form for new user registration.
     """
     club_code = forms.CharField(
+        label='Kod klubowy',
+        max_length=5,
         required=False,
         validators=[
             RegexValidator(r'^\d{5}$', 'Kod klubowy musi zwierać 5 cyfr')
-        ]
+        ],
+        widget=forms.TextInput(attrs={'class': 'invisible'})
     )
-
-    class Meta:
-        model = RushUser
-        fields = (
-            'email', 'first_name', 'last_name', 'organization_name',
-            'organization_address', 'club_code',
-        )
 
     def save(self, commit=True):
         """
@@ -36,9 +36,19 @@ class RegistrationForm(forms.ModelForm):
         """
         user = super(RegistrationForm, self).save(commit=False)
         club_code = self.cleaned_data['club_code']
-        club, __ = Club.objects.get_or_create(code=club_code)
-        user.club = club
+
+        if club_code:
+            club, __ = Club.objects.get_or_create(code=club_code)
+            user.club = club
+
         user.save()
+
+    class Meta:
+        model = RushUser
+        fields = (
+            'email', 'first_name', 'last_name', 'organization_name',
+            'organization_address', 'club_code',
+        )
 
 
 class LoginForm(AuthenticationForm):
@@ -91,3 +101,16 @@ class SettingPasswordForm(SetPasswordForm):
         if commit:
             self.user.save()
         return self.user
+
+
+class ContestantForm(forms.ModelForm):
+    """
+    Form for contestant creation.
+    """
+
+    class Meta:
+        model = Contestant
+        fields = (
+            'first_name', 'last_name', 'gender',
+            'age', 'school', 'styles_distances',
+        )
