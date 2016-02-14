@@ -1,35 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.views.generic import (
-    TemplateView,
-    View,
-)
 from django.conf import settings
 from django.contrib.auth import login
-from django.http import HttpResponse
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
+from django.views.generic import View
 from django.shortcuts import (
     redirect,
     render,
 )
-from django.utils.encoding import force_text
-from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.tokens import default_token_generator
 
 from contest.forms import (
     LoginForm,
     RegistrationForm,
     SettingPasswordForm,
-    ContestantForm,
 )
 from contest.models import RushUser
-
-
-class HomeView(TemplateView):
-    """
-    View for main page.
-    """
-    template_name = 'contest/home.html'
 
 
 class RegisterView(View):
@@ -88,44 +76,6 @@ class LoginView(View):
         return render(request, self.template_name, {'form': form})
 
 
-class AccountsView(View):
-    """
-    Special view for Rush's admin. Displays users whose one can
-    confirm or cancel, and fields 'imie' and 'nazwisko' RushUser.
-    """
-    template_name = 'contest/accounts.html'
-
-    def get(self, request, user_id):
-        """
-        Transfer RushUser model and render pages 'administratorzy/konta'.
-        """
-        users = RushUser.objects.filter(is_active=False)
-
-        return render(request, self.template_name, {'users': users})
-
-    def post(self, request, user_id):
-        """
-        Creates a user, with temporary password.
-        """
-        try:
-            user = RushUser.objects.get(pk=user_id)
-            user.activate()
-            user.send_reset_email(request)
-        except RushUser.DoesNotExist:
-            return HttpResponse(status=500)
-        return HttpResponse(status=201)
-
-    def delete(self, request, user_id):
-        """
-        Deletes a user.
-        """
-        try:
-            RushUser.objects.get(pk=user_id).delete()
-        except RushUser.DoesNotExist:
-            return HttpResponse(status=500)
-        return HttpResponse(status=204)
-
-
 class SetPasswordView(View):
     """
     View for setting user's password.
@@ -170,38 +120,4 @@ class SetPasswordView(View):
                     request, self.template_name,
                     {'message': 'Hasło ustawione, można się zalogować.'}
                 )
-        return render(request, self.template_name, {'form': form})
-
-
-class ContestantAddView(View):
-    """
-    View for contestant assigning.
-    """
-    form_class = ContestantForm
-    template_name = 'contest/contestant_add.html'
-
-    def get(self, request, *args, **kwargs):
-        """
-        Return adding a contestant form on site.
-        """
-        form = self.form_class()
-
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        """
-        Create a contestant.
-        """
-        form = self.form_class(request.POST)
-
-        if form.is_valid():
-            contestant = form.save(commit=False)
-            contestant.moderator = request.user
-            contestant.save()
-
-            return render(
-                request, self.template_name,
-                {'message': 'Dodano zawodnika.'}
-            )
-
         return render(request, self.template_name, {'form': form})

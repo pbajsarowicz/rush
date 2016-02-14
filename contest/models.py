@@ -162,7 +162,6 @@ class RushUser(AbstractBaseUser):
         )
         context = {
             'user': self.get_full_name(),
-            'username': self.username,
             'url': reset_url,
         }
         text = loader.render_to_string(
