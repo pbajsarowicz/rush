@@ -172,16 +172,16 @@ class SetPasswordView(View):
         return render(request, self.template_name, {'form': form})
 
 
-class AddContestantView(View):
+class ContestantAddView(View):
     """
     View for contestant assigning.
     """
     form_class = ContestantForm
-    template_name = 'contest/assign_contestant.html'
+    template_name = 'contest/contestant_add.html'
 
     def get(self, request, *args, **kwargs):
         """
-        Return adding contestant form on site.
+        Return adding a contestant form on site.
         """
         form = self.form_class()
 
@@ -189,14 +189,18 @@ class AddContestantView(View):
 
     def post(self, request, *args, **kwargs):
         """
-        Create contestant.
+        Create a contestant.
         """
         form = self.form_class(request.POST)
+
         if form.is_valid():
             contestant = form.save(commit=False)
             contestant.moderator = request.user
             contestant.save()
+
             return render(
-                request, self.template_name, {'form': self.form_class}
-                )
+                request, self.template_name,
+                {'message': 'Dodano zawodnika.'}
+            )
+
         return render(request, self.template_name, {'form': form})

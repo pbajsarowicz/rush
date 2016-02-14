@@ -8,7 +8,10 @@ from django.contrib.auth.forms import (
 )
 from django.utils.translation import ugettext_lazy as _
 
-from contest.models import RushUser, Contestant
+from contest.models import (
+    Contestant,
+    RushUser,
+)
 
 
 class RegistrationForm(forms.ModelForm):
@@ -18,10 +21,10 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = RushUser
-        fields = [
+        fields = (
             'email', 'first_name', 'last_name', 'organization_name',
             'organization_address',
-        ]
+        )
 
 
 class LoginForm(AuthenticationForm):
@@ -78,12 +81,12 @@ class SettingPasswordForm(SetPasswordForm):
 
 class ContestantForm(forms.ModelForm):
     """
-    Form for contestatn creation.
+    Form for contestant creation.
     """
 
     class Meta:
         model = Contestant
-        fields = [
+        fields = (
             'first_name', 'last_name', 'gender',
             'age', 'school', 'styles_distances',
-        ]
+        )

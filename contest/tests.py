@@ -410,20 +410,18 @@ class ToJSONTestCase(TestCase):
         )
 
 
-class AddingContestatnsTest(TestCase):
+class ContestantAddViewTestCase(TestCase):
     def setUp(self):
-        self.user = RushUser.objects.create_user(
+        self.user = RushUser(
             email='test@cos.pl', username='test_test',
-            password='P@ssw0rd'
+            password='P@ssw0rd', is_active=True
         )
+        self.user.set_password('P@ssw0rd')
+        self.user.save()
+
         self.client.login(username='test_test', password='P@ssw0rd')
 
-    def test_get(self):
-        response = self.client.get(reverse('contest:assign-contestant'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_post(self):
-        test_data = {
+        self.form_data = {
             'first_name': 'test',
             'last_name': 'zxqcv',
             'gender': 'F',
@@ -431,21 +429,44 @@ class AddingContestatnsTest(TestCase):
             'school': 'Jakaś szkoła',
             'styles_distances': '1000m klasycznie',
         }
-        contestant = ContestantForm(data=test_data)
-        self.assertEqual(contestant.is_valid(), True)
-        form = contestant.save(commit=False)
-        form.moderator = self.user
-        form.save()
 
+    def test_get(self):
+        response = self.client.get(reverse('contest:contestant-add'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(isinstance(response.context['form'], ContestantForm))
+
+    def test_post_with_success(self):
         response = self.client.post(
-            reverse('contest:assign-contestant')
+            reverse('contest:contestant-add'), data=self.form_data
         )
+
         self.assertEqual(response.status_code, 200)
 
-        queryset = Contestant.objects.get(moderator=self.user)
-        self.assertEqual(queryset.first_name, 'test')
-        self.assertEqual(queryset.gender, 'F')
-        self.assertEqual(queryset.age, 12)
-        self.assertEqual(queryset.school, 'Jakaś szkoła')
-        self.assertEqual(queryset.styles_distances, '1000m klasycznie')
-        self.assertEqual(queryset.moderator, self.user)
+        contestant = Contestant.objects.get(moderator=self.user)
+        self.assertEqual(contestant.first_name, 'test')
+        self.assertEqual(contestant.gender, 'F')
+        self.assertEqual(contestant.age, 12)
+        self.assertEqual(contestant.school, 'Jakaś szkoła')
+        self.assertEqual(contestant.styles_distances, '1000m klasycznie')
+        self.assertEqual(contestant.moderator, self.user)
+
+    def test_post_with_validation_error(self):
+        self.form_data['gender'] = 'WRONG'
+        response = self.client.post(
+            reverse('contest:contestant-add'), data=self.form_data
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context['form'].is_valid())
+        self.assertEqual(
+            response.context['form'].errors,
+            {
+                'gender': [(
+                    'Wybierz poprawną wartość. WRONG nie jest jednym z '
+                    'dostępnych wyborów.'
+                )]
+            }
+        )
+        self.assertFalse(
+            Contestant.objects.filter(moderator=self.user).exists()
+        )
