@@ -44,7 +44,7 @@ class ContestantAddView(View):
             contestant.save()
 
             return render(
-                request, self.template_name,
+                request, 'contest/contestant_confirmation.html',
                 {'message': 'Dodano zawodnika.'}
             )
 
