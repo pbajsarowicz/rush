@@ -67,7 +67,7 @@ class ContestTestCase(TestCase):
     def test_contest_methods(self):
         self.assertEqual(
             self.contest.__unicode__(),
-            'Szkoła {}'.format(self.now)
+            'Szkoła {} {}'.format(str(self.now)[0:10], str(self.now)[11:19])
         )
 
 

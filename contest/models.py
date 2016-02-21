@@ -204,7 +204,9 @@ class Contest(models.Model):
     description = models.TextField(blank=True)
 
     def __unicode__(self):
-        return '{} {}'.format(self.place, self.date)
+        return '{} {} {}'.format(
+            self.place, str(self.date)[0:10], str(self.date)[11:19]
+        )
 
 
 class Contestant(models.Model):
