@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 
@@ -40,8 +40,13 @@ urlpatterns = [
         name='set-password'
     ),
     url(
-        r'^zawodnicy/dodaj$',
+        r'^zawodnicy/dodaj/(?P<id>[0-9]+)$',
         login_required(views.ContestantAddView.as_view()),
+        name='contestant-add'
+    ),
+    url(
+        r'^api/',
+        include('api.urls'),
         name='contestant-add'
     ),
 ]

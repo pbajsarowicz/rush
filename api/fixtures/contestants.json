@@ -1,0 +1,58 @@
+[
+    {
+        "model": "contest.contestant",
+        "pk": 1,
+        "fields": {
+            "first_name": "fhdfgb",
+            "last_name": "fgdfgdfg",
+            "gender": "M",
+            "age": 17,
+            "school": "dasdasasdasdasdasd  asas  as",
+            "styles_distances": "gfthbnrgt",
+            "moderator": 1,
+            "contest": 1
+        }
+  },
+  {
+      "model": "contest.contestant",
+      "pk": 2,
+      "fields": {
+          "first_name": "jhyuuuh",
+          "last_name": "hhhhh",
+          "gender": "F",
+          "age": 16,
+          "school": "dfhytkmuym",
+          "styles_distances": "xzcxcxz 123",
+          "moderator": 1,
+          "contest": 1
+      }
+  },
+  {
+      "model": "contest.contestant",
+      "pk": 3,
+      "fields": {
+          "first_name": "Jakub",
+          "last_name": "Maślanka",
+          "gender": "M",
+          "age": 18,
+          "school": "dasdasasdasdasdasd  asas  as",
+          "styles_distances": "gfthbnrgt",
+          "moderator": 1,
+          "contest": 1
+      }
+  },
+  {
+      "model": "contest.contestant",
+      "pk": 4,
+      "fields": {
+          "first_name": "jhyuuuh",
+          "last_name": "hhhhh",
+          "gender": "F",
+          "age": 14,
+          "school": "dasdasasdasdasdasd  asas  as",
+          "styles_distances": "xzcxcxz 123",
+          "moderator": 1,
+          "contest": 1
+      }
+  }
+]

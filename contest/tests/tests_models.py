@@ -2,8 +2,15 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
+from django.utils import timezone
 
-from contest.models import RushUser
+from contest.models import (
+    RushUser,
+    Organizer,
+    Contest,
+    Club,
+    Contestant,
+)
 
 
 class UserMethodTests(TestCase):
@@ -47,3 +54,49 @@ class UserMethodTests(TestCase):
         superuser_test = RushUser.objects.get(email='testsuper@cos.pl')
         self.assertTrue(superuser_test.is_active)
         self.assertTrue(superuser_test.is_admin)
+
+
+class ContestTestCase(TestCase):
+    def setUp(self):
+        self.now = timezone.now()
+        self.contest = Contest.objects.create(
+            organizer=Organizer(id=1), date=self.now, place='Szkoła',
+            for_who='11-16', deadline=self.now
+        )
+
+    def test_contest_methods(self):
+        self.assertEqual(
+            self.contest.__unicode__(),
+            'Szkoła {}'.format(self.now)
+        )
+
+
+class OrganizerTestCase(TestCase):
+    def setUp(self):
+        club = Club.objects.create(name='adam', code=12345)
+        self.organizer = Organizer.objects.create(
+            name='Adam', club=club
+        )
+
+    def test_organizer_methods(self):
+        self.assertEqual(self.organizer.__unicode__(), 'Adam')
+
+
+class ContestantTestCase(TestCase):
+    def setUp(self):
+        self.contestant = Contestant.objects.create(
+            moderator=RushUser(id=1), first_name='Adam', last_name='Kowalski',
+            gender='M', age=15, school='Szkoła', styles_distances='10m żabka',
+            contest=Contest(id=1)
+        )
+
+    def test_contestant_methods(self):
+        self.assertEqual(self.contestant.__unicode__(), 'Adam Kowalski')
+
+
+class ClubTestCase(TestCase):
+    def setUp(self):
+        self.club = Club.objects.create(name='Klub', code=15545)
+
+    def test_club_methods(self):
+        self.assertEqual(self.club.__unicode__(), 'Klub')

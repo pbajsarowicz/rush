@@ -26,7 +26,7 @@ class Club(models.Model):
     code = models.IntegerField('kod klubu', default=0)
 
     def __unicode__(self):
-        return str(self.code)
+        return str(self.name)
 
 
 class RushUser(AbstractBaseUser):
@@ -177,6 +177,36 @@ class RushUser(AbstractBaseUser):
         msg.send()
 
 
+class Organizer(models.Model):
+    """
+    Model for contest organizer.
+    """
+    name = models.CharField(max_length=255)
+    email = models.EmailField(blank=True)
+    website = models.URLField(blank=True)
+    phone_number = models.CharField(max_length=9, blank=True)
+    creation_date = models.DateTimeField(auto_now_add=True)
+    club = models.OneToOneField(Club)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Contest(models.Model):
+    """
+    Model for Contest.
+    """
+    organizer = models.ForeignKey(Organizer)
+    date = models.DateTimeField()
+    place = models.CharField(max_length=255)
+    for_who = models.CharField(max_length=255)
+    deadline = models.DateTimeField()
+    description = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return '{} {}'.format(self.place, self.date)
+
+
 class Contestant(models.Model):
     """
     Model for Rush Contestant.
@@ -189,6 +219,7 @@ class Contestant(models.Model):
     age = models.IntegerField('wiek')
     school = models.CharField('rodzaj szkoły', max_length=255)
     styles_distances = models.CharField('style i dystanse', max_length=255)
+    contest = models.ForeignKey(Contest)
 
     def __unicode__(self):
         return '{} {}'.format(self.first_name, self.last_name)

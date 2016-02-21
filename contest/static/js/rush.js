@@ -62,3 +62,38 @@ $(document).ready(function() {
     onClubCodeValidation();
     $('select').material_select();
 });
+
+/*
+ * Action after clicking 'szczegoly' on main page
+ */
+$(document).ready(function(){
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $('.modal-trigger').leanModal();
+});
+
+function getContestInfo(pk) {
+    $.ajax({
+        url: '/api/contests/' + pk + '/?format=json',
+        dataType: 'json',
+        success: function(json, x, y){
+            var organizer = json['organizer'];
+            var contact = '';
+            if( organizer['phone_number']){
+                contact += '<br> Telefon: ' + organizer['phone_number'];
+            }
+            if( organizer['email']){
+                contact += '<br> Email: ' + organizer['email'];
+            }
+            if( organizer['website']){
+                contact += '<br> Strona Internetowa: <a href="'+organizer['website']+'">' + organizer['website'] + '</a>'
+            }
+
+            var result = 'Data i godzina: ' + json['date'].substr(0, 10) + ' ' + json['date'].substr(11, 8) +
+            '<br> Miejsce: ' + json['place'] + '<br> Dla kogo: ' + json['for_who'] + '<br> Termin zgłaszania zawodników: ' +
+            json['deadline'].substr(0, 10) + ' ' + json['deadline'].substr(11, 8) + '<br> Organizator: ' +
+            organizer['name'] + contact + '<br> Opis: ' + json['description'];
+
+            document.getElementById('text'+pk).innerHTML = result
+        }
+    });
+}
