@@ -9,11 +9,23 @@
             <form class="col s6" action="?next={{next}}" role="form" method="post">
                 <div class="row center">
                     {% csrf_token %}
+                    {{ formset.management_form }}
                     {{ form.as_p }}
+                    <div id="form_set">
+                            {% for form in formset %}
+                                {{ form.as_p }}
+                            {% endfor %}
+                    </div>
                     <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Anuluj</a>
                     <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
+                    <button type="submit" value="Add More" id="add_more" class="pull-right btn btn-primary">Dodaj następnego</button>
+                    <div id="empty_form" style="display: none">                      
+                  </div>
                 </div>
             </form>
+             <div class='no_error'>
+                            {{ formset.empty_form.as_p }}
+                        </div>
         {% endif %}
     </div>
 </div>
