@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from urlparse import urljoin
+from datetime import datetime
 import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -12,6 +13,7 @@ from django.db import models
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils import timezone
 from unidecode import unidecode
 
 from contest.manager import RushUserManager
@@ -199,14 +201,30 @@ class Contest(models.Model):
     organizer = models.ForeignKey(Organizer)
     date = models.DateTimeField()
     place = models.CharField(max_length=255)
-    for_who = models.CharField(max_length=255)
+    age_min = models.SmallIntegerField()
+    age_max = models.SmallIntegerField()
     deadline = models.DateTimeField()
     description = models.TextField(blank=True)
 
     def __unicode__(self):
-        return '{} {} {}'.format(
-            self.place, str(self.date)[0:10], str(self.date)[11:19]
+        return '{} {}'.format(
+            self.place, datetime.strftime(self.date, '%d.%m.%Y %X')
         )
+
+    @property
+    def is_submitting_open(self):
+        """
+        Return whether a contestant can submit to contest or not.
+        """
+        return self.deadline > timezone.now()
+
+    @property
+    def is_future(self):
+        """
+        Return whether a contest is a future contest
+        or it has already taken place.
+        """
+        return self.date >= timezone.now()
 
 
 class Contestant(models.Model):

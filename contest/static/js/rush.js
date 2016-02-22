@@ -72,28 +72,31 @@ $(document).ready(function(){
 });
 
 function getContestInfo(pk) {
+    var organizer = '';
+    var contact = '';
+    var result = ''
     $.ajax({
-        url: '/api/contests/' + pk + '/?format=json',
+        url: '/api/v1/contests/' + pk + '/?format=json',
         dataType: 'json',
-        success: function(json, x, y){
-            var organizer = json['organizer'];
-            var contact = '';
-            if( organizer['phone_number']){
+        success: function(json){
+            organizer = json['organizer'];
+            if(organizer['phone_number']){
                 contact += '<br> Telefon: ' + organizer['phone_number'];
             }
-            if( organizer['email']){
+            if(organizer['email']){
                 contact += '<br> Email: ' + organizer['email'];
             }
-            if( organizer['website']){
-                contact += '<br> Strona Internetowa: <a href="'+organizer['website']+'">' + organizer['website'] + '</a>'
+            if(organizer['website']){
+                contact += '<br> Strona Internetowa: <a href="' + organizer['website'] + '">' +
+                organizer['website'] + '</a>';
             }
 
-            var result = 'Data i godzina: ' + json['date'].substr(0, 10) + ' ' + json['date'].substr(11, 8) +
-            '<br> Miejsce: ' + json['place'] + '<br> Dla kogo: ' + json['for_who'] + '<br> Termin zgłaszania zawodników: ' +
-            json['deadline'].substr(0, 10) + ' ' + json['deadline'].substr(11, 8) + '<br> Organizator: ' +
+            result = 'Data i godzina: ' + json['date'] + '<br> Miejsce: ' +
+            json['place'] + '<br> Dla kogo: ' + json['for_who'] +
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Organizator: ' +
             organizer['name'] + contact + '<br> Opis: ' + json['description'];
 
-            document.getElementById('text'+pk).innerHTML = result
+            document.getElementById('text' + pk).innerHTML = result;
         }
     });
 }

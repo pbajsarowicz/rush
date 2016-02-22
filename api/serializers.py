@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from rest_framework import serializers
 
+
 from contest.models import (
     Contest,
     Organizer,
@@ -30,12 +31,14 @@ class OrganizerSerializer(serializers.HyperlinkedModelSerializer):
 
 class ContestSerializer(serializers.HyperlinkedModelSerializer):
     organizer = OrganizerSerializer()
+    deadline = serializers.DateTimeField(format='%d.%m.%Y %X')
+    date = serializers.DateTimeField(format='%d.%m.%Y %X')
 
     class Meta:
         model = Contest
         fields = (
-            'pk', 'date', 'place', 'for_who', 'deadline', 'description',
-            'organizer'
+            'pk', 'date', 'place', 'age_min', 'age_max', 'deadline',
+            'description', 'organizer'
         )
 
 

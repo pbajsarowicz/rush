@@ -45,8 +45,8 @@ urlpatterns = [
         name='contestant-add'
     ),
     url(
-        r'^api/',
+        r'^api/v1/',
         include('api.urls'),
-        name='contestant-add'
+        name='contest-api'
     ),
 ]

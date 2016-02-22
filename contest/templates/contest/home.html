@@ -11,25 +11,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for obj in upcoming %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'contest:contestant-add' id=obj.pk %}" class="collection-item">{{ obj }}</a>
-                            </td>
-                            <td>
-                                <a class="waves-effect waves-light btn modal-trigger" href="#modal{{obj.pk}}" onclick="getContestInfo({{obj.pk}})">Szczegóły</a>
-                                <div id="modal{{obj.pk}}" class="modal">
-                                    <div class="modal-content">
-                                        <h4>Szczegóły konkursu</h4>
-                                        <p id="text{{obj.pk}}"></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <a href="" class=" modal-action modal-close waves-effect waves-green btn-flat">Zamknij</a>
-                                    </div>
+                {% for contest in upcoming %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'contest:contestant-add' id=contest.pk %}" class="collection-item">{{ contest }}</a>
+                        </td>
+                        <td>
+                            <a class="waves-effect waves-light btn modal-trigger" href="#modal{{contest.pk}}" onclick="getContestInfo({{contest.pk}})">Szczegóły</a>
+                            <div id="modal{{contest.pk}}" class="modal">
+                                <div class="modal-content">
+                                    <h4>Szczegóły konkursu</h4>
+                                    <p id="text{{contest.pk}}"></p>
                                 </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
+                                <div class="modal-footer">
+                                    <a href="" class=" modal-action modal-close waves-effect waves-green btn-flat">Zamknij</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
             <table class="striped">
@@ -39,25 +39,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for obj in completed %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'contest:contestant-add' id=obj.pk %}" class="collection-item">{{ obj }}</a>
-                            </td>
-                            <td>
-                                <a class="waves-effect waves-light btn modal-trigger" href="#modal{{obj.pk}}" onclick="getContestInfo({{obj.pk}})">Szczegóły</a>
-                                <div id="modal{{obj.pk}}" class="modal">
-                                    <div class="modal-content">
-                                        <h4>Szczegóły konkursu</h4>
-                                        <p id="text{{obj.pk}}"></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <a href="" class=" modal-action modal-close waves-effect waves-green btn-flat">Zamknij</a>
-                                    </div>
+                {% for contest in completed %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'contest:contestant-add' id=contest.pk %}" class="collection-item">{{ contest }}</a>
+                        </td>
+                        <td>
+                            <a class="waves-effect waves-light btn modal-trigger" href="#modal{{contest.pk}}" onclick="getContestInfo({{contest.pk}})">Szczegóły</a>
+                            <div id="modal{{contest.pk}}" class="modal">
+                                <div class="modal-content">
+                                    <h4>Szczegóły konkursu</h4>
+                                    <p id="text{{contest.pk}}"></p>
                                 </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
+                                <div class="modal-footer">
+                                    <a href="" class=" modal-action modal-close waves-effect waves-green btn-flat">Zamknij</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>

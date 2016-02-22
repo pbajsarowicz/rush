@@ -30,12 +30,12 @@ class HomeViewTests(TestCase):
     def setUp(self):
         self.contest = Contest.objects.create(
             organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', for_who='11-16', description='Opis',
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
             organizer=Organizer(id=2), date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', for_who='11-16', description='Opis',
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
         self.user = RushUser.objects.create_superuser(
@@ -311,17 +311,17 @@ class ContestantAddViewTestCase(TestCase):
         }
         self.contest = Contest.objects.create(
             organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', for_who='11-16', description='Opis',
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
             organizer=Organizer(id=2), date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', for_who='11-16', description='Opis',
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
         self.contest_deadline = Contest.objects.create(
             organizer=Organizer(id=3), date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', for_who='11-16', description='Opis',
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
 
@@ -377,6 +377,31 @@ class ContestantAddViewTestCase(TestCase):
         self.assertEqual(contestant.contest, self.contest)
 
     def test_post_with_validation_error(self):
+        response = self.client.post(
+            reverse('contest:contestant-add', kwargs={'id': 865}),
+            data=self.form_data
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            'Takie zawody nie istnieją.'
+        )
+
+        self.form_data['age'] = 99
+        response = self.client.post(
+            reverse('contest:contestant-add', kwargs={'id': 1}),
+            data=self.form_data
+        )
+        self.assertEqual(
+            response.context['form'].errors,
+            {
+                'age': [
+                    'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
+                ]
+            }
+        )
+
+        self.form_data['age'] = 15
         self.form_data['gender'] = 'WRONG'
         response = self.client.post(
             reverse('contest:contestant-add', kwargs={'id': 1}),
@@ -396,16 +421,4 @@ class ContestantAddViewTestCase(TestCase):
         )
         self.assertFalse(
             Contestant.objects.filter(moderator=self.user).exists()
-        )
-
-    def test_post_invalid_age_error(self):
-        self.form_data['age'] = 20
-        response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': 1}),
-            data=self.form_data
-        )
-
-        self.assertEqual(
-            response.context['message'],
-            'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
         )

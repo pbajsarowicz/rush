@@ -122,7 +122,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # http://www.django-rest-framework.org/
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'PAGE_SIZE': 10
 }
 

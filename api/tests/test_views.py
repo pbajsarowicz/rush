@@ -14,7 +14,7 @@ class ContestTestsAPI(APITestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.response = self.client.get('/api/contests/?format=json')
+        self.response = self.client.get('/api/v1/contests/?format=json')
 
     def test_getting_info(self):
         self.assertEqual(self.response.status_code, 200)
@@ -41,12 +41,12 @@ class ContestantTestsAPI(APITestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.response = self.client.get('/api/contestants/?format=json')
+        self.response = self.client.get('/api/v1/contestants/?format=json')
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get('/api/contestants/?format=json')
+        self.response_2 = self.client.get('/api/v1/contestants/?format=json')
 
     def test_getting_info(self):
         self.assertEqual(
@@ -61,12 +61,12 @@ class ClubTestsAPI(APITestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.response = self.client.get('/api/clubs/?format=json')
+        self.response = self.client.get('/api/v1/clubs/?format=json')
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get('/api/clubs/?format=json')
+        self.response_2 = self.client.get('/api/v1/clubs/?format=json')
 
     def test_getting_info(self):
         self.assertEqual(
@@ -81,12 +81,12 @@ class OrganizerTestsAPI(APITestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.response = self.client.get('/api/organizers/?format=json')
+        self.response = self.client.get('/api/v1/organizers/?format=json')
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get('/api/organizers/?format=json')
+        self.response_2 = self.client.get('/api/v1/organizers/?format=json')
 
     def test_getting_info(self):
         self.assertEqual(
@@ -101,12 +101,12 @@ class UserTestsAPI(APITestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.response = self.client.get('/api/users/?format=json')
+        self.response = self.client.get('/api/v1/users/?format=json')
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get('/api/users/?format=json')
+        self.response_2 = self.client.get('/api/v1/users/?format=json')
 
     def test_getting_info(self):
         self.assertEqual(

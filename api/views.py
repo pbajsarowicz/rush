@@ -33,7 +33,7 @@ class OrganizerViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allow to view Organizers.
     """
-    queryset = Organizer.objects.all().order_by('id')
+    queryset = Organizer.objects.all()
     serializer_class = OrganizerSerializer
 
 
@@ -41,7 +41,7 @@ class ClubViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allow to view Clubs.
     """
-    queryset = Club.objects.all().order_by('id')
+    queryset = Club.objects.all()
     serializer_class = ClubSerializer
 
 

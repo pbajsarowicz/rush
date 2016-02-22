@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from datetime import datetime
 
 from django.test import TestCase
 from django.utils import timezone
@@ -61,13 +62,13 @@ class ContestTestCase(TestCase):
         self.now = timezone.now()
         self.contest = Contest.objects.create(
             organizer=Organizer(id=1), date=self.now, place='Szkoła',
-            for_who='11-16', deadline=self.now
+            age_min=11, age_max=16, deadline=self.now
         )
 
     def test_contest_methods(self):
         self.assertEqual(
             self.contest.__unicode__(),
-            'Szkoła {} {}'.format(str(self.now)[0:10], str(self.now)[11:19])
+            'Szkoła {}'.format(datetime.strftime(self.now, '%d.%m.%Y %X'))
         )
 
 
