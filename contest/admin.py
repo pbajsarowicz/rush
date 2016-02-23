@@ -6,6 +6,9 @@ from django.contrib import admin
 from contest.models import (
     Contestant,
     RushUser,
+    Organizer,
+    Contest,
+    Club,
 )
 
 
@@ -45,3 +48,6 @@ class RushUserAdmin(admin.ModelAdmin):
 
 admin.site.register(RushUser, RushUserAdmin)
 admin.site.register(Contestant)
+admin.site.register(Organizer)
+admin.site.register(Contest)
+admin.site.register(Club)

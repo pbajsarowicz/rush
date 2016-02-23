@@ -4,15 +4,62 @@
 {% block container %}
     <div class="container">
         <div class="section">
-            <ul class="collection with-header">
-                <li class="collection-header"><h4>Nadchodzące</h4></li>
-                <li class="collection-item">
-                    <a href="{% url 'contest:contestant-add' %}" class="collection-item">Jakieś tam zawody o puchar kogoś tam w mieście jakimś tam na basenie imienia czyjegoś tam.</a>
-                </li>
-            </ul>
-            <ul class="collection with-header">
-                <li class="collection-header"><h4>Zakończone</h4></li>
-            </ul>
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <h4 class="center-align">Nadchodzące</h4>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for contest in upcoming %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'contest:contestant-add' id=contest.pk %}" class="collection-item">{{ contest }}</a>
+                        </td>
+                        <td>
+                            <a class="waves-effect waves-light btn modal-trigger" href="#modal{{contest.pk}}" onclick="getContestInfo({{contest.pk}})">Szczegóły</a>
+                            <div id="modal{{contest.pk}}" class="modal">
+                                <div class="modal-content">
+                                    <h4>Szczegóły konkursu</h4>
+                                    <p id="text{{contest.pk}}"></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="" class=" modal-action modal-close waves-effect waves-green btn-flat">Zamknij</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <h4 class="center-align">Zakończone</h4>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for contest in completed %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'contest:contestant-add' id=contest.pk %}" class="collection-item">{{ contest }}</a>
+                        </td>
+                        <td>
+                            <a class="waves-effect waves-light btn modal-trigger" href="#modal{{contest.pk}}" onclick="getContestInfo({{contest.pk}})">Szczegóły</a>
+                            <div id="modal{{contest.pk}}" class="modal">
+                                <div class="modal-content">
+                                    <h4>Szczegóły konkursu</h4>
+                                    <p id="text{{contest.pk}}"></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="" class=" modal-action modal-close waves-effect waves-green btn-flat">Zamknij</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
         <div class="section">
             <div class="row">
