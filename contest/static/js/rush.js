@@ -91,8 +91,8 @@ function getContestInfo(pk) {
                 organizer['website'] + '</a>';
             }
 
-            result = 'Data i godzina: ' + json['date'] + '<br> Miejsce: ' +
-            json['place'] + '<br> Dla kogo: ' + json['for_who'] +
+            result = 'Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
+            '<br> Dla kogo: od ' + json['age_min'] + ' do ' + json['age_max'] + ' lat' +
             '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Organizator: ' +
             organizer['name'] + contact + '<br> Opis: ' + json['description'];
 

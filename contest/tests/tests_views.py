@@ -117,10 +117,11 @@ class PasswordSettingTests(TestCase):
         self.user_1.set_password('password123')
         self.user_1.save()
 
-        self.user_2 = RushUser(
+        self.user_2 = RushUser.objects.create(
             email='kkk@kkk.pl', first_name='Ewa', last_name='Olczak',
-            is_active=True, username='username_taken'
+            username='username_taken'
         )
+        self.user_2.is_active = True
         self.user_2.set_password('Password_already_set')
         self.user_2.save()
         self.user1_uid = urlsafe_base64_encode(force_bytes(self.user_1.pk))
@@ -156,6 +157,17 @@ class PasswordSettingTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(SetPasswordView._get_user('00'))
+
+        self.client.login(
+            username='username_taken', password='Password_already_set'
+        )
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': self.user1_uid, 'token': self.user1_token}
+            )
+        )
+        self.assertFalse(isinstance(response.context['user'], RushUser))
 
     def test_setting_password(self):
         form_data = {

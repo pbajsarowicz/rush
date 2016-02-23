@@ -109,7 +109,7 @@ class ContestantForm(forms.ModelForm):
     Form for contestant creation.
     """
     def __init__(self, *args, **kwargs):
-        self.contest = kwargs.pop('id')
+        self.contest = kwargs.pop('contest_id')
         super(ContestantForm, self).__init__(*args, **kwargs)
 
     def clean_age(self):

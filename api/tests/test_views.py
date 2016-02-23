@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import (
+    APITestCase,
+    APIClient,
+)
 
 from contest.models import RushUser
 
@@ -31,6 +34,8 @@ class ContestTestsAPI(APITestCase):
             self.response.data['results'][0]['organizer']['website'],
             'http://www.google.pl'
         )
+        self.assertEqual(self.response.data['results'][0]['age_min'], 10)
+        self.assertEqual(self.response.data['results'][0]['age_max'], 20)
 
 
 class ContestantTestsAPI(APITestCase):

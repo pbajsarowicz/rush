@@ -48,7 +48,7 @@ class ContestantAddView(View):
         """
         Return adding a contestant form on site.
         """
-        form = self.form_class(id=id)
+        form = self.form_class(contest_id=id)
         try:
             contest = Contest.objects.get(pk=id)
         except Contest.DoesNotExist:
@@ -70,14 +70,12 @@ class ContestantAddView(View):
         """
         Create a contestant.
         """
-        form = self.form_class(request.POST, id=id)
+        form = self.form_class(request.POST, contest_id=id)
         try:
             contest = Contest.objects.get(pk=id)
         except Contest.DoesNotExist:
             return render(
-                request,
-                self.template_name,
-                {'message': self._get_message()}
+                request, self.template_name, {'message': self._get_message()}
             )
         if form.is_valid():
             contestant = form.save(commit=False)
