@@ -72,3 +72,40 @@ $('#add_more').click(function() {
     $('#formset').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 });
+/*
+ * Action after clicking 'szczegoly' on main page
+ */
+$(document).ready(function(){
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $('.modal-trigger').leanModal();
+});
+
+function getContestInfo(pk) {
+    var organizer = '';
+    var contact = '';
+    var result = ''
+    $.ajax({
+        url: '/api/v1/contests/' + pk + '/?format=json',
+        dataType: 'json',
+        success: function(json){
+            organizer = json['organizer'];
+            if(organizer['phone_number']){
+                contact += '<br> Telefon: ' + organizer['phone_number'];
+            }
+            if(organizer['email']){
+                contact += '<br> Email: ' + organizer['email'];
+            }
+            if(organizer['website']){
+                contact += '<br> Strona Internetowa: <a href="' + organizer['website'] + '">' +
+                organizer['website'] + '</a>';
+            }
+
+            result = 'Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
+            '<br> Dla kogo: od ' + json['age_min'] + ' do ' + json['age_max'] + ' lat' +
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Organizator: ' +
+            organizer['name'] + contact + '<br> Opis: ' + json['description'];
+
+            document.getElementById('text' + pk).innerHTML = result;
+        }
+    });
+}

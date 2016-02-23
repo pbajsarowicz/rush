@@ -14,6 +14,7 @@ from contest.models import (
     Contestant,
     Club,
     RushUser,
+    Contest,
 )
 
 
@@ -108,6 +109,20 @@ class ContestantForm(forms.ModelForm):
     """
     Form for contestant creation.
     """
+    def __init__(self, *args, **kwargs):
+        self.contest = kwargs.pop('contest_id')
+        super(ContestantForm, self).__init__(*args, **kwargs)
+
+    def clean_age(self):
+        age = self.cleaned_data.get('age')
+        contest = Contest.objects.get(pk=self.contest)
+        if contest.age_min <= age <= contest.age_max:
+            return age
+        raise forms.ValidationError(
+            'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
+        )
+
+
     class Meta:
         model = Contestant
         fields = (

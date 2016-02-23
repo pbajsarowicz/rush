@@ -1,0 +1,27 @@
+[
+  {
+      "model": "contest.organizer",
+      "pk": 1,
+      "fields": {
+          "name": "Adam Juszczyk",
+          "email": "test@test.pl",
+          "website": "http://www.google.pl",
+          "phone_number": "123456789",
+          "creation_date": "2016-02-20T13:03:10.642608Z",
+          "club": 1
+      }
+  },
+  {
+
+      "model": "contest.organizer",
+      "pk": 2,
+      "fields": {
+          "name": "Ewa Kowalska",
+          "email": "tes11t@tes11t.pl",
+          "website": "http://www.wp.pl",
+          "phone_number": "698745236",
+          "creation_date": "2016-02-20T13:03:10.642608Z",
+          "club": 2
+      }
+  }
+]

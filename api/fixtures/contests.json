@@ -1,0 +1,41 @@
+[
+  {
+      "model": "contest.contest",
+      "pk": 3,
+      "fields": {
+          "date": "2016-02-03T11:00:00Z",
+          "place": "Basen Wodnik we Wrocławiu",
+          "age_min": 10,
+          "age_max": 20,
+          "deadline": "2016-03-10T05:00:00Z",
+          "description": "Lorem ipsum dolor sit amet.",
+          "organizer": 1
+      }
+  },
+  {
+      "model": "contest.contest",
+      "pk": 2,
+      "fields": {
+          "date": "2016-02-28T17:00:00Z",
+          "place": "Basen Wodnik w Poznaniu",
+          "age_min": 10,
+          "age_max": 20,
+          "deadline": "2016-02-25T11:00:00Z",
+          "description": "Lorem ipsum dolor sit amet.",
+          "organizer": 1
+      }
+  },
+  {
+      "model": "contest.contest",
+      "pk": 1,
+      "fields": {
+          "date": "2016-03-17T13:09:11Z",
+          "place": "Basen Wodnik w Pile",
+          "age_min": 10,
+          "age_max": 20,
+          "deadline": "2016-03-10T22:59:59Z",
+          "description": "Zapraszamy!",
+          "organizer": 1
+      }
+  }
+]
