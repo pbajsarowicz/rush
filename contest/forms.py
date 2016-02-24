@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import uuid
 
 from django import forms
 from django.contrib.auth.forms import (
@@ -36,6 +37,7 @@ class RegistrationForm(forms.ModelForm):
         Handles assigning club to a user.
         """
         user = super(RegistrationForm, self).save(commit=False)
+        user.username = uuid.uuid4()
         club_code = self.cleaned_data['club_code']
 
         if club_code:

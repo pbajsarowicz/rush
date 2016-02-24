@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 from urlparse import urljoin
 from datetime import datetime
-import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import make_password
@@ -17,7 +16,6 @@ from django.utils import timezone
 from unidecode import unidecode
 
 from contest.manager import RushUserManager
-from contest.utils import is_uuid4
 
 
 class Club(models.Model):
@@ -109,30 +107,6 @@ class RushUser(AbstractBaseUser):
         return unidecode(
             '{}{}'.format(self.first_name[0], self.last_name)
         ).lower()
-
-    def _initialize_username(self):
-        """
-        Initialize username:
-        * with the value given by hand (shell),
-        * with the uuid4 value, when somebody asks for an account,
-        * with the value consistent with pattern `first letter
-          of firstname + lastname` when an admin accepts an account.
-        """
-        if self.is_active:
-            self.username = (
-                self.username if self.username and not is_uuid4(self.username)
-                else self._get_username()
-            )
-        else:
-            self.username = self.username if self.username else uuid.uuid4()
-
-    def save(self, *args, **kwargs):
-        """
-        Provide extra RushUser's logic
-        """
-        self._initialize_username()
-
-        return super(RushUser, self).save(*args, **kwargs)
 
     def activate(self):
         """
