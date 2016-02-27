@@ -314,13 +314,25 @@ class ContestantAddViewTestCase(TestCase):
         self.client.login(username='test_test', password='P@ssw0rd')
 
         self.form_data = {
-            'first_name': 'test',
-            'last_name': 'zxqcv',
-            'gender': 'F',
-            'age': 12,
-            'school': 'Jakaś szkoła',
-            'styles_distances': '1000m klasycznie',
+            'csrfmiddlewaretoken': 'A33GMETyB7NE1CknWDg2jVuS1Jsm5A9y',
+            'form-0-age': '11',
+            'form-0-first_name': 'Jan',
+            'form-0-gender': 'M',
+            'form-0-last_name': 'Kowalski',
+            'form-0-school': 'Test',
+            'form-0-styles_distances': '1000m',
+            'form-1-age': '16',
+            'form-1-first_name': 'Anna',
+            'form-1-gender': 'F',
+            'form-1-last_name': 'Nowak',
+            'form-1-school': 'Test',
+            'form-1-styles_distances': '500m',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+            'form-MIN_NUM_FORMS': '0',
+            'form-TOTAL_FORMS': '2'
         }
+
         self.contest = Contest.objects.create(
             organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
             place='Szkoła', age_min=11, age_max=16, description='Opis',
@@ -342,7 +354,9 @@ class ContestantAddViewTestCase(TestCase):
             reverse('contest:contestant-add', kwargs={'id': 1}),
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(isinstance(response.context['form'], ContestantForm))
+        self.assertIsInstance(
+            response.context['formset'].forms[0], ContestantForm
+        )
 
         response = self.client.get(
             reverse('contest:contestant-add', kwargs={'id': 865}),
@@ -378,15 +392,12 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        contestants = Contestant.objects.filter(moderator=self.user)
 
-        contestant = Contestant.objects.get(moderator=self.user)
-        self.assertEqual(contestant.first_name, 'test')
-        self.assertEqual(contestant.gender, 'F')
-        self.assertEqual(contestant.age, 12)
-        self.assertEqual(contestant.school, 'Jakaś szkoła')
-        self.assertEqual(contestant.styles_distances, '1000m klasycznie')
-        self.assertEqual(contestant.moderator, self.user)
-        self.assertEqual(contestant.contest, self.contest)
+        self.assertEquals(len(contestants), 2)
+
+        self.assertEqual(contestants[0].first_name, 'Jan')
+        self.assertEqual(contestants[1].first_name, 'Anna')
 
     def test_post_with_validation_error(self):
         response = self.client.post(
@@ -399,37 +410,36 @@ class ContestantAddViewTestCase(TestCase):
             'Takie zawody nie istnieją.'
         )
 
-        self.form_data['age'] = 99
+        self.form_data['form-0-age'] = 99
         response = self.client.post(
             reverse('contest:contestant-add', kwargs={'id': 1}),
             data=self.form_data
-        )
-        self.assertEqual(
-            response.context['form'].errors,
-            {
-                'age': [
-                    'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
-                ]
-            }
         )
 
-        self.form_data['age'] = 15
-        self.form_data['gender'] = 'WRONG'
+        expected_error = {
+            'age': ['Zawodnik nie mieści się w wymaganym przedziale wiekowym.']
+        }
+        self.assertEqual(
+            response.context['formset'].errors, [expected_error, {}]
+        )
+
+        self.form_data['form-0-age'] = 15
+        self.form_data['form-0-gender'] = 'WRONG'
         response = self.client.post(
             reverse('contest:contestant-add', kwargs={'id': 1}),
             data=self.form_data
         )
+        expected_error = {
+            'gender': [(
+                'Wybierz poprawną wartość. WRONG nie jest jednym z '
+                'dostępnych wyborów.'
+            )]
+        }
 
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.context['form'].is_valid())
+        self.assertFalse(response.context['formset'].is_valid())
         self.assertEqual(
-            response.context['form'].errors,
-            {
-                'gender': [(
-                    'Wybierz poprawną wartość. WRONG nie jest jednym z '
-                    'dostępnych wyborów.'
-                )]
-            }
+            response.context['formset'].errors, [expected_error, {}]
         )
         self.assertFalse(
             Contestant.objects.filter(moderator=self.user).exists()

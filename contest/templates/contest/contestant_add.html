@@ -1,21 +1,32 @@
 {% extends "contest/base.html" %}
 
 {% block container %}
-<div class="container">
-    <div class="center">
-    {% if message %}
-        <p class="red-text text-darken-2">{{ message }}</p>
-    {% else %}
-        <p class="blue-text text-darken-2">Konkurs: {{ name }}</p>
-        <form class="col s6" action="?next={{next}}" role="form" method="post">
-            <div class="row center">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Anuluj</a>
-                <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
-            </div>
-        </form>
-    {% endif %}
+    <div class="container">
+        <div class="center">
+            {% if message %}
+                {{ message }}
+            {% else %}
+                <p class="blue-text text-darken-2">Konkurs: {{ name }}</p>
+                <form class="col s6" action="?next={{next}}" role="form" method="post">
+                    <div id="formset" class="row center">
+                        {% csrf_token %}
+                        {{ formset.management_form }}
+                        {% for form in formset %}
+                            <div id="id_{{ form.prefix}}">
+                                {{ form.as_p }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Anuluj</a>
+                    <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
+                    <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
+                </form>
+            {% endif %}
+        </div>
     </div>
-</div>
+    <div id="empty_form" style="display:none">
+        <div id="id_{{ formset.empty_form.prefix}}">
+            {{ formset.empty_form.as_p }}
+        </div>
+    </div>
 {% endblock container %}
