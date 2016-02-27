@@ -62,8 +62,6 @@ class AdminMethodTests(TestCase):
         self.assertIn(reset_url, mail.outbox[0].body)
 
         self.assertTrue(self.user_1.is_active and self.user_2.is_active)
-        self.assertEqual(self.user_1.username, 'lslazak')
-        self.assertEqual(self.user_2.username, 'aslowacki')
 
     def test_deleting_user(self):
         queryset = RushUser.objects.filter(email='ccc@ccc.pl')
