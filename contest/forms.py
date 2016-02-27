@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.forms import formset_factory
 from django.contrib.auth.forms import (
     AuthenticationForm,
     SetPasswordForm,
@@ -121,7 +120,6 @@ class ContestantForm(forms.ModelForm):
         raise forms.ValidationError(
             'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
         )
-
 
     class Meta:
         model = Contestant

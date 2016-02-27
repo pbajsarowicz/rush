@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.forms import formset_factory
 from django.shortcuts import render
 from django.utils import timezone
+from django.utils.functional import curry
 from django.views.generic import (
     TemplateView,
     View,
@@ -31,7 +32,6 @@ class ContestantAddView(View):
     """
     View for contestant assigning.
     """
-    formset_class = formset_factory(ContestantForm)
     template_name = 'contest/contestant_add.html'
 
     @staticmethod
@@ -45,13 +45,23 @@ class ContestantAddView(View):
             return 'Czas na dodawanie zawodników już minął.'
         return 'Zawody się już skończyły.'
 
+    @staticmethod
+    def get_formset(contest_id, data=None):
+        """
+        Returns formset of `ContestantForm` forms.
+        """
+        formset_class = formset_factory(ContestantForm, extra=1)
+        formset_class.form = staticmethod(
+            curry(ContestantForm, contest_id=contest_id)
+        )
+        return formset_class(data) if data else formset_class()
+
     def get(self, request, id, *args, **kwargs):
         """
         Return adding a contestant form on site.
         """
-        formset = self.formset_class()
-        return render(request, self.template_name, {'formset': formset})
-        form = self.form_class(contest_id=id)
+        formset = self.get_formset(id)
+
         try:
             contest = Contest.objects.get(pk=id)
         except Contest.DoesNotExist:
@@ -66,35 +76,31 @@ class ContestantAddView(View):
                 {'message': self._get_message(contest)}
             )
         return render(
-            request, self.template_name, {'form': form, 'name': contest}
+            request, self.template_name, {'formset': formset, 'name': contest}
         )
 
     def post(self, request, id, *args, **kwargs):
         """
         Create a contestant.
         """
-        formset = self.formset_class(request.POST)
+        formset = self.get_formset(id, request.POST)
 
-        if formset.is_valid():
-            for form in formset:
-                contestant = form.save(commit=False)
-                contestant.moderator = request.user
-                contestant.save()
-
-        form = self.form_class(request.POST, contest_id=id)
         try:
             contest = Contest.objects.get(pk=id)
         except Contest.DoesNotExist:
             return render(
                 request, self.template_name, {'message': self._get_message()}
             )
-        if form.is_valid():
-            contestant = form.save(commit=False)
-            contestant.moderator = request.user
-            contestant.contest = contest
-            contestant.save()
+
+        if formset.is_valid():
+            for form in formset:
+                contestant = form.save(commit=False)
+                contestant.moderator = request.user
+                contestant.contest = contest
+                contestant.save()
+
             return render(
                 request, self.template_name, {'message': 'Dodano zawodników.'}
             )
+
         return render(request, self.template_name, {'formset': formset})
-        return render(request, self.template_name, {'form': form})

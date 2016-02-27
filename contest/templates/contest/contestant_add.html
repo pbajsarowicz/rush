@@ -6,6 +6,7 @@
             {% if message %}
                 {{ message }}
             {% else %}
+                <p class="blue-text text-darken-2">Konkurs: {{ name }}</p>
                 <form class="col s6" action="?next={{next}}" role="form" method="post">
                     <div id="formset" class="row center">
                         {% csrf_token %}
@@ -18,10 +19,8 @@
                     </div>
                     <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Anuluj</a>
                     <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
-                    <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Dodaj następnego</button>
+                    <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
                 </form>
-                 <div class='no_error'>
-                </div>
             {% endif %}
         </div>
     </div>
@@ -29,20 +28,5 @@
         <div id="id_{{ formset.empty_form.prefix}}">
             {{ formset.empty_form.as_p }}
         </div>
-<div class="container">
-    <div class="center">
-    {% if message %}
-        <p class="red-text text-darken-2">{{ message }}</p>
-    {% else %}
-        <p class="blue-text text-darken-2">Konkurs: {{ name }}</p>
-        <form class="col s6" action="?next={{next}}" role="form" method="post">
-            <div class="row center">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Anuluj</a>
-                <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
-            </div>
-        </form>
-    {% endif %}
     </div>
 {% endblock container %}

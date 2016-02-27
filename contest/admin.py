@@ -46,8 +46,17 @@ class RushUserAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
 
 
+class ContestantInline(admin.StackedInline):
+    model = Contestant
+    extra = 0
+
+
+class ContestAdmin(admin.ModelAdmin):
+    inlines = [ContestantInline]
+
+
 admin.site.register(RushUser, RushUserAdmin)
 admin.site.register(Contestant)
 admin.site.register(Organizer)
-admin.site.register(Contest)
+admin.site.register(Contest, ContestAdmin)
 admin.site.register(Club)
