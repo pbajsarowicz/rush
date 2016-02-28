@@ -56,21 +56,22 @@ function hideClubCode() {
     }
 
 /*
- * Action on document ready.
+ * Generates formset. Moreover, handles MaterializeCSS selects.
  */
-$(document).ready(function() {
-    onClubCodeValidation();
+$('#add_more').click(function() {
+    $('select').material_select('destroy');
+
+    var form_idx = $('#id_form-TOTAL_FORMS').val();
+    $('#id_form-' + (parseInt(form_idx) - 1)).hide();
+    $('#formset').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+
     $('select').material_select();
 });
 
 /*
- * Action after clicking 'szczegoly' on main page
+ * Populates modal with contest info.
  */
-$(document).ready(function(){
-    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-    $('.modal-trigger').leanModal();
-});
-
 function getContestInfo(pk) {
     var organizer = '';
     var contact = '';
@@ -100,3 +101,12 @@ function getContestInfo(pk) {
         }
     });
 }
+
+/*
+ * Action on document ready.
+ */
+$(document).ready(function() {
+    onClubCodeValidation();
+    $('select').material_select();
+    $('.modal-trigger').leanModal();
+});

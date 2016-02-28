@@ -48,7 +48,7 @@ class ToJSONTestCase(TestCase):
                 'last_name': 'Anonymous',
                 'organization_address': '',
                 'organization_name': '',
-                'username': 'tanonymous',
+                'username': '',
                 'club': None
             }
         )
