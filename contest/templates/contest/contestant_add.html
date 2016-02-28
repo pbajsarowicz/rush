@@ -17,7 +17,16 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Anuluj</a>
+                    <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Anuluj</a>
+                    <div id="modal1" class="modal">
+                        <div class="modal-content">
+                            <h4>Na pewno chcesz powrócić do głównego ekranu? Wszystkie dane wprowadzone przed chwilą zostaną utracone.</h4>
+                        </div>
+                        <div class="modal-footer">
+                            <a class=" modal-action modal-close waves-effect waves-green btn-flat">Nie</a>
+                            <a href="{% url 'contest:home' %}" class=" modal-action modal-close waves-effect waves-green btn-flat">Tak</a>
+                        </div>
+                    </div>
                     <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
                     <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
                 </form>
