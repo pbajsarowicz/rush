@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import uuid
 
 from django import forms
 from django.contrib.auth.forms import (
@@ -13,6 +14,7 @@ from contest.models import (
     Contestant,
     Club,
     RushUser,
+    Contest,
 )
 
 
@@ -35,6 +37,7 @@ class RegistrationForm(forms.ModelForm):
         Handles assigning club to a user.
         """
         user = super(RegistrationForm, self).save(commit=False)
+        user.username = uuid.uuid4()
         club_code = self.cleaned_data['club_code']
 
         if club_code:
@@ -107,6 +110,18 @@ class ContestantForm(forms.ModelForm):
     """
     Form for contestant creation.
     """
+    def __init__(self, *args, **kwargs):
+        self.contest = kwargs.pop('contest_id')
+        super(ContestantForm, self).__init__(*args, **kwargs)
+
+    def clean_age(self):
+        age = self.cleaned_data.get('age')
+        contest = Contest.objects.get(pk=self.contest)
+        if contest.age_min <= age <= contest.age_max:
+            return age
+        raise forms.ValidationError(
+            'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
+        )
 
     class Meta:
         model = Contestant

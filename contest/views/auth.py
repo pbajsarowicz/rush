@@ -2,7 +2,10 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.contrib.auth import login
+from django.contrib.auth import (
+    login,
+    logout,
+)
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
@@ -99,6 +102,8 @@ class SetPasswordView(View):
         """
         Return clear form for setting password.
         """
+        if request.user.is_authenticated():
+            logout(request)
         user = self._get_user(uidb64)
 
         if user and default_token_generator.check_token(user, token):

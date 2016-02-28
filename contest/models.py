@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from urlparse import urljoin
-import uuid
+from datetime import datetime
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import make_password
@@ -12,10 +12,10 @@ from django.db import models
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils import timezone
 from unidecode import unidecode
 
 from contest.manager import RushUserManager
-from contest.utils import is_uuid4
 
 
 class Club(models.Model):
@@ -26,7 +26,7 @@ class Club(models.Model):
     code = models.IntegerField('kod klubu', default=0)
 
     def __unicode__(self):
-        return str(self.code)
+        return str(self.name)
 
 
 class RushUser(AbstractBaseUser):
@@ -108,30 +108,6 @@ class RushUser(AbstractBaseUser):
             '{}{}'.format(self.first_name[0], self.last_name)
         ).lower()
 
-    def _initialize_username(self):
-        """
-        Initialize username:
-        * with the value given by hand (shell),
-        * with the uuid4 value, when somebody asks for an account,
-        * with the value consistent with pattern `first letter
-          of firstname + lastname` when an admin accepts an account.
-        """
-        if self.is_active:
-            self.username = (
-                self.username if self.username and not is_uuid4(self.username)
-                else self._get_username()
-            )
-        else:
-            self.username = self.username if self.username else uuid.uuid4()
-
-    def save(self, *args, **kwargs):
-        """
-        Provide extra RushUser's logic
-        """
-        self._initialize_username()
-
-        return super(RushUser, self).save(*args, **kwargs)
-
     def activate(self):
         """
         Activates a user and sets a password.
@@ -177,6 +153,54 @@ class RushUser(AbstractBaseUser):
         msg.send()
 
 
+class Organizer(models.Model):
+    """
+    Model for contest organizer.
+    """
+    name = models.CharField(max_length=255)
+    email = models.EmailField(blank=True)
+    website = models.URLField(blank=True)
+    phone_number = models.CharField(max_length=9, blank=True)
+    creation_date = models.DateTimeField(auto_now_add=True)
+    club = models.OneToOneField(Club)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Contest(models.Model):
+    """
+    Model for Contest.
+    """
+    organizer = models.ForeignKey(Organizer)
+    date = models.DateTimeField()
+    place = models.CharField(max_length=255)
+    age_min = models.SmallIntegerField()
+    age_max = models.SmallIntegerField()
+    deadline = models.DateTimeField()
+    description = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return '{} {}'.format(
+            self.place, datetime.strftime(self.date, '%d.%m.%Y %X')
+        )
+
+    @property
+    def is_submitting_open(self):
+        """
+        Return whether a contestant can submit to contest or not.
+        """
+        return self.deadline > timezone.now()
+
+    @property
+    def is_future(self):
+        """
+        Return whether a contest is a future contest
+        or it has already taken place.
+        """
+        return self.date >= timezone.now()
+
+
 class Contestant(models.Model):
     """
     Model for Rush Contestant.
@@ -189,6 +213,7 @@ class Contestant(models.Model):
     age = models.IntegerField('wiek')
     school = models.CharField('rodzaj szkoły', max_length=255)
     styles_distances = models.CharField('style i dystanse', max_length=255)
+    contest = models.ForeignKey(Contest)
 
     def __unicode__(self):
         return '{} {}'.format(self.first_name, self.last_name)

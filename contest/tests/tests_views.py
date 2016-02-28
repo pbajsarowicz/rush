@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.utils.timezone import make_aware
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
@@ -18,104 +20,36 @@ from contest.forms import (
 from contest.models import (
     Contestant,
     RushUser,
+    Contest,
+    Organizer,
 )
 from contest.views import SetPasswordView
 
 
-class UserMethodTests(TestCase):
+class HomeViewTests(TestCase):
     def setUp(self):
-        self.user = RushUser.objects.create_user(
-            email='xyz@xyz.pl', first_name='Name', last_name='Last Name',
-            organization_name='School', organization_address='Address',
-            password='Password', username='username'
+        self.contest = Contest.objects.create(
+            organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2048, 11, 20))
         )
-        RushUser.objects.create_user(
-            email='test@xyz.pl', first_name='Name',
-            last_name='Last Name', organization_name='Org',
-            organization_address='Address'
+        self.contest_done = Contest.objects.create(
+            organizer=Organizer(id=2), date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2008, 11, 20))
         )
-        RushUser.objects.create_superuser(
-            email='testsuper@cos.pl', username='test',
-            password='P@ssw0rd'
+        self.user = RushUser.objects.create_superuser(
+            email='xyz@xyz.pl', username='login', password='Password'
         )
-        self.user.is_active = True
-        self.user.set_password('Password')
-        self.user.save()
+        self.client.login(username='login', password='Password')
+        self.response = self.client.get(reverse('contest:home'))
 
-    def test_user(self):
-        """
-        Checking status and informations for user.
-        """
-        user_test = RushUser.objects.get(email='test@xyz.pl')
-        self.assertEqual(user_test.get_full_name(), 'Name Last Name')
-        self.assertEqual(user_test.get_short_name(), 'Last Name')
-        self.assertTrue(user_test.has_perm(None))
-        self.assertTrue(user_test.has_module_perms(None))
-        self.assertFalse(user_test.is_staff())
-        self.assertEqual(user_test.__unicode__(), 'test@xyz.pl')
-        user_test.discard()
-        self.assertFalse(RushUser.objects.filter(email='test@xyz.pl').exists())
-        self.assertEqual(user_test.email, 'test@xyz.pl')
-        self.assertEqual(user_test.first_name, 'Name')
-        self.assertEqual(user_test.last_name, 'Last Name')
-        self.assertEqual(user_test.organization_name, 'Org')
-        self.assertEqual(user_test.organization_address, 'Address')
-        self.assertFalse(user_test.is_active)
-        self.assertFalse(user_test.is_admin)
-
-    def test_superuser(self):
-        """
-        Checking status and informations for super user.
-        """
-        superuser_test = RushUser.objects.get(email='testsuper@cos.pl')
-        self.assertTrue(superuser_test.is_active)
-        self.assertTrue(superuser_test.is_admin)
-
-    def test_authenticate(self):
-        """
-        Checking if authenticate() returns good values depending
-        on input. In this case: correct data, incorrect, empty.
-        """
-        self.user.is_active = True
-        self.user.set_password('Password')
-        self.user.save()
-
-        self.assertEqual(
-            authenticate(username='username', password='Password'),
-            self.user
+    def test_context(self):
+        self.assertEqual(len(self.response.context['completed']), 1)
+        self.assertEqual(len(self.response.context['upcoming']), 1)
+        self.assertTrue(
+            isinstance(self.response.context['completed'][0], Contest)
         )
-        self.assertIsNone(
-            authenticate(username='username', password='random_pass')
-        )
-        self.assertIsNone(
-            authenticate(username='example@example.pl', password='qwerty')
-        )
-        self.assertIsNone(authenticate(username='', password=''))
-
-    def test_login_form(self):
-        """
-        Checking if form is valid for correct data and invalid for
-        wrong data or inactive user
-        """
-        self.assertEqual(list(LoginForm.base_fields), ['username', 'password'])
-
-        form_data = {'username': 'username', 'password': 'wrong_password'}
-        form = LoginForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors['__all__'],
-            [
-                'Wprowadź poprawny login oraz hasło. '
-                'Uwaga: wielkość liter ma znaczenie.'
-            ]
-        )
-
-        form_data = {'username': 'username', 'password': 'Password'}
-        self.user.is_active = True
-        self.user.set_password('Password')
-        self.user.save()
-        form = LoginForm(data=form_data)
-        self.assertTrue(form.is_valid())
 
 
 class LoginViewTests(TestCase):
@@ -183,10 +117,11 @@ class PasswordSettingTests(TestCase):
         self.user_1.set_password('password123')
         self.user_1.save()
 
-        self.user_2 = RushUser(
+        self.user_2 = RushUser.objects.create(
             email='kkk@kkk.pl', first_name='Ewa', last_name='Olczak',
-            is_active=True, username='username_taken'
+            username='username_taken'
         )
+        self.user_2.is_active = True
         self.user_2.set_password('Password_already_set')
         self.user_2.save()
         self.user1_uid = urlsafe_base64_encode(force_bytes(self.user_1.pk))
@@ -222,6 +157,17 @@ class PasswordSettingTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(SetPasswordView._get_user('00'))
+
+        self.client.login(
+            username='username_taken', password='Password_already_set'
+        )
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': self.user1_uid, 'token': self.user1_token}
+            )
+        )
+        self.assertFalse(isinstance(response.context['user'], RushUser))
 
     def test_setting_password(self):
         form_data = {
@@ -368,50 +314,132 @@ class ContestantAddViewTestCase(TestCase):
         self.client.login(username='test_test', password='P@ssw0rd')
 
         self.form_data = {
-            'first_name': 'test',
-            'last_name': 'zxqcv',
-            'gender': 'F',
-            'age': 12,
-            'school': 'Jakaś szkoła',
-            'styles_distances': '1000m klasycznie',
+            'csrfmiddlewaretoken': 'A33GMETyB7NE1CknWDg2jVuS1Jsm5A9y',
+            'form-0-age': '11',
+            'form-0-first_name': 'Jan',
+            'form-0-gender': 'M',
+            'form-0-last_name': 'Kowalski',
+            'form-0-school': 'Test',
+            'form-0-styles_distances': '1000m',
+            'form-1-age': '16',
+            'form-1-first_name': 'Anna',
+            'form-1-gender': 'F',
+            'form-1-last_name': 'Nowak',
+            'form-1-school': 'Test',
+            'form-1-styles_distances': '500m',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+            'form-MIN_NUM_FORMS': '0',
+            'form-TOTAL_FORMS': '2'
         }
 
+        self.contest = Contest.objects.create(
+            organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2048, 11, 20))
+        )
+        self.contest_done = Contest.objects.create(
+            organizer=Organizer(id=2), date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2008, 11, 20))
+        )
+        self.contest_deadline = Contest.objects.create(
+            organizer=Organizer(id=3), date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2008, 11, 20))
+        )
+
     def test_get(self):
-        response = self.client.get(reverse('contest:contestant-add'))
+        response = self.client.get(
+            reverse('contest:contestant-add', kwargs={'id': 1}),
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(isinstance(response.context['form'], ContestantForm))
+        self.assertIsInstance(
+            response.context['formset'].forms[0], ContestantForm
+        )
+
+        response = self.client.get(
+            reverse('contest:contestant-add', kwargs={'id': 865}),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            'Takie zawody nie istnieją.'
+        )
+
+        response = self.client.get(
+            reverse('contest:contestant-add', kwargs={'id': 2}),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            'Zawody się już skończyły.'
+        )
+
+        response = self.client.get(
+            reverse('contest:contestant-add', kwargs={'id': 3}),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            'Czas na dodawanie zawodników już minął.'
+        )
 
     def test_post_with_success(self):
         response = self.client.post(
-            reverse('contest:contestant-add'), data=self.form_data
+            reverse('contest:contestant-add', kwargs={'id': 1}),
+            data=self.form_data
         )
 
         self.assertEqual(response.status_code, 200)
+        contestants = Contestant.objects.filter(moderator=self.user)
 
-        contestant = Contestant.objects.get(moderator=self.user)
-        self.assertEqual(contestant.first_name, 'test')
-        self.assertEqual(contestant.gender, 'F')
-        self.assertEqual(contestant.age, 12)
-        self.assertEqual(contestant.school, 'Jakaś szkoła')
-        self.assertEqual(contestant.styles_distances, '1000m klasycznie')
-        self.assertEqual(contestant.moderator, self.user)
+        self.assertEquals(len(contestants), 2)
+
+        self.assertEqual(contestants[0].first_name, 'Jan')
+        self.assertEqual(contestants[1].first_name, 'Anna')
 
     def test_post_with_validation_error(self):
-        self.form_data['gender'] = 'WRONG'
         response = self.client.post(
-            reverse('contest:contestant-add'), data=self.form_data
+            reverse('contest:contestant-add', kwargs={'id': 865}),
+            data=self.form_data
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            'Takie zawody nie istnieją.'
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.context['form'].is_valid())
+        self.form_data['form-0-age'] = 99
+        response = self.client.post(
+            reverse('contest:contestant-add', kwargs={'id': 1}),
+            data=self.form_data
+        )
+
+        expected_error = {
+            'age': ['Zawodnik nie mieści się w wymaganym przedziale wiekowym.']
+        }
         self.assertEqual(
-            response.context['form'].errors,
-            {
-                'gender': [(
-                    'Wybierz poprawną wartość. WRONG nie jest jednym z '
-                    'dostępnych wyborów.'
-                )]
-            }
+            response.context['formset'].errors, [expected_error, {}]
+        )
+
+        self.form_data['form-0-age'] = 15
+        self.form_data['form-0-gender'] = 'WRONG'
+        response = self.client.post(
+            reverse('contest:contestant-add', kwargs={'id': 1}),
+            data=self.form_data
+        )
+        expected_error = {
+            'gender': [(
+                'Wybierz poprawną wartość. WRONG nie jest jednym z '
+                'dostępnych wyborów.'
+            )]
+        }
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context['formset'].is_valid())
+        self.assertEqual(
+            response.context['formset'].errors, [expected_error, {}]
         )
         self.assertFalse(
             Contestant.objects.filter(moderator=self.user).exists()

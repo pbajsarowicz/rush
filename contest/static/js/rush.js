@@ -56,9 +56,57 @@ function hideClubCode() {
     }
 
 /*
+ * Generates formset. Moreover, handles MaterializeCSS selects.
+ */
+$('#add_more').click(function() {
+    $('select').material_select('destroy');
+
+    var form_idx = $('#id_form-TOTAL_FORMS').val();
+    $('#id_form-' + (parseInt(form_idx) - 1)).hide();
+    $('#formset').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+
+    $('select').material_select();
+});
+
+/*
+ * Populates modal with contest info.
+ */
+function getContestInfo(pk) {
+    var organizer = '';
+    var contact = '';
+    var result = ''
+    $.ajax({
+        url: '/api/v1/contests/' + pk + '/?format=json',
+        dataType: 'json',
+        success: function(json){
+            organizer = json['organizer'];
+            if(organizer['phone_number']){
+                contact += '<br> Telefon: ' + organizer['phone_number'];
+            }
+            if(organizer['email']){
+                contact += '<br> Email: ' + organizer['email'];
+            }
+            if(organizer['website']){
+                contact += '<br> Strona Internetowa: <a href="' + organizer['website'] + '">' +
+                organizer['website'] + '</a>';
+            }
+
+            result = 'Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
+            '<br> Dla kogo: od ' + json['age_min'] + ' do ' + json['age_max'] + ' lat' +
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Organizator: ' +
+            organizer['name'] + contact + '<br> Opis: ' + json['description'];
+
+            document.getElementById('text' + pk).innerHTML = result;
+        }
+    });
+}
+
+/*
  * Action on document ready.
  */
 $(document).ready(function() {
     onClubCodeValidation();
     $('select').material_select();
+    $('.modal-trigger').leanModal();
 });

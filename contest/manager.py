@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import uuid
 
 from django.contrib.auth.models import BaseUserManager
 
@@ -18,7 +19,7 @@ class RushUserManager(BaseUserManager):
 
         email = self.normalize_email(email)
         user = self.model(
-            username=username,
+            username=username if username else uuid.uuid4(),
             email=email,
             first_name=first_name,
             last_name=last_name,

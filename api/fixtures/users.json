@@ -1,0 +1,34 @@
+[
+  {
+      "model": "contest.RushUser",
+      "pk": 1,
+      "fields": {
+          "username": "login123",
+          "email": "ocean@wp.pl",
+          "first_name": "Jakub",
+          "last_name": "Nowak",
+          "date_joined": "2016-02-20T13:00:26.299023Z",
+          "is_active": true,
+          "is_admin": false,
+          "club": 1,
+          "organization_name": "ZSP1 w Pile",
+          "organization_address": "Ceglana 4"
+      }
+  },
+  {
+      "model": "contest.RushUser",
+      "pk": 2,
+      "fields": {
+          "username": "login321",
+          "email": "test@test.com",
+          "first_name": "Ewa",
+          "last_name": "Kolczyk",
+          "date_joined": "2016-02-20T13:00:26.299023Z",
+          "is_active": true,
+          "is_admin": true,
+          "club": 1,
+          "organization_name": "ZSP1 w Pile",
+          "organization_address": "Ceglana 4"
+      }
+  }
+]
