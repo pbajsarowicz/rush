@@ -99,8 +99,11 @@ class ContestantAddView(View):
                 contestant.contest = contest
                 contestant.save()
 
-            return render(
-                request, self.template_name, {'message': 'Dodano zawodników.'}
+            msg = (
+                'Dziękujemy! Potwierdzenie zapisów zostało wysłane na email '
+                'podany przy rejestracji. Życzymy powodzenia.'
             )
+
+            return render(request, self.template_name, {'message': msg})
 
         return render(request, self.template_name, {'formset': formset})
