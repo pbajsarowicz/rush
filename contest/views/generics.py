@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.template import loader
+from django.core.mail import EmailMessage
 from django.forms import formset_factory
 from django.shortcuts import render
 from django.utils import timezone
@@ -56,6 +58,22 @@ class ContestantAddView(View):
         )
         return formset_class(data) if data else formset_class()
 
+    def send_email_with_contestant(self, contestants, email, *args, **kwargs):
+        """
+        Sends an email with a list contestants
+        """
+        text = loader.render_to_string(
+            'email/contestant_add.html', {'contestants': contestants},
+        )
+        msg = EmailMessage(
+            'Potwierdzenie dodania zawodników',
+            text,
+            'email_from@rush.pl',
+            [email],
+        )
+        msg.content_subtype = 'html'
+        msg.send()
+
     def get(self, request, id, *args, **kwargs):
         """
         Return adding a contestant form on site.
@@ -93,11 +111,14 @@ class ContestantAddView(View):
             )
 
         if formset.is_valid():
+            contestants = []
             for form in formset:
                 contestant = form.save(commit=False)
                 contestant.moderator = request.user
                 contestant.contest = contest
                 contestant.save()
+                contestants.append(contestant)
+            self.send_email_with_contestant(contestants, request.user.email)
 
             msg = (
                 'Dziękujemy! Potwierdzenie zapisów zostało wysłane na email '

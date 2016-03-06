@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+    <body>
+        <h2>Zawodnicy dodani na zawody:</h2>
+        {% for contestant in contestants %}
+        <div>
+            <hr/>
+            <p>Imię i Nazwisko: {{ contestant.first_name }}
+            {{ contestant.last_name }}</p>
+            <p>Wiek: {{ contestant.age }} </p>
+            <p>Szkoła/Klub: {{ contestant.school }} </p>
+            <p>Style i dystanse: {{ contestant.styles_distances }} </p>
+        </div>
+        {% endfor %}
+    </body>
+</html>
