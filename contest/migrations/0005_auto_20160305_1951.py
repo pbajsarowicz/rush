@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group
 
 def forwards_func(apps, schema_editor):
     """
-    Create user groups: Moderators, Administrators, Individual contestants
+    Create user groups: Moderators, Administrators, Individual contestants.
     """
     Group.objects.get_or_create(name='Moderators')
     Group.objects.get_or_create(name='Administrators')
@@ -17,7 +17,7 @@ def forwards_func(apps, schema_editor):
 
 def backwards_func(apps, schema_editor):
     """
-    Delete user groups: Moderators, Administrators, Individual contestants
+    Delete user groups: Moderators, Administrators, Individual contestants.
     """
     Group.objects.filter(name='Moderators').delete()
     Group.objects.filter(name='Administrators').delete()
