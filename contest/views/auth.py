@@ -106,10 +106,37 @@ class SetPasswordView(View):
             logout(request)
         user = self._get_user(uidb64)
 
-        if user and default_token_generator.check_token(user, token):
+        if user and user.has_setted_password:
+            return render(
+                request,
+                self.template_name,
+                {'message': 'Użytkownik już posiada hasło.'}
+            )
+        elif user and default_token_generator.check_token(user, token):
             form = self.form_class(user)
             return render(request, self.template_name, {'form': form})
-        return redirect('contest:login')
+        elif user:
+           user.send_reset_email(request)
+           return render(
+                request,
+                self.template_name,
+                {
+                    'message': (
+                       'Minęły 3 dni od wysłania do Ciebie wiadomości '
+                       'email z linkiem do strony z ustawieniem hasła w '
+                       'związku z czym jest on już nieważny. Klikając w '
+                       'ten link spowodowałeś ponowne wysłanie '
+                       'wiadomościemail.Sprawdź skrzynkę.'
+                    )
+                }
+            )
+        else:
+            return render(
+                request,
+                self.template_name,
+                {'message': 'Użytkownik nie istnieje.'}
+            )
+
 
     def post(self, request, uidb64=None, token=None):
         """
@@ -121,6 +148,8 @@ class SetPasswordView(View):
             form = self.form_class(user, data=request.POST)
             if form.is_valid():
                 form.save()
+                user.has_setted_password = True
+                user.save()
                 return render(
                     request, self.template_name,
                     {'message': 'Hasło ustawione, można się zalogować.'}
