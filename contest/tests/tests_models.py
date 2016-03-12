@@ -43,7 +43,7 @@ class UserMethodTests(TestCase):
         self.assertEqual(user_test.get_short_name(), 'Last Name')
         self.assertTrue(user_test.has_perm(None))
         self.assertTrue(user_test.has_module_perms(None))
-        self.assertFalse(user_test.is_staff())
+        self.assertFalse(user_test.is_staff)
         self.assertEqual(user_test.__unicode__(), 'test@xyz.pl')
         user_test.discard()
         self.assertFalse(RushUser.objects.filter(email='test@xyz.pl'))
