@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.template import loader
 from django.core.mail import EmailMessage
+from django.conf import settings
 from django.forms import formset_factory
 from django.shortcuts import render
+from django.template import loader
 from django.utils import timezone
 from django.utils.functional import curry
 from django.views.generic import (
@@ -58,7 +59,8 @@ class ContestantAddView(View):
         )
         return formset_class(data) if data else formset_class()
 
-    def send_email_with_contestant(self, contestants, email, *args, **kwargs):
+    @staticmethod
+    def send_email_with_contestant(contestants, email, *args, **kwargs):
         """
         Sends an email with a list contestants
         """
@@ -68,7 +70,7 @@ class ContestantAddView(View):
         msg = EmailMessage(
             'Potwierdzenie dodania zawodników',
             text,
-            'email_from@rush.pl',
+            settings.SUPPORT_EMAIL,
             [email],
         )
         msg.content_subtype = 'html'
