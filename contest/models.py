@@ -94,6 +94,7 @@ class RushUser(AbstractBaseUser):
             raw_password if self.is_admin or self.is_active else ''
         )
 
+    @property
     def is_staff(self):
         """
         Return True if user has admin privileges.
