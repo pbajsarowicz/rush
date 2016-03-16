@@ -106,31 +106,30 @@ class SetPasswordView(View):
             logout(request)
         user = self._get_user(uidb64)
 
-        if user and user. is_set_password:
-            return render(
-                request,
-                self.template_name,
-                {'message': 'Użytkownik już posiada hasło.'}
-            )
-        elif user and default_token_generator.check_token(user, token):
-            form = self.form_class(user)
-            return render(request, self.template_name, {'form': form})
-        elif user:
-            user.send_reset_email(request)
-            return render(
-                request,
-                self.template_name,
-                {
-                    'message':
-                    (
-                        'Minęły 3 dni od wysłania do Ciebie wiadomości '
-                        'email z linkiem do strony z ustawieniem hasła w '
-                        'związku z czym jest on już nieważny. Klikając w '
-                        'ten link spowodowałeś ponowne wysłanie '
-                        'wiadomości email.Sprawdź skrzynkę.'
-                    )
-                }
-            )
+        if user:
+            if user.password != '':
+                return render(
+                    request,
+                    self.template_name,
+                    {'message': 'Użytkownik już posiada hasło.'}
+                )
+            elif default_token_generator.check_token(user, token):
+                form = self.form_class(user)
+                return render(request, self.template_name, {'form': form})
+            else:
+                user.send_reset_email(request)
+                return render(
+                    request,
+                    self.template_name, {
+                        'message': (
+                            'Minęły 3 dni od wysłania do Ciebie wiadomości '
+                            'email z linkiem do strony z ustawieniem hasła w '
+                            'związku z czym jest on już nieważny. Klikając w '
+                            'ten link spowodowałeś ponowne wysłanie '
+                            'wiadomości email.Sprawdź skrzynkę.'
+                        )
+                    }
+                )
         else:
             return render(
                 request,
@@ -148,8 +147,6 @@ class SetPasswordView(View):
             form = self.form_class(user, data=request.POST)
             if form.is_valid():
                 form.save()
-                user. is_set_password = True
-                user.save()
                 return render(
                     request, self.template_name,
                     {'message': 'Hasło ustawione, można się zalogować.'}

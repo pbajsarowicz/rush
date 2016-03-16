@@ -48,13 +48,14 @@ class RushUser(AbstractBaseUser):
     date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
     is_admin = models.BooleanField(default=False)
-    is_set_password = models.BooleanField(default=False)
     club = models.ForeignKey(Club, blank=True, null=True)
 
     objects = RushUserManager()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
+
+    default_password = ''
 
     def __unicode__(self):
         return self.email
@@ -85,15 +86,15 @@ class RushUser(AbstractBaseUser):
 
     def set_password(self, raw_password):
         """
-        Initialize password with empty string.
+        Set password to given by user.
         """
-        self.password = (
-            make_password(raw_password) if self.is_admin or self.is_active
-            else ''
-        )
-        self._password = (
-            raw_password if self.is_admin or self.is_active else ''
-        )
+        self.password = make_password(raw_password)
+
+    def set_default_password(self):
+        """
+        Set password to default value.
+        """
+        self.password = self.default_password
 
     @property
     def is_staff(self):
@@ -112,10 +113,10 @@ class RushUser(AbstractBaseUser):
 
     def activate(self):
         """
-        Activates a user and sets a password.
+        Activates a user.
         """
         self.is_active = True
-        self.set_password('password123')
+        self.set_default_password()
         self.save()
 
     def discard(self):
