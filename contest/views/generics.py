@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.forms import formset_factory
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template import loader
 from django.utils import timezone
 from django.utils.functional import curry
@@ -14,7 +14,7 @@ from django.views.generic import (
 )
 
 from contest.forms import ContestantForm
-from contest.models import Contest
+from contest.models import Contest, Contestant
 
 
 class HomeView(TemplateView):
@@ -130,3 +130,83 @@ class ContestantAddView(View):
             return render(request, self.template_name, {'message': msg})
 
         return render(request, self.template_name, {'formset': formset})
+
+
+class ContestantListView(View):
+    """
+    View with list of added contestants.
+    """
+    template_name = 'contest/contestant_list.html'
+
+    def get(self, request, contest_id, *args, **kwargs):
+        """
+        Get contestant data.
+        """
+        contestants = Contestant.objects.filter(
+            contest=contest_id, moderator=request.user
+        )
+
+        return render(
+            request, self.template_name,
+            {'contestants': contestants},
+        )
+
+
+class EditContestantView(View):
+    """
+    Edit contestant page.
+    """
+
+    template_name = 'contest/contestant_edit.html'
+    form_class = ContestantForm
+    data = {}
+
+    def get(self, request, contestant_id, *args, **kwargs):
+        """
+        Return form with fill fields.
+        """
+        contestant = Contestant.objects.get(
+            id=contestant_id, moderator=request.user
+        )
+        self.data = {
+            'first_name': contestant.first_name,
+            'last_name': contestant.last_name,
+            'gender': contestant.gender,
+            'age': contestant.age,
+            'school': contestant.school,
+            'styles_distances': contestant.styles_distances,
+            'moderator': contestant.moderator.id,
+        }
+        form = self.form_class(
+            initial=self.data,
+            contest_id=contestant.contest.id
+        )
+
+        return render(
+            request, self.template_name,
+            {'contestant': contestant, 'form': form},
+        )
+
+    def post(self, request, contestant_id, *args, **kwargs):
+        """
+        Submit contestant data.
+        """
+        contestant = Contestant.objects.get(
+            id=contestant_id, moderator=request.user
+        )
+        form = self.form_class(
+            request.POST, instance=contestant,
+            contest_id=contestant.contest.id
+        )
+        if form.has_changed():
+            if form.is_valid():
+                form.save()
+                return redirect(
+                    'contest:contestant-list',
+                    contest_id=contestant.contest.id
+                )
+        else:
+            return redirect(
+                'contest:contestant-list',
+                contest_id=contestant.contest.id
+            )

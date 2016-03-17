@@ -1,0 +1,19 @@
+{% extends "contest/base.html" %}
+
+{% block container %}
+{}
+	
+	<div class="container">
+        <div class="center">
+			<form class="col s6" role="form" method="post" name="edit_form">
+				<div class="row center">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="pull-right btn btn-primary">Zapisz</button>
+                    <a  href=""class="pull-left btn btn-primary">Anuluj</a>
+                </div>
+            </form>
+   		</div>
+    </div>
+
+{% endblock container %}
