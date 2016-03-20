@@ -56,18 +56,77 @@ function hideClubCode() {
     }
 
 /*
+ * Checking whether add_contestant form has validation errors.
+ */
+
+function validateContestantForm() {
+    var form_idx = $('#id_form-TOTAL_FORMS').val();
+    var id = 'id_form-' + (parseInt(form_idx) - 1);
+
+    var firstName = document.forms['contestants'][id+ '-first_name'].value;
+    var lastName = document.forms['contestants'][id + '-last_name'].value;
+    var gender = document.forms['contestants'][id + '-gender'].value;
+    var age = document.forms['contestants'][id + '-age'].value;
+    var school = document.forms['contestants'][id + '-school'].value;
+    var styles = document.forms['contestants'][id + '-styles_distances'].value
+    var errorMessage = '';
+
+    var checkName = RegExp('[A-Za-z]{3,}');
+
+    if(firstName == null || firstName == '')
+        errorMessage += '<p>Pole <b>Imie</b> nie może być puste.</p>';
+    else if (!checkName.test(firstName))
+        errorMessage += '<p>Wprowadzone imie jest nieprawidłowe.</p>';
+
+    if(lastName == null || lastName == '')
+        errorMessage += '<p>Pole <b>Nazwisko</b> nie może być puste.</p>';
+    else if (!checkName.test(lastName))
+        errorMessage += '<p>Wprowadzone nazwisko jest nieprawidłowe.</p>';
+
+    if(gender != 'F' && gender != 'M')
+        errorMessage += '<p>Wybierz poprawną płeć.</p>';
+
+    if(age == null || age == '')
+        errorMessage += '<p>Pole <b>Wiek</b> nie może być puste.</p>';
+    else if(age < minAge || age > maxAge )
+        errorMessage += '<p>Wiek zawodnika nie mieści się w przedziale ' +
+        'przeznaczonym dla tego konkursu.</p>';
+
+    if(school == null || school == '')
+        errorMessage += '<p>Pole <b>Rodzaj szkoły</b> nie może być puste.</p>';
+
+    if(styles == null || styles == '')
+        errorMessage += '<p>Pole <b>Style i dystanse</b> nie może być puste.</p>';
+
+    if(errorMessage){
+        $('#errors').html(errorMessage);
+        $('html, body').animate({ scrollTop: 0 });
+        return false;
+    }
+    else
+        $('#errors').html('');
+    return true
+}
+
+/*
  * Generates formset. Moreover, handles MaterializeCSS selects.
  */
 $('#add_more').click(function() {
+
+    if(validateContestantForm() == false)
+        return false
+
     $('select').material_select('destroy');
 
     var form_idx = $('#id_form-TOTAL_FORMS').val();
-    $('#id_form-' + (parseInt(form_idx) - 1)).hide();
+    var id = 'id_form-' + (parseInt(form_idx) - 1);
+    $('#' + id).hide();
     $('#formset').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
     $('select').material_select();
 });
+
 
 /*
  * Populates modal with contest info.

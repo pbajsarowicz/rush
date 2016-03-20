@@ -9,3 +9,7 @@
 .visible {
     display: inherit;
 }
+
+#errors p {
+    text-align: center;
+}

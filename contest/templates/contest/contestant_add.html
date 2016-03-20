@@ -9,8 +9,16 @@
                     <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">ok</a>
                 </div>
             {% else %}
+                {% block scripts %}
+                    {{ block.super }}
+                    <script>
+                        var minAge = {{ name.age_min }};
+                        var maxAge = {{ name.age_max }};
+                    </script>
+                {% endblock scripts %}
                 <p class="blue-text text-darken-2">Konkurs: {{ name }}</p>
-                <form class="col s6" action="?next={{next}}" role="form" method="post">
+                <form class="col s6" action="?next={{next}}" role="form" method="post" name="contestants" onsubmit="return validateContestantForm()">
+                    <div id="errors" class="red-text"></div>
                     <div id="formset" class="row center">
                         {% csrf_token %}
                         {{ formset.management_form }}
