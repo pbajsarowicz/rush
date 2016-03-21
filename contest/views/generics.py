@@ -153,8 +153,7 @@ class ContestantListView(View):
         )
         if contestants:
             return render(
-                request, self.template_name,
-                {'contestants': contestants},
+                request, self.template_name, {'contestants': contestants},
             )
         else:
             return render(
