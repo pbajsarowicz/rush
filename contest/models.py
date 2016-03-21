@@ -55,8 +55,6 @@ class RushUser(AbstractBaseUser):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
-    default_password = ''
-
     def __unicode__(self):
         return self.email
 
@@ -90,12 +88,6 @@ class RushUser(AbstractBaseUser):
         """
         self.password = make_password(raw_password)
 
-    def set_default_password(self):
-        """
-        Set password to default value.
-        """
-        self.password = self.default_password
-
     @property
     def is_staff(self):
         """
@@ -116,7 +108,6 @@ class RushUser(AbstractBaseUser):
         Activates a user.
         """
         self.is_active = True
-        self.set_default_password()
         self.save()
 
     def discard(self):
