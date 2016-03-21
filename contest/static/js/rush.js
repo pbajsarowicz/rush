@@ -63,49 +63,77 @@ function validateContestantForm() {
     var form_idx = $('#id_form-TOTAL_FORMS').val();
     var id = 'id_form-' + (parseInt(form_idx) - 1);
 
-    var firstName = document.forms['contestants'][id+ '-first_name'].value;
+    var firstName = document.forms['contestants'][id + '-first_name'].value;
     var lastName = document.forms['contestants'][id + '-last_name'].value;
     var gender = document.forms['contestants'][id + '-gender'].value;
     var age = document.forms['contestants'][id + '-age'].value;
     var school = document.forms['contestants'][id + '-school'].value;
     var styles = document.forms['contestants'][id + '-styles_distances'].value
-    var errorMessage = '';
 
-    var checkName = RegExp('[A-Za-z]{3,}');
+    var errorMessage = document.createDocumentFragment();
+    var paragraph;
 
-    if(firstName == null || firstName == '')
-        errorMessage += '<p>Pole <b>Imie</b> nie może być puste.</p>';
-    else if (!checkName.test(firstName))
-        errorMessage += '<p>Wprowadzone imie jest nieprawidłowe.</p>';
+    var checkName = RegExp('[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]{3,}');
 
-    if(lastName == null || lastName == '')
-        errorMessage += '<p>Pole <b>Nazwisko</b> nie może być puste.</p>';
-    else if (!checkName.test(lastName))
-        errorMessage += '<p>Wprowadzone nazwisko jest nieprawidłowe.</p>';
+    if(!firstName) {
+        paragraph = document.createElement('p');
+        paragraph.innerHTML = 'Pole <b>Imie</b> nie może być puste.';
+        errorMessage.appendChild(paragraph);
+    }
+    else if (!checkName.test(firstName)) {
+        paragraph = document.createElement('p');
+        paragraph.appendChild(document.createTextNode('Wprowadzone imie jest nieprawidłowe.'));
+        errorMessage.appendChild(paragraph);
+    }
 
-    if(gender != 'F' && gender != 'M')
-        errorMessage += '<p>Wybierz poprawną płeć.</p>';
+    if(!lastName) {
+        paragraph = document.createElement('p');
+        paragraph.innerHTML = 'Pole <b>Nazwisko</b> nie może być puste.';
+        errorMessage.appendChild(paragraph);
+    }
+    else if (!checkName.test(lastName)) {
+        paragraph = document.createElement('p');
+        paragraph.appendChild(document.createTextNode('Wprowadzone nazwisko jest nieprawidłowe.'));
+        errorMessage.appendChild(paragraph);
+    }
 
-    if(age == null || age == '')
-        errorMessage += '<p>Pole <b>Wiek</b> nie może być puste.</p>';
-    else if(age < minAge || age > maxAge )
-        errorMessage += '<p>Wiek zawodnika nie mieści się w przedziale ' +
-        'przeznaczonym dla tego konkursu.</p>';
+    if(gender != 'F' && gender != 'M') {
+        paragraph = document.createElement('p');
+        paragraph.appendChild(document.createTextNode('Wybierz poprawną płeć.'));
+        errorMessage.appendChild(paragraph);
+    }
 
-    if(school == null || school == '')
-        errorMessage += '<p>Pole <b>Rodzaj szkoły</b> nie może być puste.</p>';
+    if(!age) {
+        paragraph = document.createElement('p');
+        paragraph.innerHTML = 'Pole <b>Wiek</b> nie może być puste.';
+        errorMessage.appendChild(paragraph);
+    }
+    else if(age < minAge || age > maxAge ) {
+        paragraph = document.createElement('p');
+        paragraph.appendChild(document.createTextNode('Wiek zawodnika nie mieści się ' +
+        'w przedziale przeznaczonym dla tego konkursu.'));
+        errorMessage.appendChild(paragraph);
+    }
 
-    if(styles == null || styles == '')
-        errorMessage += '<p>Pole <b>Style i dystanse</b> nie może być puste.</p>';
+    if(!school) {
+        paragraph = document.createElement('p');
+        paragraph.innerHTML = 'Pole <b>Rodzaj szkoły</b> nie może być puste.';
+        errorMessage.appendChild(paragraph);
+    }
 
-    if(errorMessage){
-        $('#errors').html(errorMessage);
+
+    if(!styles) {
+        paragraph = document.createElement('p');
+        paragraph.innerHTML = 'Pole <b>Style i dystanse</b> nie może być puste.';
+        errorMessage.appendChild(paragraph);
+    }
+
+    $('#errors').html(errorMessage);
+    if(paragraph) {
         $('html, body').animate({ scrollTop: 0 });
         return false;
     }
-    else
-        $('#errors').html('');
-    return true
+    return true;
 }
 
 /*
@@ -113,18 +141,19 @@ function validateContestantForm() {
  */
 $('#add_more').click(function() {
 
-    if(validateContestantForm() == false)
-        return false
+    if(validateContestantForm() == false) {
+        return false;
+    }
 
     $('select').material_select('destroy');
 
     var form_idx = $('#id_form-TOTAL_FORMS').val();
-    var id = 'id_form-' + (parseInt(form_idx) - 1);
-    $('#' + id).hide();
+    $('#id_form-' + (parseInt(form_idx) - 1)).hide();
     $('#formset').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
     $('select').material_select();
+    $('html, body').animate({ scrollTop: 0 });
 });
 
 
