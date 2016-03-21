@@ -9,3 +9,7 @@
 .visible {
     display: inherit;
 }
+
+.nav-margin {
+    margin-bottom: 40px !important;;
+}
