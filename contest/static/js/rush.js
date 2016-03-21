@@ -121,7 +121,6 @@ function validateContestantForm() {
         errorMessage.appendChild(paragraph);
     }
 
-
     if(!styles) {
         paragraph = document.createElement('p');
         paragraph.innerHTML = 'Pole <b>Style i dystanse</b> nie może być puste.';
@@ -141,7 +140,7 @@ function validateContestantForm() {
  */
 $('#add_more').click(function() {
 
-    if(validateContestantForm() == false) {
+    if(!validateContestantForm()) {
         return false;
     }
 
