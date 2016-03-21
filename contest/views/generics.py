@@ -143,7 +143,6 @@ class ContestantListView(View):
     View with list of added contestants.
     """
     template_name = 'contest/contestant_list.html'
-    msg = 'Nie dodałeś zawodników do tych zawodów.'
 
     def get(self, request, contest_id, *args, **kwargs):
         """
@@ -160,7 +159,7 @@ class ContestantListView(View):
         else:
             return render(
                 request, self.template_name,
-                {'msg': self.msg},
+                {'msg': 'Nie dodałeś zawodników do tych zawodów.'},
             )
 
 
@@ -177,7 +176,6 @@ class EditContestantView(View):
         """
         Return form with filled fields.
         """
-        msg = "Nie możesz edytować tego zawodnika."
         contestant = Contestant.objects.get(id=contestant_id)
 
         self.data = {
@@ -196,7 +194,7 @@ class EditContestantView(View):
         if not contestant.moderator == request.user:
             return render(
                 request, self.template_name,
-                {'msg': msg},
+                {'msg': 'Nie możesz edytować tego zawodnika.'},
             )
         return render(
             request, self.template_name,
