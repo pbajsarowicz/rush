@@ -6,9 +6,12 @@ from datetime import datetime
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import Q
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -18,12 +21,46 @@ from unidecode import unidecode
 from contest.manager import RushUserManager
 
 
+class Contact(models.Model):
+    """
+    Model with contact details.
+    """
+    email = models.EmailField('adres email', unique=True)
+    website = models.URLField('strona internetowa szkoły/klubu', blank=True)
+    phone_number = models.CharField('numer telefonu', max_length=9, blank=True)
+
+    def __unicode__(self):
+        return str(self.website)
+
+
+class School(models.Model):
+    """
+    Stores sport clubs data.
+    """
+    name = models.CharField('nazwa szkoły', max_length=255)
+
+    contact = models.OneToOneField(
+        Contact,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+
+    def __unicode__(self):
+        return str(self.name)
+
+
 class Club(models.Model):
     """
     Stores sport clubs data.
     """
     name = models.CharField('nazwa klubu', max_length=255)
     code = models.IntegerField('kod klubu', default=0)
+
+    contact = models.OneToOneField(
+        Contact,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
 
     def __unicode__(self):
         return str(self.name)
@@ -33,6 +70,10 @@ class RushUser(AbstractBaseUser):
     """
     User model for Rush users.
     """
+    UNIT_LIMIT = (
+        Q(app_label='contest', model='club') |
+        Q(app_label='contest', model='school')
+    )
     username = models.CharField(
         'nazwa użytkownika', max_length=64, unique=True
     )
@@ -48,7 +89,12 @@ class RushUser(AbstractBaseUser):
     date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
     is_admin = models.BooleanField(default=False)
-    club = models.ForeignKey(Club, blank=True, null=True)
+    content_type = models.ForeignKey(
+        ContentType, limit_choices_to=UNIT_LIMIT,
+        blank=True, null=True
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    unit = GenericForeignKey('content_type', 'object_id')
 
     objects = RushUserManager()
 
@@ -173,6 +219,10 @@ class Contest(models.Model):
     """
     Model for Contest.
     """
+    UNIT_LIMIT = (
+        Q(app_label='contest', model='club') |
+        Q(app_label='contest', model='school')
+    )
     organizer = models.ForeignKey(Organizer)
     date = models.DateTimeField()
     place = models.CharField(max_length=255)
@@ -180,6 +230,12 @@ class Contest(models.Model):
     age_max = models.SmallIntegerField()
     deadline = models.DateTimeField()
     description = models.TextField(blank=True)
+    content_type = models.ForeignKey(
+        ContentType, limit_choices_to=UNIT_LIMIT,
+        blank=True, null=True
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    organizer = GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
         return '{} {}'.format(

@@ -9,6 +9,8 @@ from contest.models import (
     Organizer,
     Contest,
     Club,
+    School,
+    Contact,
 )
 
 
@@ -60,3 +62,5 @@ admin.site.register(Contestant)
 admin.site.register(Organizer)
 admin.site.register(Contest, ContestAdmin)
 admin.site.register(Club)
+admin.site.register(School)
+admin.site.register(Contact)
