@@ -23,7 +23,11 @@ from contest.models import (
     Contest,
     Organizer,
 )
-from contest.views import SetPasswordView
+from contest.views import (
+    SetPasswordView,
+    EditContestantView,
+    ContestantListView,
+)
 
 
 class HomeViewTests(TestCase):
@@ -444,3 +448,108 @@ class ContestantAddViewTestCase(TestCase):
         self.assertFalse(
             Contestant.objects.filter(moderator=self.user).exists()
         )
+
+
+class ContestantListViewTestCase(TestCase):
+    def setup(self):
+        self.user = RushUser(
+            email='root@root.pl', username='root',
+            password='R@ootroot', is_active=True
+        )
+        self.user.set_password('R@ootroot')
+        self.user.save()
+
+        self.client.login(username='root', password='R@ootroot')
+
+        self.contest = Contest.objects.create(
+            organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2048, 11, 20))
+        )
+        self.contestant1 = Contestant.objects.create(
+            moderator=RushUser(id=1), first_name='Adam', last_name='Nowak',
+            gender='M', age=15, school='Szkoła', styles_distances='10m żabka',
+            contest=Contest(id=1)
+        )
+        self.contestant2 = Contestant.objects.create(
+            moderator=RushUser(id=1), first_name='Patryk',
+            last_name='Kowalski', gender='M', age=14,
+            school='Gdzieś', styles_distances='10m kraul',
+            contest=Contest(id=1)
+        )
+        self.contestant3 = Contestant.objects.create(
+            moderator=RushUser(id=1), first_name='Dominika',
+            last_name='Nowak', gender='F', age=16,
+            school='Szkoła', styles_distances='100m motylkowy',
+            contest=Contest(id=1)
+        )
+        self.contestant4 = Contestant.objects.create(
+            moderator=RushUser(id=1), first_name='Kuba',
+            last_name='Kowalski', gender='M', age=12,
+            school='Szkoła2', styles_distances='10m klasyczny',
+            contest=Contest(id=1)
+        )
+
+    def test_get(self):
+        response = self.client.get(
+            reverse('contest:contestant-list', kwargs={'contest_id': 1}),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['users']), 4)
+
+
+class EditContestantViewTestCase(TestCase):
+    def setup(self):
+        self.user = RushUser(
+            email='root@root.pl', username='root',
+            password='R@ootroot', is_active=True
+        )
+        self.user.set_password('R@ootroot')
+        self.user.save()
+
+        self.client.login(username='root', password='R@ootroot')
+
+        self.contest = Contest.objects.create(
+            organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2048, 11, 20))
+        )
+        self.contestant = Contestant.objects.create(
+            moderator=RushUser(id=1), first_name='Adam', last_name='Nowak',
+            gender='M', age=15, school='Szkoła', styles_distances='10m żabka',
+            contest=Contest(id=1)
+        )
+
+    def test_get(self):
+        response = self.client.get(
+            reverse('contest:contestant-edit', kwargs={'contestant_id': 1}),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['form'].initial['first_name'], 'Adam'
+        )
+        self.assertEqual(
+            response.context['form'].initial['last_name'], 'Nowak'
+        )
+        self.assertEqual(response.context['form'].initial['gender'], 'abcd')
+        self.assertEqual(response.context['form'].initial['school'], 'Szkoła')
+        self.assertEqual(
+            response.context['form'].initial['styles_distances'], '10m żabka'
+        )
+        self.assertEqual(response.context['form'].initial['age'], 15)
+
+    def test_post(self):
+        response = self.client.post(
+            reverse('contest:contestant-edit', kwargs={'contestant_id': 1}),
+            data={
+                'first_name': 'Karol',
+                'last_name': 'Kowal',
+                'gender': 'M',
+                'age': 13,
+                'school': 'Szkoła',
+                'styles_distances': '10m żabka',
+            }
+        )
+        self.assertEqual(response.context['first_name'], 'Karol')
+        self.assertEqual(response.context['last_name'], 'Kowal')
+        self.assertEqual(response.context['age'], 13)

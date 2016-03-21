@@ -4,7 +4,10 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.forms import formset_factory
-from django.shortcuts import render, redirect
+from django.shortcuts import(
+    render,
+    redirect,
+)
 from django.template import loader
 from django.utils import timezone
 from django.utils.functional import curry
@@ -14,7 +17,10 @@ from django.views.generic import (
 )
 
 from contest.forms import ContestantForm
-from contest.models import Contest, Contestant
+from contest.models import (
+    Contest,
+    Contestant,
+)
 
 
 class HomeView(TemplateView):
@@ -143,13 +149,19 @@ class ContestantListView(View):
         Get contestant data.
         """
         contestants = Contestant.objects.filter(
-            contest=contest_id, moderator=request.user
+            contest=contest_id, moderator=request.user,
         )
-
-        return render(
-            request, self.template_name,
-            {'contestants': contestants},
-        )
+        msg = 'Nie dodałeś zawodników do tych zawodów.'
+        if contestants:
+            return render(
+                request, self.template_name,
+                {'contestants': contestants},
+            )
+        else:
+            return render(
+                request, self.template_name,
+                {'msg': msg},
+            )
 
 
 class EditContestantView(View):
@@ -163,11 +175,11 @@ class EditContestantView(View):
 
     def get(self, request, contestant_id, *args, **kwargs):
         """
-        Return form with fill fields.
+        Return form with filled fields.
         """
-        contestant = Contestant.objects.get(
-            id=contestant_id, moderator=request.user
-        )
+        msg = "Nie możesz edytować tego zawodnika."
+        contestant = Contestant.objects.get(id=contestant_id)
+
         self.data = {
             'first_name': contestant.first_name,
             'last_name': contestant.last_name,
@@ -175,13 +187,17 @@ class EditContestantView(View):
             'age': contestant.age,
             'school': contestant.school,
             'styles_distances': contestant.styles_distances,
-            'moderator': contestant.moderator.id,
         }
         form = self.form_class(
             initial=self.data,
-            contest_id=contestant.contest.id
+            contest_id=contestant.contest.id,
         )
 
+        if not contestant.moderator == request.user:
+            return render(
+                request, self.template_name,
+                {'msg': msg},
+            )
         return render(
             request, self.template_name,
             {'contestant': contestant, 'form': form},
@@ -191,22 +207,25 @@ class EditContestantView(View):
         """
         Submit contestant data.
         """
-        contestant = Contestant.objects.get(
-            id=contestant_id, moderator=request.user
-        )
+        contestant = Contestant.objects.get(id=contestant_id)
         form = self.form_class(
             request.POST, instance=contestant,
-            contest_id=contestant.contest.id
+            contest_id=contestant.contest.id,
         )
         if form.has_changed():
             if form.is_valid():
                 form.save()
                 return redirect(
                     'contest:contestant-list',
-                    contest_id=contestant.contest.id
+                    contest_id=contestant.contest.id,
+                )
+            else:
+                return render(
+                    request, self.template_name,
+                    {'contestant': contestant, 'form': form},
                 )
         else:
             return redirect(
                 'contest:contestant-list',
-                contest_id=contestant.contest.id
+                contest_id=contestant.contest.id,
             )

@@ -15,6 +15,7 @@
                 <p>Wiek: {{ contestant.age }}</p>
                 <p>Szkoła/Klub: {{ contestant.school }}</p>
                 <p>Style i dystanse: {{ contestant.styles_distances }}</p>
+                <a href="{% url 'contest:contestant-list' contest_id=contestant.contest.id %}">Lista dodanych zawodników</a>
             </div>
         {% endfor %}
     </body>
