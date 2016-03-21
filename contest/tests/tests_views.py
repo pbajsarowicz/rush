@@ -25,8 +25,6 @@ from contest.models import (
 )
 from contest.views import (
     SetPasswordView,
-    EditContestantView,
-    ContestantListView,
 )
 
 
