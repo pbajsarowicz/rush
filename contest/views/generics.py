@@ -143,6 +143,7 @@ class ContestantListView(View):
     View with list of added contestants.
     """
     template_name = 'contest/contestant_list.html'
+    msg = 'Nie dodałeś zawodników do tych zawodów.'
 
     def get(self, request, contest_id, *args, **kwargs):
         """
@@ -151,7 +152,6 @@ class ContestantListView(View):
         contestants = Contestant.objects.filter(
             contest=contest_id, moderator=request.user,
         )
-        msg = 'Nie dodałeś zawodników do tych zawodów.'
         if contestants:
             return render(
                 request, self.template_name,
@@ -160,7 +160,7 @@ class ContestantListView(View):
         else:
             return render(
                 request, self.template_name,
-                {'msg': msg},
+                {'msg': self.msg},
             )
 
 
