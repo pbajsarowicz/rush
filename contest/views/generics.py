@@ -153,7 +153,7 @@ class ContestantListView(View):
         )
         if contestants:
             return render(
-                request, self.template_name, {'contestants': contestants},
+                request, self.template_name, {'contestants': contestants}
             )
         else:
             return render(
@@ -186,8 +186,7 @@ class EditContestantView(View):
             'styles_distances': contestant.styles_distances,
         }
         form = self.form_class(
-            initial=self.data,
-            contest_id=contestant.contest.id,
+            initial=self.data, contest_id=contestant.contest.id,
         )
 
         if not contestant.moderator == request.user:
@@ -206,15 +205,13 @@ class EditContestantView(View):
         """
         contestant = Contestant.objects.get(id=contestant_id)
         form = self.form_class(
-            request.POST, instance=contestant,
-            contest_id=contestant.contest.id,
+            request.POST, instance=contestant, contest_id=contestant.contest.id
         )
         if form.has_changed():
             if form.is_valid():
                 form.save()
                 return redirect(
-                    'contest:contestant-list',
-                    contest_id=contestant.contest.id,
+                    'contest:contestant-list', contest_id=contestant.contest.id
                 )
             else:
                 return render(
