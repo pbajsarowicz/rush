@@ -9,3 +9,11 @@
 .visible {
     display: inherit;
 }
+
+#errors p {
+    text-align: center;
+}
+
+.nav-margin {
+    margin-bottom: 40px !important;;
+}
