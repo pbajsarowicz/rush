@@ -23,9 +23,7 @@ from contest.models import (
     Contest,
     Organizer,
 )
-from contest.views import (
-    SetPasswordView,
-)
+from contest.views import SetPasswordView
 
 
 class HomeViewTests(TestCase):
@@ -353,7 +351,7 @@ class ContestantAddViewTestCase(TestCase):
 
     def test_get(self):
         response = self.client.get(
-            reverse('contest:contestant-add', kwargs={'id': 1}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 1}),
         )
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(
@@ -361,7 +359,7 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         response = self.client.get(
-            reverse('contest:contestant-add', kwargs={'id': 865}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 865}),
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -370,7 +368,7 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         response = self.client.get(
-            reverse('contest:contestant-add', kwargs={'id': 2}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 2}),
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -379,7 +377,7 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         response = self.client.get(
-            reverse('contest:contestant-add', kwargs={'id': 3}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 3}),
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -389,7 +387,7 @@ class ContestantAddViewTestCase(TestCase):
 
     def test_post_with_success(self):
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': 1}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 1}),
             data=self.form_data
         )
 
@@ -403,7 +401,7 @@ class ContestantAddViewTestCase(TestCase):
 
     def test_post_with_validation_error(self):
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': 865}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 865}),
             data=self.form_data
         )
         self.assertEqual(response.status_code, 200)
@@ -414,7 +412,7 @@ class ContestantAddViewTestCase(TestCase):
 
         self.form_data['form-0-age'] = 99
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': 1}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 1}),
             data=self.form_data
         )
 
@@ -428,7 +426,7 @@ class ContestantAddViewTestCase(TestCase):
         self.form_data['form-0-age'] = 15
         self.form_data['form-0-gender'] = 'WRONG'
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': 1}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 1}),
             data=self.form_data
         )
         expected_error = {
@@ -458,7 +456,6 @@ class ContestantListViewTestCase(TestCase):
         self.user.save()
 
         self.client.login(username='root', password='R@ootroot')
-
         self.contest = Contest.objects.create(
             organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
             place='Szkoła', age_min=11, age_max=16, description='Opis',

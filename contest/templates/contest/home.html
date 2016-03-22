@@ -14,7 +14,7 @@
                 {% for contest in upcoming %}
                     <tr>
                         <td>
-                            <a href="{% url 'contest:contestant-add' id=contest.pk %}" class="collection-item">{{ contest }}</a>
+                            <a href="{% url 'contest:contestant-add' contest_id=contest.pk %}" class="collection-item">{{ contest }}</a>
                         </td>
                         <td>
                             <a class="waves-effect waves-light btn modal-trigger" href="#modal{{contest.pk}}" onclick="getContestInfo({{contest.pk}})">Szczegóły</a>
@@ -42,7 +42,7 @@
                 {% for contest in completed %}
                     <tr>
                         <td>
-                            <a href="{% url 'contest:contestant-add' id=contest.pk %}" class="collection-item">{{ contest }}</a>
+                            <a href="{% url 'contest:contestant-add' contest_id=contest.pk %}" class="collection-item">{{ contest }}</a>
                         </td>
                         <td>
                             <a class="waves-effect waves-light btn modal-trigger" href="#modal{{contest.pk}}" onclick="getContestInfo({{contest.pk}})">Szczegóły</a>

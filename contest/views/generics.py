@@ -82,14 +82,14 @@ class ContestantAddView(View):
         msg.content_subtype = 'html'
         msg.send()
 
-    def get(self, request, id, *args, **kwargs):
+    def get(self, request, contest_id, *args, **kwargs):
         """
         Return adding a contestant form on site.
         """
-        formset = self.get_formset(id)
+        formset = self.get_formset(contest_id)
 
         try:
-            contest = Contest.objects.get(pk=id)
+            contest = Contest.objects.get(pk=contest_id)
         except Contest.DoesNotExist:
             return render(
                 request, self.template_name, {'message': self._get_message()}
@@ -105,14 +105,14 @@ class ContestantAddView(View):
             request, self.template_name, {'formset': formset, 'name': contest}
         )
 
-    def post(self, request, id, *args, **kwargs):
+    def post(self, request, contest_id, *args, **kwargs):
         """
         Create a contestant.
         """
-        formset = self.get_formset(id, request.POST)
+        formset = self.get_formset(contest_id, request.POST)
 
         try:
-            contest = Contest.objects.get(pk=id)
+            contest = Contest.objects.get(pk=contest_id)
         except Contest.DoesNotExist:
             return render(
                 request, self.template_name, {'message': self._get_message()}
@@ -155,11 +155,10 @@ class ContestantListView(View):
             return render(
                 request, self.template_name, {'contestants': contestants}
             )
-        else:
-            return render(
-                request, self.template_name,
-                {'msg': 'Nie dodałeś zawodników do tych zawodów.'},
-            )
+        return render(
+            request, self.template_name,
+            {'msg': 'Nie dodałeś zawodników do tych zawodów.'},
+        )
 
 
 class EditContestantView(View):
@@ -169,7 +168,6 @@ class EditContestantView(View):
 
     template_name = 'contest/contestant_edit.html'
     form_class = ContestantForm
-    data = {}
 
     def get(self, request, contestant_id, *args, **kwargs):
         """
@@ -177,17 +175,7 @@ class EditContestantView(View):
         """
         contestant = Contestant.objects.get(id=contestant_id)
 
-        self.data = {
-            'first_name': contestant.first_name,
-            'last_name': contestant.last_name,
-            'gender': contestant.gender,
-            'age': contestant.age,
-            'school': contestant.school,
-            'styles_distances': contestant.styles_distances,
-        }
-        form = self.form_class(
-            initial=self.data, contest_id=contestant.contest.id,
-        )
+        form = self.form_class(initial=self.data)
 
         if not contestant.moderator == request.user:
             return render(
@@ -213,13 +201,11 @@ class EditContestantView(View):
                 return redirect(
                     'contest:contestant-list', contest_id=contestant.contest.id
                 )
-            else:
-                return render(
-                    request, self.template_name,
-                    {'contestant': contestant, 'form': form},
-                )
-        else:
-            return redirect(
-                'contest:contestant-list',
-                contest_id=contestant.contest.id,
+            return render(
+                request, self.template_name,
+                {'contestant': contestant, 'form': form},
             )
+        return redirect(
+            'contest:contestant-list',
+            contest_id=contestant.contest.id,
+        )

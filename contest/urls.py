@@ -48,7 +48,7 @@ urlpatterns = [
         name='contestant-list'
     ),
     url(
-        r'^zawodnicy/dodaj/(?P<id>[0-9]+)$',
+        r'^zawodnicy/dodaj/(?P<contest_id>[0-9]+)$',
         login_required(views.ContestantAddView.as_view()),
         name='contestant-add'
     ),
