@@ -11,6 +11,7 @@ from contest.models import (
     Contest,
     Club,
     Contestant,
+    School,
 )
 
 
@@ -79,8 +80,14 @@ class OrganizerTestCase(TestCase):
             name='Adam', club=club
         )
 
+        school = School.objects.create(name='szkola')
+        self.organizer2 = Organizer.objects.create(
+            name='Maciek', school=school
+        )
+
     def test_organizer_methods(self):
         self.assertEqual(self.organizer.__unicode__(), 'Adam')
+        self.assertEqual(self.organizer2.__unicode__(), 'Maciek')
 
 
 class ContestantTestCase(TestCase):

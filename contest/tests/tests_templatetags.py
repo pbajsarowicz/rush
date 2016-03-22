@@ -49,6 +49,7 @@ class ToJSONTestCase(TestCase):
                 'organization_address': '',
                 'organization_name': '',
                 'username': '',
-                'club': None
+                'content_type': None,
+                'object_id': None,
             }
         )

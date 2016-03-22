@@ -20,13 +20,18 @@ from unidecode import unidecode
 
 from contest.manager import RushUserManager
 
+UNIT_LIMIT = (
+        Q(app_label='contest', model='club') |
+        Q(app_label='contest', model='school')
+    )
+
 
 class Contact(models.Model):
     """
     Model with contact details.
     """
     email = models.EmailField('adres email', unique=True)
-    website = models.URLField('strona internetowa szkoły/klubu', blank=True)
+    website = models.URLField('strona internetowa', blank=True)
     phone_number = models.CharField('numer telefonu', max_length=9, blank=True)
 
     def __unicode__(self):
@@ -42,7 +47,7 @@ class School(models.Model):
     contact = models.OneToOneField(
         Contact,
         on_delete=models.CASCADE,
-        primary_key=True,
+        null=True,
     )
 
     def __unicode__(self):
@@ -59,7 +64,7 @@ class Club(models.Model):
     contact = models.OneToOneField(
         Contact,
         on_delete=models.CASCADE,
-        primary_key=True,
+        null=True,
     )
 
     def __unicode__(self):
@@ -70,10 +75,6 @@ class RushUser(AbstractBaseUser):
     """
     User model for Rush users.
     """
-    UNIT_LIMIT = (
-        Q(app_label='contest', model='club') |
-        Q(app_label='contest', model='school')
-    )
     username = models.CharField(
         'nazwa użytkownika', max_length=64, unique=True
     )
@@ -219,10 +220,6 @@ class Contest(models.Model):
     """
     Model for Contest.
     """
-    UNIT_LIMIT = (
-        Q(app_label='contest', model='club') |
-        Q(app_label='contest', model='school')
-    )
     organizer = models.ForeignKey(Organizer)
     date = models.DateTimeField()
     place = models.CharField(max_length=255)
