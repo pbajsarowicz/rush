@@ -447,6 +447,11 @@ class ContestantAddViewTestCase(TestCase):
 
 
 class ContestantListViewTestCase(TestCase):
+    fixtures = [
+        'organizers.json', 'contests.json', 'clubs.json',
+        'users.json'
+    ]
+
     def setup(self):
         self.user = RushUser(
             email='root@root.pl', username='root',
@@ -456,44 +461,21 @@ class ContestantListViewTestCase(TestCase):
         self.user.save()
 
         self.client.login(username='root', password='R@ootroot')
-        self.contest = Contest.objects.create(
-            organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2048, 11, 20))
-        )
-        self.contestant1 = Contestant.objects.create(
-            moderator=RushUser(id=1), first_name='Adam', last_name='Nowak',
-            gender='M', age=15, school='Szkoła', styles_distances='10m żabka',
-            contest=Contest(id=1)
-        )
-        self.contestant2 = Contestant.objects.create(
-            moderator=RushUser(id=1), first_name='Patryk',
-            last_name='Kowalski', gender='M', age=14,
-            school='Gdzieś', styles_distances='10m kraul',
-            contest=Contest(id=1)
-        )
-        self.contestant3 = Contestant.objects.create(
-            moderator=RushUser(id=1), first_name='Dominika',
-            last_name='Nowak', gender='F', age=16,
-            school='Szkoła', styles_distances='100m motylkowy',
-            contest=Contest(id=1)
-        )
-        self.contestant4 = Contestant.objects.create(
-            moderator=RushUser(id=1), first_name='Kuba',
-            last_name='Kowalski', gender='M', age=12,
-            school='Szkoła2', styles_distances='10m klasyczny',
-            contest=Contest(id=1)
-        )
 
     def test_get(self):
         response = self.client.get(
             reverse('contest:contestant-list', kwargs={'contest_id': 1}),
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['users']), 4)
+        self.assertEqual(len(response.context['users']), 3)
 
 
 class EditContestantViewTestCase(TestCase):
+    fixtures = [
+        'organizers.json', 'contests.json', 'clubs.json',
+        'users.json'
+    ]
+
     def setup(self):
         self.user = RushUser(
             email='root@root.pl', username='root',
@@ -503,17 +485,6 @@ class EditContestantViewTestCase(TestCase):
         self.user.save()
 
         self.client.login(username='root', password='R@ootroot')
-
-        self.contest = Contest.objects.create(
-            organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2048, 11, 20))
-        )
-        self.contestant = Contestant.objects.create(
-            moderator=RushUser(id=1), first_name='Adam', last_name='Nowak',
-            gender='M', age=15, school='Szkoła', styles_distances='10m żabka',
-            contest=Contest(id=1)
-        )
 
     def test_get(self):
         response = self.client.get(

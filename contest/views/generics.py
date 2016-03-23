@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.forms import formset_factory
+from django.core.urlresolvers import reverse
 from django.shortcuts import(
     render,
     redirect,
@@ -66,12 +67,14 @@ class ContestantAddView(View):
         return formset_class(data) if data else formset_class()
 
     @staticmethod
-    def send_email_with_contestant(contestants, email, *args, **kwargs):
+    def send_email_with_contestant(contestants, email, link, *args, **kwargs):
         """
         Sends an email with a list contestants
         """
         text = loader.render_to_string(
-            'email/contestant_add.html', {'contestants': contestants},
+            'email/contestant_add.html', {
+                'contestants': contestants, 'link': link
+            },
         )
         msg = EmailMessage(
             'Potwierdzenie dodania zawodników',
@@ -118,6 +121,13 @@ class ContestantAddView(View):
                 request, self.template_name, {'message': self._get_message()}
             )
 
+        link = 'http://{}{}'.format(
+            request.get_host(),
+            reverse(
+                'contest:contestant-list', kwargs={'contest_id': contest_id}
+            )
+        )
+
         if formset.is_valid():
             contestants = []
             for form in formset:
@@ -126,7 +136,10 @@ class ContestantAddView(View):
                 contestant.contest = contest
                 contestant.save()
                 contestants.append(contestant)
-            self.send_email_with_contestant(contestants, request.user.email)
+            self.send_email_with_contestant(
+                contestants, request.user.email,
+                link,
+            )
 
             msg = (
                 'Dziękujemy! Potwierdzenie zapisów zostało wysłane na email '
@@ -175,7 +188,9 @@ class EditContestantView(View):
         """
         contestant = Contestant.objects.get(id=contestant_id)
 
-        form = self.form_class(initial=self.data)
+        form = self.form_class(
+            instance=contestant, contest_id=contestant.contest.id
+        )
 
         if not contestant.moderator == request.user:
             return render(
