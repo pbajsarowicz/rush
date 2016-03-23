@@ -26,7 +26,7 @@ class Club(models.Model):
     code = models.IntegerField('kod klubu', default=0)
 
     def __unicode__(self):
-        return str(self.name)
+        return self.name
 
 
 class RushUser(AbstractBaseUser):
