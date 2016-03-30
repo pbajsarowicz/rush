@@ -22,6 +22,7 @@ from contest.models import (
     RushUser,
     Contest,
     Organizer,
+    Club,
 )
 from contest.views import SetPasswordView
 
@@ -436,7 +437,7 @@ class ContestantAddViewTestCase(TestCase):
             )]
         }
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         self.assertFalse(response.context['formset'].is_valid())
         self.assertEqual(
             response.context['formset'].errors, [expected_error, {}]
@@ -447,27 +448,40 @@ class ContestantAddViewTestCase(TestCase):
 
 
 class ContestantListViewTestCase(TestCase):
-    fixtures = [
-        'organizers.json', 'contests.json', 'clubs.json',
-        'users.json'
-    ]
 
     def setup(self):
         self.user = RushUser(
-            email='root@root.pl', username='root',
-            password='R@ootroot', is_active=True
+            email='test@cos.pl', username='test_test',
+            password='P@ssw0rd', is_active=True
         )
-        self.user.set_password('R@ootroot')
+        self.user.set_password('P@ssw0rd')
         self.user.save()
 
-        self.client.login(username='root', password='R@ootroot')
+        self.client.login(username='test_test', password='P@ssw0rd')
+
+        club = Club.objects.create(name='adam', code=12345)
+        organizer = Organizer.objects.create(
+            name='Adam', club=club
+        )
+
+        contest = Contest.objects.create(
+            organizer=organizer,
+            date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2048, 11, 20))
+        )
+        self.contestant = Contestant.objects.create(
+            moderator=self.user, first_name='Adam', last_name='Nowak',
+            gender='M', age=14, school='Szkoła', styles_distances='100m motyl',
+            contest=contest
+        )
 
     def test_get(self):
         response = self.client.get(
             reverse('contest:contestant-list', kwargs={'contest_id': 1}),
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['users']), 3)
+        self.assertEqual(len(response.context['contestants']), 1)
 
 
 class EditContestantViewTestCase(TestCase):
@@ -497,25 +511,25 @@ class EditContestantViewTestCase(TestCase):
         self.assertEqual(
             response.context['form'].initial['last_name'], 'Nowak'
         )
-        self.assertEqual(response.context['form'].initial['gender'], 'abcd')
+        self.assertEqual(response.context['form'].initial['gender'], 'M')
         self.assertEqual(response.context['form'].initial['school'], 'Szkoła')
         self.assertEqual(
-            response.context['form'].initial['styles_distances'], '10m żabka'
+            response.context['form'].initial['styles_distances'], '100m motyl'
         )
-        self.assertEqual(response.context['form'].initial['age'], 15)
+        self.assertEqual(response.context['form'].initial['age'], 14)
 
     def test_post(self):
         response = self.client.post(
-            reverse('contest:contestant-edit', kwargs={'contestant_id': 1}),
-            data={
-                'first_name': 'Karol',
-                'last_name': 'Kowal',
-                'gender': 'M',
-                'age': 13,
-                'school': 'Szkoła',
-                'styles_distances': '10m żabka',
-            }
+            reverse(
+                'contest:contestant-edit', kwargs={'contestant_id': 1},
+                data={
+                    'first_name': 'Karol', 'last_name': 'Kowalski',
+                    'school': 'School', 'gender': 'F', 'age': 11,
+                }
+            )
         )
         self.assertEqual(response.context['first_name'], 'Karol')
-        self.assertEqual(response.context['last_name'], 'Kowal')
-        self.assertEqual(response.context['age'], 13)
+        self.assertEqual(response.context['last_name'], 'Kowalski')
+        self.assertEqual(response.context['school'], 'School')
+        self.assertEqual(response.context['gender'], 'F')
+        self.assertEqual(response.context['age'], 11)
