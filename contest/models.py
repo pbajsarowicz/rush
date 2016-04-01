@@ -26,7 +26,7 @@ class Club(models.Model):
     code = models.IntegerField('kod klubu', default=0)
 
     def __unicode__(self):
-        return str(self.name)
+        return self.name
 
 
 class RushUser(AbstractBaseUser):
@@ -84,16 +84,11 @@ class RushUser(AbstractBaseUser):
 
     def set_password(self, raw_password):
         """
-        Initialize password with empty string.
+        Set password to given by user.
         """
-        self.password = (
-            make_password(raw_password) if self.is_admin or self.is_active
-            else ''
-        )
-        self._password = (
-            raw_password if self.is_admin or self.is_active else ''
-        )
+        self.password = make_password(raw_password)
 
+    @property
     def is_staff(self):
         """
         Return True if user has admin privileges.
@@ -110,10 +105,9 @@ class RushUser(AbstractBaseUser):
 
     def activate(self):
         """
-        Activates a user and sets a password.
+        Activates a user.
         """
         self.is_active = True
-        self.set_password('password123')
         self.save()
 
     def discard(self):

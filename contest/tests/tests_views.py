@@ -114,7 +114,6 @@ class PasswordSettingTests(TestCase):
             email='ddd@ddd.pl', first_name='Łukasz', last_name='Ślązak',
             is_active=True
         )
-        self.user_1.set_password('password123')
         self.user_1.save()
 
         self.user_2 = RushUser.objects.create(
@@ -139,6 +138,7 @@ class PasswordSettingTests(TestCase):
             isinstance(response.context['form'], SettingPasswordForm)
         )
 
+    def test_resend_on_wrong_token(self):
         wrong_token = default_token_generator.make_token(self.user_2)
         response = self.client.get(
             reverse(
@@ -146,8 +146,9 @@ class PasswordSettingTests(TestCase):
                 kwargs={'uidb64': self.user1_uid, 'token': wrong_token}
             )
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
+    def test_resend_on_wrong_uid(self):
         wrong_uid = urlsafe_base64_encode(force_bytes(self.user_2.pk))
         response = self.client.get(
             reverse(
@@ -155,9 +156,10 @@ class PasswordSettingTests(TestCase):
                 kwargs={'uidb64': wrong_uid, 'token': self.user1_token}
             )
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(SetPasswordView._get_user('00'))
 
+    def test_password_already_set(self):
         self.client.login(
             username='username_taken', password='Password_already_set'
         )
