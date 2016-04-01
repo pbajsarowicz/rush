@@ -129,3 +129,34 @@ class ContestantForm(forms.ModelForm):
             'first_name', 'last_name', 'gender',
             'age', 'school', 'styles_distances',
         )
+
+
+class ResetPasswordSendEmailForm(forms.ModelForm):
+    """
+    Form that send form with link to reset password
+    """
+    email = forms.EmailField(
+        label='email',
+        required=True)
+
+    class Meta:
+        model = RushUser
+        fields = ['email']
+
+
+class ResetPasswordForm(SetPasswordForm):
+    """
+    Form for reset user's password.
+    """
+    error_messages = {
+        'password_mismatch': _('Hasła nie są identyczne.'),
+    }
+    new_password1 = forms.CharField(
+        label=_('Hasło'),
+        widget=forms.PasswordInput
+    )
+    new_password2 = forms.CharField(
+        label=_('Powtórz hasło'),
+        widget=forms.PasswordInput
+    )
+    field_order = ['new_password1', 'new_password2']

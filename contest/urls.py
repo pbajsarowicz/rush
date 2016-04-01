@@ -9,6 +9,7 @@ from contest import views
 
 
 urlpatterns = [
+
     url(
         r'^$',
         login_required(views.HomeView.as_view()),
@@ -20,10 +21,21 @@ urlpatterns = [
         name='register'
     ),
     url(
+        r'^logowanie/resetowanie_hasla_email$',
+        views.ResetPasswordSendEmailView.as_view(),
+        name='reset'
+    ),
+    url(
         r'^logowanie/$',
         views.LoginView.as_view(),
         name='login'
     ),
+    url(
+        r'^logowanie/resetowanie_hasla$',
+        views.ResetPasswordView.as_view(),
+        name='reset_password'
+    ),
+
     url(
         r'^administrator/konta/(?P<user_id>[0-9]+)?/?$',
         login_required(views.AccountsView.as_view()),
@@ -42,6 +54,7 @@ urlpatterns = [
         views.SetPasswordView.as_view(),
         name='set-password'
     ),
+
     url(
         r'^zawodnicy/dodaj/(?P<id>[0-9]+)$',
         login_required(views.ContestantAddView.as_view()),
