@@ -60,6 +60,11 @@
                 {% endfor %}
                 </tbody>
             </table>
+            {% if user.is_authenticated and user.is_creator %}
+                <div class="section center-align">
+                    <a class="waves-effect waves-light btn-large modal-trigger" href="{% url 'contest:contest-add' %}">Nowe zawody</a>
+                </div>
+            {% endif %}
         </div>
         <div class="section">
             <div class="row">

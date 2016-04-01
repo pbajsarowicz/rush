@@ -48,6 +48,7 @@ class RushUser(AbstractBaseUser):
     date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
     is_admin = models.BooleanField(default=False)
+    is_creator = models.BooleanField(default=False)
     club = models.ForeignKey(Club, blank=True, null=True)
 
     objects = RushUserManager()

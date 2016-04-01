@@ -130,3 +130,7 @@ class ContestantAddView(View):
             return render(request, self.template_name, {'message': msg})
 
         return render(request, self.template_name, {'formset': formset})
+
+
+class ContestAddView(View):
+    pass
