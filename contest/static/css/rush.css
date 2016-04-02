@@ -6,7 +6,7 @@ Contest
 }
 
 .contest-item .text {
-    line-height: 38px
+    line-height: 38px;
 }
 
 .contest-item .button {
@@ -61,5 +61,5 @@ Base elements
 }
 
 .nav-margin {
-    margin-bottom: 40px !important;;
+    margin-bottom: 40px !important;
 }
