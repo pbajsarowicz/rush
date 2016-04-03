@@ -517,7 +517,7 @@ class ContestAddTestCase(TestCase):
             response.context['form'].errors['deadline'],
             [
                 'Ostateczny termin dodawania zawodników nie może być później '
-                'niż data zawodów'
+                'niż data zawodów.'
             ]
         )
 

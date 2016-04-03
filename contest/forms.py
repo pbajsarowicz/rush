@@ -163,7 +163,7 @@ class ContestForm(forms.ModelForm):
         elif deadline > date:
             raise forms.ValidationError(
                 'Ostateczny termin dodawania zawodników nie może być później '
-                'niż data zawodów'
+                'niż data zawodów.'
             )
         return deadline
 
