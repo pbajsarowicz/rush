@@ -6,7 +6,7 @@
         {% if message %}
             {{ message }}
             <div class="row center">
-                <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">ok</a>
+                <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Ok</a>
             </div>
         {% else %}
             <form class="col s6" action="?next={{next}}" role="form" method="post">
