@@ -196,4 +196,5 @@ $(document).ready(function() {
     onClubCodeValidation();
     $('select').material_select();
     $('.modal-trigger').leanModal();
+    $('.datetime').mask('99.99.9999 99:99', {placeholder: 'dd.mm.yyyy hh:mm'});
 });

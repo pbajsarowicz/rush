@@ -32,6 +32,9 @@ class ToJSONTestCase(TestCase):
         encoded_date = encoder.default(example_date)
         self.assertEqual(encoded_date, '01-01-2000')
 
+        example_date = 'Wrong format'
+        self.assertRaises(TypeError, encoder.default, example_date)
+
     def test_to_json(self):
         result = to_json(self.user)
         result_json = json.loads(result)
@@ -44,6 +47,7 @@ class ToJSONTestCase(TestCase):
                 'id': 1,
                 'is_active': True,
                 'is_admin': False,
+                'is_creator': False,
                 'last_login': None,
                 'last_name': 'Anonymous',
                 'organization_address': '',

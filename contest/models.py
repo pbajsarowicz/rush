@@ -13,7 +13,6 @@ from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils import timezone
-from unidecode import unidecode
 
 from contest.manager import RushUserManager
 
@@ -95,14 +94,6 @@ class RushUser(AbstractBaseUser):
         Return True if user has admin privileges.
         """
         return self.is_admin
-
-    def _get_username(self):
-        """
-        Returns username for an active user.
-        """
-        return unidecode(
-            '{}{}'.format(self.first_name[0], self.last_name)
-        ).lower()
 
     def activate(self):
         """

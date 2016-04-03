@@ -13,7 +13,10 @@ from django.views.generic import (
     View,
 )
 
-from contest.forms import ContestantForm
+from contest.forms import (
+    ContestantForm,
+    ContestForm,
+)
 from contest.models import Contest
 
 
@@ -133,4 +136,30 @@ class ContestantAddView(View):
 
 
 class ContestAddView(View):
-    pass
+    """
+    View for adding contests.
+    """
+    template_name = 'contest/contest_add.html'
+    form_class = ContestForm
+
+    def get(self, request):
+        """
+        Return clear form.
+        """
+        form = self.form_class()
+
+        if not request.user.is_authenticated or not request.user.is_creator:
+            msg = 'Nie masz uprawnień do dodawania zawodów'
+            return render(request, self.template_name, {'message': msg})
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        """
+        Create new Contest.
+        """
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
+            return render(request, self.template_name, {'message': msg})
+        return render(request, self.template_name, {'form': form})
