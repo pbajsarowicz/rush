@@ -147,7 +147,6 @@ class ContestAddView(View):
         Return clear form.
         """
         form = self.form_class()
-
         if not request.user.is_authenticated or not request.user.is_creator:
             msg = 'Nie masz uprawnień do dodawania zawodów'
             return render(request, self.template_name, {'message': msg})

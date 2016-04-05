@@ -4,6 +4,10 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import (
+    Group,
+    Permission,
+)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -466,8 +470,12 @@ class ContestAddTestCase(TestCase):
             email='d@d.pl', is_active=True, username='wrong', password='pass12'
         )
         self.user_2 = RushUser.objects.create_user(
-            email='c@c.pl', is_active=True, is_creator=True, username='right',
-            password='pass12'
+            email='c@c.pl', is_active=True, username='right', password='pass12'
+        )
+        self.user_1.groups.add(Group.objects.get(name='Moderators'))
+        self.user_2.groups.add(Group.objects.get(name='Moderators'))
+        self.user_2.user_permissions.add(
+            Permission.objects.get(name='Can add contest')
         )
         club = Club.objects.create(name='abc')
         Organizer.objects.create(name='Organizator', club=club)

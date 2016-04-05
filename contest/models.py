@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
@@ -28,7 +29,7 @@ class Club(models.Model):
         return self.name
 
 
-class RushUser(AbstractBaseUser):
+class RushUser(AbstractBaseUser, PermissionsMixin):
     """
     User model for Rush users.
     """
@@ -47,7 +48,6 @@ class RushUser(AbstractBaseUser):
     date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
     is_admin = models.BooleanField(default=False)
-    is_creator = models.BooleanField(default=False)
     club = models.ForeignKey(Club, blank=True, null=True)
 
     objects = RushUserManager()
@@ -94,6 +94,15 @@ class RushUser(AbstractBaseUser):
         Return True if user has admin privileges.
         """
         return self.is_admin
+
+    @property
+    def is_creator(self):
+        """
+        Return True if user has permission to add contests.
+        """
+        return (('contest.add_contest' in self.get_all_permissions() and
+                self.groups.filter(name='Moderators').exists()) or
+                self.is_staff)
 
     def activate(self):
         """

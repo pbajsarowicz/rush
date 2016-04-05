@@ -10,7 +10,6 @@
           "date_joined": "2016-02-20T13:00:26.299023Z",
           "is_active": true,
           "is_admin": false,
-          "is_creator": false,
           "club": 1,
           "organization_name": "ZSP1 w Pile",
           "organization_address": "Ceglana 4"
@@ -27,7 +26,6 @@
           "date_joined": "2016-02-20T13:00:26.299023Z",
           "is_active": true,
           "is_admin": true,
-          "is_creator": true,
           "club": 1,
           "organization_name": "ZSP1 w Pile",
           "organization_address": "Ceglana 4"

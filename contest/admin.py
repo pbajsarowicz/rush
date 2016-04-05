@@ -44,6 +44,7 @@ class RushUserAdmin(admin.ModelAdmin):
     readonly_fields = ('last_login', 'date_joined')
     actions = [create, cancel]
     list_filter = ('is_active',)
+    filter_horizontal = ['user_permissions']
 
 
 class ContestantInline(admin.StackedInline):
