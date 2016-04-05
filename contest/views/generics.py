@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
 from django.forms import formset_factory
 from django.shortcuts import render
@@ -135,10 +136,11 @@ class ContestantAddView(View):
         return render(request, self.template_name, {'formset': formset})
 
 
-class ContestAddView(View):
+class ContestAddView(PermissionRequiredMixin, View):
     """
     View for adding contests.
     """
+    permission_required = 'contest.add_contest'
     template_name = 'contest/contest_add.html'
     form_class = ContestForm
 
@@ -147,9 +149,6 @@ class ContestAddView(View):
         Return clear form.
         """
         form = self.form_class()
-        if not request.user.is_authenticated or not request.user.is_creator:
-            msg = 'Nie masz uprawnień do dodawania zawodów'
-            return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):

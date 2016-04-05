@@ -492,10 +492,10 @@ class ContestAddTestCase(TestCase):
     def test_has_access(self):
         self.client.login(username='wrong', password='pass12')
         response = self.client.get(reverse('contest:contest-add'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(
-            response.context['message'],
-            'Nie masz uprawnień do dodawania zawodów'
+            response.url,
+            '{}?next=/zawody/dodaj'.format(reverse('contest:login'))
         )
 
         self.client.login(username='right', password='pass12')

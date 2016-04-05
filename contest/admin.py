@@ -36,10 +36,17 @@ class RushUserAdmin(admin.ModelAdmin):
             queryset.delete()
     cancel.short_description = 'Usuń'
 
+    fields = [
+        'username', 'email', 'first_name', 'last_name', 'organization_name',
+        'organization_address', 'club', 'date_joined', 'last_login',
+        'groups', 'user_permissions'
+    ]
+    """
     exclude = (
         'password', 'date_joined', 'last_login', 'status', 'is_superuser',
         'is_staff', 'is_active', 'is_admin',
     )
+    """
     list_display = ('first_name', 'last_name', 'is_active')
     readonly_fields = ('last_login', 'date_joined')
     actions = [create, cancel]

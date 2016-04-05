@@ -74,7 +74,9 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         """
         Return True if user have specified permission.
         """
-        return True
+        if self.groups.filter(name='Administrators') or self.is_staff:
+            return True
+        return super(RushUser, self).has_perm(perm, obj)
 
     def has_module_perms(self, app_label):
         """
@@ -100,9 +102,7 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         """
         Return True if user has permission to add contests.
         """
-        return (('contest.add_contest' in self.get_all_permissions() and
-                self.groups.filter(name='Moderators').exists()) or
-                self.is_staff)
+        return self.has_perm('contest.add_contest')
 
     def activate(self):
         """
