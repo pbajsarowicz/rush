@@ -46,7 +46,7 @@ class RegisterView(View):
             {'first_name': name, 'last_name': last_name, 'page': page}
         )
         msg = EmailMessage(
-            'Nowy Użytkownik',
+            'Nowe zapytanie o konto',
             text,
             settings.SUPPORT_EMAIL,
             email,

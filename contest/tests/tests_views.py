@@ -25,8 +25,8 @@ from contest.models import (
     Organizer,
 )
 from contest.views import (
-    SetPasswordView,
     RegisterView,
+    SetPasswordView
 )
 
 
