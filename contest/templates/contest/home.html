@@ -12,6 +12,11 @@
         <ul class="collection with-header">
             <li class="collection-header">
                 <h4 class="center-align">Nadchodzące</h4>
+                {% if user.is_authenticated and user.is_creator %}
+                    <div class="section center-align">
+                        <a class="waves-effect waves-light btn-large modal-trigger" href="{% url 'contest:contest-add' %}">Nowe zawody</a>
+                    </div>
+                {% endif %}
             </li>
             {% if upcoming %}
                 {% for contest in upcoming %}

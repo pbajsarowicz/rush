@@ -7,8 +7,9 @@ from django.contrib.auth.forms import (
     AuthenticationForm,
     SetPasswordForm,
 )
-from django.utils.translation import ugettext_lazy as _
 from django.core.validators import RegexValidator
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from contest.models import (
     Contestant,
@@ -129,3 +130,57 @@ class ContestantForm(forms.ModelForm):
             'first_name', 'last_name', 'gender',
             'age', 'school', 'styles_distances',
         )
+
+
+class ContestForm(forms.ModelForm):
+    """
+    Form for creating Contests.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(ContestForm, self).__init__(*args, **kwargs)
+        self.fields['date'].widget.attrs = {'class': 'datetime'}
+        self.fields['deadline'].widget.attrs = {'class': 'datetime'}
+        self.fields['description'].widget.attrs = {
+            'class': 'materialize-textarea'
+        }
+
+    def clean_date(self):
+        date = self.cleaned_data.get('date')
+        if date < timezone.now():
+            raise forms.ValidationError(
+                'Data zawodów nie może być wcześniejsza niż dzień dzisiejszy.'
+            )
+        return date
+
+    def clean_deadline(self):
+        deadline = self.cleaned_data.get('deadline')
+        date = self.cleaned_data.get('date')
+        if deadline < timezone.now():
+            raise forms.ValidationError(
+                'Termin dodawania zwodników musi być dłuższy niż podana data.'
+            )
+        elif deadline > date:
+            raise forms.ValidationError(
+                'Ostateczny termin dodawania zawodników nie może być później '
+                'niż data zawodów.'
+            )
+        return deadline
+
+    def clean_age_max(self):
+        age_min = self.cleaned_data.get('age_min')
+        age_max = self.cleaned_data.get('age_max')
+
+        if age_min > age_max:
+            raise forms.ValidationError(
+                'Przedział wiekowy jest niepoprawny. '
+                'Popraw wartości i spróbuj ponownie.'
+            )
+        return age_max
+
+    class Meta:
+        model = Contest
+        fields = [
+            'date', 'place', 'deadline', 'age_min',
+            'age_max', 'description', 'organizer'
+        ]
