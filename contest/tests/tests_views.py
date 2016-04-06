@@ -5,6 +5,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
+from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils.timezone import make_aware
@@ -213,8 +214,9 @@ class PasswordSettingTests(TestCase):
         )
 
         def test_sending_mail(self):
-            RegisterView.send_email_with_new_user('Janek',
-                'Kowalski', ['admin@admin.pl'], 'www.rush.pl')
+            RegisterView.send_email_with_new_user(
+                'Janek', 'Kowalski',
+                ['admin@admin.pl'], 'www.rush.pl')
             self.assertEqual(len(mail.outbox), 1)
             self.assertEqual(mail.outbox[0].to, ['admin@admin.pl'])
 

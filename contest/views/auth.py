@@ -80,8 +80,7 @@ class RegisterView(View):
                 reverse('contest:accounts')
             )
             self.send_email_with_new_user(
-                user_name,
-                user_lastname, emails, page)
+                user_name, user_lastname, emails, page)
             return render(
                 request, 'contest/confirmation.html',
                 {'email': settings.SUPPORT_EMAIL},
