@@ -12,6 +12,11 @@
         <ul class="collection with-header">
             <li class="collection-header">
                 <h4 class="center-align">Nadchodzące</h4>
+                {% if user.is_authenticated and user.is_creator %}
+                    <div class="section center-align">
+                        <a class="waves-effect waves-light btn-large modal-trigger" href="{% url 'contest:contest-add' %}">Nowe zawody</a>
+                    </div>
+                {% endif %}
             </li>
             {% if upcoming %}
                 {% for contest in upcoming %}
@@ -47,7 +52,7 @@
                 {% for contest in completed %}
                 <li class="collection-item contest-item">
                     <div class="contest-item">
-                        <a class="text" href="{% url 'contest:contestant-add' id=contest.pk %}">{{ contest }}</a>
+                        <span class="text">{{ contest }}</span>
                         <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}" onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
                         <div id="modal{{contest.pk}}" class="modal">
                             <div class="modal-content">

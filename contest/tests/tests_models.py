@@ -41,7 +41,7 @@ class UserMethodTests(TestCase):
         user_test = RushUser.objects.get(email='test@xyz.pl')
         self.assertEqual(user_test.get_full_name(), 'Name Last Name')
         self.assertEqual(user_test.get_short_name(), 'Last Name')
-        self.assertTrue(user_test.has_perm(None))
+        self.assertFalse(user_test.has_perm('contest.add_contest'))
         self.assertTrue(user_test.has_module_perms(None))
         self.assertFalse(user_test.is_staff)
         self.assertEqual(user_test.__unicode__(), 'test@xyz.pl')

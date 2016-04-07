@@ -11,7 +11,8 @@ class RushUserManager(BaseUserManager):
     """
     def create_user(
         self, email, username='', password='', first_name='', last_name='',
-        organization_name='', organization_address=''
+        organization_name='', organization_address='', is_active=False,
+        is_admin=False
     ):
         """
         Regular user creation.
@@ -25,6 +26,8 @@ class RushUserManager(BaseUserManager):
             last_name=last_name,
             organization_name=organization_name,
             organization_address=organization_address,
+            is_active=is_active,
+            is_admin=is_admin,
         )
         user.set_password(password)
         user.save(using=self._db)
