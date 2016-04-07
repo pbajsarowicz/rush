@@ -7,8 +7,8 @@
             <div class="row center">
                 {% csrf_token %}
                 {{ form.as_p }}
+                <a href="{% url 'contest:reset' %}"><button type="button" class="pull-right waves-effect waves-teal btn-flat">Nie pamiętam hasła</button></a>
                 <button type="submit" class="pull-right btn btn-primary">Zaloguj się</button>
-                <a href="resetowanie_hasla_email"><button type="button" class="pull-right btn btn-primary">Zapomniałem hasła</button></a>
             </div>
         </form>
     </div>

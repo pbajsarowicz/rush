@@ -3,9 +3,11 @@ from __future__ import unicode_literals
 import uuid
 
 from django import forms
+from django.conf import settings
 from django.contrib.auth.forms import (
     AuthenticationForm,
     SetPasswordForm,
+    PasswordResetForm,
 )
 from django.core.validators import RegexValidator
 from django.utils import timezone
@@ -69,15 +71,14 @@ class LoginForm(AuthenticationForm):
     }
 
 
-class SettingPasswordForm(SetPasswordForm):
+class RushResetPasswordForm(SetPasswordForm):
     """
-    Form for setting user's password.
+    Form for resetting user's password.
     """
     error_messages = {
         'password_mismatch': _('Hasła nie są identyczne.'),
         'username_appears': _('Podana nazwa użytkownika jest już zajęta.')
     }
-    username = forms.CharField(label=_('Nazwa użytkownika'))
     new_password1 = forms.CharField(
         label=_('Hasło'),
         widget=forms.PasswordInput
@@ -86,6 +87,25 @@ class SettingPasswordForm(SetPasswordForm):
         label=_('Powtórz hasło'),
         widget=forms.PasswordInput
     )
+
+    field_order = ['new_password1', 'new_password2']
+
+    def save(self, commit=True):
+        password = self.cleaned_data['new_password1']
+        self.user.set_password(password)
+
+        if commit:
+            self.user.save()
+
+        return self.user
+
+
+class RushSetPasswordForm(RushResetPasswordForm):
+    """
+    Form for setting user's password.
+    """
+    username = forms.CharField(label=_('Nazwa użytkownika'))
+
     field_order = ['username', 'new_password1', 'new_password2']
 
     def clean_username(self):
@@ -98,13 +118,43 @@ class SettingPasswordForm(SetPasswordForm):
         return username
 
     def save(self, commit=True):
-        password = self.cleaned_data['new_password1']
+        self.user = super(RushSetPasswordForm, self).save(commit=False)
+
         username = self.cleaned_data['username']
-        self.user.set_password(password)
         self.user.username = username
+
         if commit:
             self.user.save()
+
         return self.user
+
+
+class RushResetPasswordEmailForm(PasswordResetForm):
+    """
+    Form that sends form with link to reset password.
+    """
+    def __init__(self, *args, **kwargs):
+        super(RushResetPasswordEmailForm, self).__init__(*args, **kwargs)
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not RushUser.objects.filter(email=email, is_active=True).exists():
+            raise forms.ValidationError(
+                'Konto dla podanego adresu nie istnieje lub nie zostało '
+                'jeszcze aktywowane. Sprawdź poprawność podanego adresu. '
+                'W razie problemów skontaktuj się z nami {}'.format(
+                    settings.SUPPORT_EMAIL
+                )
+            )
+        return email
+
+    def send_email(self, request):
+        """
+        Sends an email with a link which lets reset a password.
+        """
+        email = self.cleaned_data['email']
+        for user in self.get_users(email):
+            user.send_reset_password_email(request)
 
 
 class ContestantForm(forms.ModelForm):
@@ -130,37 +180,6 @@ class ContestantForm(forms.ModelForm):
             'first_name', 'last_name', 'gender',
             'age', 'school', 'styles_distances',
         )
-
-
-class ResetPasswordSendEmailForm(forms.ModelForm):
-    """
-    Form that send form with link to reset password
-    """
-    email = forms.EmailField(
-        label='email',
-        required=True)
-
-    class Meta:
-        model = RushUser
-        fields = ['email']
-
-
-class ResetPasswordForm(SetPasswordForm):
-    """
-    Form for reset user's password.
-    """
-    error_messages = {
-        'password_mismatch': _('Hasła nie są identyczne.'),
-    }
-    new_password1 = forms.CharField(
-        label=_('Hasło'),
-        widget=forms.PasswordInput
-    )
-    new_password2 = forms.CharField(
-        label=_('Powtórz hasło'),
-        widget=forms.PasswordInput
-    )
-    field_order = ['new_password1', 'new_password2']
 
 
 class ContestForm(forms.ModelForm):

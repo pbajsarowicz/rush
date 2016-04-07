@@ -19,7 +19,7 @@ from contest.forms import (
     ContestantForm,
     LoginForm,
     RegistrationForm,
-    SettingPasswordForm,
+    RushSetPasswordForm,
     ContestForm,
 )
 from contest.models import (
@@ -29,7 +29,7 @@ from contest.models import (
     Organizer,
     Club,
 )
-from contest.views import SetPasswordView
+from contest.views import SetResetPasswordView
 
 
 class HomeViewTests(TestCase):
@@ -141,7 +141,7 @@ class PasswordSettingTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
-            isinstance(response.context['form'], SettingPasswordForm)
+            isinstance(response.context['form'], RushSetPasswordForm)
         )
 
     def test_resend_on_wrong_token(self):
@@ -163,7 +163,7 @@ class PasswordSettingTests(TestCase):
             )
         )
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(SetPasswordView._get_user('00'))
+        self.assertFalse(SetResetPasswordView._get_user('00'))
 
         response = self.client.get(
             reverse(
@@ -495,7 +495,7 @@ class ContestAddTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
             response.url,
-            '{}?next=/zawody/dodaj'.format(reverse('contest:login'))
+            '{}/?next=/zawody/dodaj'.format(reverse('contest:login'))
         )
 
         self.client.login(username='right', password='pass12')
