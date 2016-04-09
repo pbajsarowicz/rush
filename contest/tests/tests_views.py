@@ -449,7 +449,7 @@ class ContestantAddViewTestCase(TestCase):
 
 class ContestantListViewTestCase(TestCase):
 
-    def setup(self):
+    def setUp(self):
         self.user = RushUser(
             email='test@cos.pl', username='test_test',
             password='P@ssw0rd', is_active=True
@@ -486,23 +486,35 @@ class ContestantListViewTestCase(TestCase):
 
 class EditContestantViewTestCase(TestCase):
     fixtures = [
-        'organizers.json', 'contests.json', 'clubs.json',
-        'users.json'
+        'organizers.json', 'contests.json', 'clubs.json', 'users.json',
     ]
 
-    def setup(self):
+    def setUp(self):
         self.user = RushUser(
             email='root@root.pl', username='root',
             password='R@ootroot', is_active=True
         )
         self.user.set_password('R@ootroot')
         self.user.save()
+        self.contestant = Contestant.objects.create(
+            first_name='Adam',
+            last_name='Nowak',
+            gender='M',
+            age=14,
+            school='Szkoła',
+            styles_distances='100m motyl',
+            contest=Contest.objects.first(),
+            moderator=self.user
+        )
 
         self.client.login(username='root', password='R@ootroot')
 
     def test_get(self):
         response = self.client.get(
-            reverse('contest:contestant-edit', kwargs={'contestant_id': 1}),
+            reverse(
+                'contest:contestant-edit',
+                kwargs={'contestant_id': self.contestant.id}
+            ),
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -521,12 +533,13 @@ class EditContestantViewTestCase(TestCase):
     def test_post(self):
         response = self.client.post(
             reverse(
-                'contest:contestant-edit', kwargs={'contestant_id': 1},
-                data={
-                    'first_name': 'Karol', 'last_name': 'Kowalski',
-                    'school': 'School', 'gender': 'F', 'age': 11,
-                }
-            )
+                'contest:contestant-edit',
+                kwargs={'contestant_id': self.contestant.id}
+            ),
+            data={
+                'first_name': 'Karol', 'last_name': 'Kowalski',
+                'school': 'School', 'gender': 'F', 'age': 11,
+            }
         )
         self.assertEqual(response.context['first_name'], 'Karol')
         self.assertEqual(response.context['last_name'], 'Kowalski')
