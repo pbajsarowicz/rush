@@ -153,5 +153,3 @@ LOGIN_URL = '/zaloguj/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_URL = '/wyloguj/'
 SUPPORT_EMAIL = 'Sample@email.com'
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

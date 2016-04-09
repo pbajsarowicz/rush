@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from datetime import datetime
+from datetime import (
+    date,
+    datetime,
+)
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -14,34 +17,44 @@ from django.test import TestCase
 from django.utils.timezone import make_aware
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from mock import patch
 
 from contest.forms import (
     ContestantForm,
+    ContestForm,
     LoginForm,
     RegistrationForm,
+    RushResetPasswordEmailForm,
+    RushResetPasswordForm,
     RushSetPasswordForm,
-    ContestForm,
 )
 from contest.models import (
-    Contestant,
-    RushUser,
-    Contest,
-    Organizer,
     Club,
+    Contest,
+    Contestant,
+    Organizer,
+    RushUser,
 )
 from contest.views import SetResetPasswordView
 
 
 class HomeViewTests(TestCase):
+    fixtures = [
+        'clubs.json',
+        'organizers.json',
+    ]
+
     def setUp(self):
         self.contest = Contest.objects.create(
-            organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            organizer=Organizer.objects.first(),
+            date=make_aware(datetime(2050, 12, 31)), place='Szkoła',
+            age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
-            organizer=Organizer(id=2), date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            organizer=Organizer.objects.last(),
+            date=make_aware(datetime(2008, 12, 31)), place='Szkoła',
+            age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
         self.user = RushUser.objects.create_superuser(
@@ -114,7 +127,8 @@ class LoginViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
 
-class PasswordSettingTests(TestCase):
+class SetResetPasswordViewTestCase(TestCase):
+
     def setUp(self):
         self.user_1 = RushUser(
             email='ddd@ddd.pl', first_name='Łukasz', last_name='Ślązak',
@@ -225,6 +239,118 @@ class PasswordSettingTests(TestCase):
             'Hasło ustawione, można się zalogować.'
         )
 
+    def test_reset_password_successful_get(self):
+        user_2_uid = urlsafe_base64_encode(force_bytes(self.user_2.pk))
+        user_2_token = default_token_generator.make_token(self.user_2)
+
+        response = self.client.get(
+            reverse(
+                'contest:reset-password',
+                kwargs={'uidb64': user_2_uid, 'token': user_2_token}
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['form'], RushResetPasswordForm)
+
+    def test_reset_password_expired_token_get(self):
+        user_2_uid = urlsafe_base64_encode(force_bytes(self.user_2.pk))
+
+        with patch('django.contrib.auth.tokens.date') as mock_date:
+            mock_date.today.return_value = date(2010, 1, 1)
+            mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+            user_2_token = default_token_generator.make_token(self.user_2)
+
+        response = self.client.get(
+            reverse(
+                'contest:reset-password',
+                kwargs={'uidb64': user_2_uid, 'token': user_2_token}
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            'Link nie jest już aktywny. Jeśli masz problemy z zalogowaniem, '
+            'skorzystaj z formularza resetowania hasła.'
+        )
+
+    def test_reset_password_post(self):
+        user_2_uid = urlsafe_base64_encode(force_bytes(self.user_2.pk))
+        user_2_token = default_token_generator.make_token(self.user_2)
+        form_data = {
+            'new_password1': 'pass1234', 'new_password2': 'pass1234'
+        }
+
+        response = self.client.post(
+            reverse(
+                'contest:reset-password',
+                kwargs={'uidb64': user_2_uid, 'token': user_2_token}
+            ),
+            data=form_data,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            'Hasło ustawione, można się zalogować.'
+        )
+
+
+class ResetPasswordEmailViewTestCase(TestCase):
+
+    def setUp(self):
+        self.user = RushUser.objects.create(
+            email='bruce@lee.com', first_name='Bruce', last_name='Lee',
+            username='brucelee'
+        )
+        self.user.is_active = True
+        self.user.set_password('Password_already_set')
+        self.user.save()
+
+    def test_get(self):
+        response = self.client.get(reverse('contest:reset-email'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(
+            response.context['form'], RushResetPasswordEmailForm
+        )
+
+    def test_post_successful(self):
+        form_data = {'email': 'bruce@lee.com'}
+
+        response = self.client.post(
+            reverse('contest:reset-email'), data=form_data,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            (
+                'Link do zresetowania hasła został wysłany. Sprawdź skrzynkę '
+                'e-mailową.'
+            )
+        )
+
+    def test_post_validation_error(self):
+        form_data = {'email': 'fake@mail.com'}
+
+        response = self.client.post(
+            reverse('contest:reset-email'), data=form_data,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['form'].errors,
+            {
+                'email': [(
+                    'Konto dla podanego adresu nie istnieje lub nie zostało '
+                    'jeszcze aktywowane. Sprawdź poprawność podanego adresu. '
+                    'W razie problemów skontaktuj się z nami Sample@email.com'
+                )]
+            }
+        )
+
 
 class AccountsViewTestCase(TestCase):
     def setUp(self):
@@ -321,6 +447,8 @@ class RegisterViewTests(TestCase):
 
 
 class ContestantAddViewTestCase(TestCase):
+    fixtures = ['organizers.json', 'clubs.json']
+
     def setUp(self):
         self.user = RushUser(
             email='test@cos.pl', username='test_test',
@@ -352,24 +480,27 @@ class ContestantAddViewTestCase(TestCase):
         }
 
         self.contest = Contest.objects.create(
-            organizer=Organizer(id=1), date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            organizer=Organizer.objects.get(id=1),
+            date=make_aware(datetime(2050, 12, 31)), place='Szkoła',
+            age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
-            organizer=Organizer(id=2), date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            organizer=Organizer.objects.get(id=2),
+            date=make_aware(datetime(2008, 12, 31)), place='Szkoła',
+            age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
         self.contest_deadline = Contest.objects.create(
-            organizer=Organizer(id=3), date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            organizer=Organizer.objects.get(id=2),
+            date=make_aware(datetime(2050, 12, 31)), place='Szkoła',
+            age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
 
     def test_get(self):
         response = self.client.get(
-            reverse('contest:contestant-add', kwargs={'id': 1}),
+            reverse('contest:contestant-add', kwargs={'id': self.contest.id}),
         )
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(
@@ -386,7 +517,10 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         response = self.client.get(
-            reverse('contest:contestant-add', kwargs={'id': 2}),
+            reverse(
+                'contest:contestant-add',
+                kwargs={'id': self.contest_done.id}
+            ),
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -395,7 +529,10 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         response = self.client.get(
-            reverse('contest:contestant-add', kwargs={'id': 3}),
+            reverse(
+                'contest:contestant-add',
+                kwargs={'id': self.contest_deadline.id}
+            ),
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -405,7 +542,7 @@ class ContestantAddViewTestCase(TestCase):
 
     def test_post_with_success(self):
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': 1}),
+            reverse('contest:contestant-add', kwargs={'id': self.contest.id}),
             data=self.form_data
         )
 
@@ -430,7 +567,7 @@ class ContestantAddViewTestCase(TestCase):
 
         self.form_data['form-0-age'] = 99
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': 1}),
+            reverse('contest:contestant-add', kwargs={'id': self.contest.id}),
             data=self.form_data
         )
 
@@ -444,7 +581,7 @@ class ContestantAddViewTestCase(TestCase):
         self.form_data['form-0-age'] = 15
         self.form_data['form-0-gender'] = 'WRONG'
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': 1}),
+            reverse('contest:contestant-add', kwargs={'id': self.contest.id}),
             data=self.form_data
         )
         expected_error = {
@@ -465,6 +602,8 @@ class ContestantAddViewTestCase(TestCase):
 
 
 class ContestAddTestCase(TestCase):
+    fixtures = ['organizers.json', 'clubs.json']
+
     def setUp(self):
         self.user_1 = RushUser.objects.create_user(
             email='d@d.pl', is_active=True, username='wrong', password='pass12'
@@ -478,7 +617,7 @@ class ContestAddTestCase(TestCase):
             Permission.objects.get(name='Can add contest')
         )
         club = Club.objects.create(name='abc')
-        Organizer.objects.create(name='Organizator', club=club)
+        organizer = Organizer.objects.create(name='Organizator', club=club)
         self.form_data = {
             'date': '31.12.2100 16:00',
             'place': 'Majorka',
@@ -486,7 +625,7 @@ class ContestAddTestCase(TestCase):
             'age_min': 14,
             'age_max': 17,
             'description': 'Zapraszamy na zawody!',
-            'organizer': 1
+            'organizer': organizer.id
         }
 
     def test_has_access(self):
@@ -509,6 +648,7 @@ class ContestAddTestCase(TestCase):
             reverse('contest:contest-add'), data=self.form_data
         )
         self.assertEqual(response.status_code, 200)
+
         self.assertEqual(
             response.context['message'],
             'Dziękujemy! Możesz teraz dodać zawodników.'

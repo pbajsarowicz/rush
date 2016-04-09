@@ -191,7 +191,7 @@ class ResetPasswordEmailView(View):
 
     def post(self, request, uidb64=None, token=None):
         """
-        Send email with link to reset password.
+        Sends an email with a link to reset the password.
         """
         form = self.form_class(data=request.POST)
 

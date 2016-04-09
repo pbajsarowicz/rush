@@ -39,6 +39,8 @@ class ToJSONTestCase(TestCase):
         result = to_json(self.user)
         result_json = json.loads(result)
         result_json.pop('password')
+        result_json.pop('id')
+
         self.assertEqual(
             result_json,
             {
@@ -46,7 +48,6 @@ class ToJSONTestCase(TestCase):
                 'email': 'test@user.pl',
                 'first_name': 'Test',
                 'groups': [],
-                'id': 1,
                 'is_active': True,
                 'is_admin': False,
                 'is_superuser': False,

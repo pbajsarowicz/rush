@@ -27,7 +27,7 @@ auth_patterns = [
     url(
         r'^zaloguj/zresetuj_haslo/?$',
         views.ResetPasswordEmailView.as_view(),
-        name='reset'
+        name='reset-email'
     ),
     url(
         (
