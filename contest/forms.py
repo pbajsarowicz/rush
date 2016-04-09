@@ -6,18 +6,18 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import (
     AuthenticationForm,
-    SetPasswordForm,
     PasswordResetForm,
+    SetPasswordForm,
 )
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from contest.models import (
-    Contestant,
     Club,
-    RushUser,
     Contest,
+    Contestant,
+    RushUser,
 )
 
 
@@ -75,10 +75,6 @@ class RushResetPasswordForm(SetPasswordForm):
     """
     Form for resetting user's password.
     """
-    error_messages = {
-        'password_mismatch': _('Hasła nie są identyczne.'),
-        'username_appears': _('Podana nazwa użytkownika jest już zajęta.')
-    }
     new_password1 = forms.CharField(
         label=_('Hasło'),
         widget=forms.PasswordInput
@@ -88,6 +84,9 @@ class RushResetPasswordForm(SetPasswordForm):
         widget=forms.PasswordInput
     )
 
+    error_messages = {
+        'password_mismatch': _('Hasła nie są identyczne.'),
+    }
     field_order = ['new_password1', 'new_password2']
 
     def save(self, commit=True):
@@ -112,8 +111,7 @@ class RushSetPasswordForm(RushResetPasswordForm):
         username = self.cleaned_data.get('username')
         if RushUser.objects.filter(username=username).exists():
             raise forms.ValidationError(
-                self.error_messages['username_appears'],
-                code='username_appears',
+                'Podana nazwa użytkownika jest już zajęta.'
             )
         return username
 
