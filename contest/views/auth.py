@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from urlparse import urljoin
 
 from django.conf import settings
 from django.contrib.auth import (
@@ -7,6 +8,9 @@ from django.contrib.auth import (
     logout,
 )
 from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import EmailMessage
+from django.core.urlresolvers import reverse
+from django.template import loader
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.views.generic import View
@@ -30,6 +34,26 @@ class RegisterView(View):
     form_class = RegistrationForm
     template_name = 'contest/register.html'
 
+    @staticmethod
+    def send_email_with_new_user(
+            name, last_name,
+            email, page, *args, **kwargs):
+        """
+        Sends an email with new user to admins.
+        """
+        text = loader.render_to_string(
+            'email/new_user_request.html',
+            {'first_name': name, 'last_name': last_name, 'page': page}
+        )
+        msg = EmailMessage(
+            'Nowe zapytanie o konto',
+            text,
+            settings.SUPPORT_EMAIL,
+            email,
+        )
+        msg.content_subtype = 'html'
+        msg.send()
+
     def get(self, request, *args, **kwargs):
         """
         Return registration form on site.
@@ -45,9 +69,21 @@ class RegisterView(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
+            emails = []
+            admins = RushUser.objects.filter(is_admin=True)
+            for admin in admins:
+                emails.append(admin.email)
+            user_name = form.cleaned_data['first_name']
+            user_lastname = form.cleaned_data['last_name']
+            page = urljoin(
+                'http://{}'.format(request.get_host()),
+                reverse('contest:accounts')
+            )
+            self.send_email_with_new_user(
+                user_name, user_lastname, emails, page)
             return render(
                 request, 'contest/confirmation.html',
-                {'email': settings.SUPPORT_EMAIL}
+                {'email': settings.SUPPORT_EMAIL},
             )
         else:
             return render(request, self.template_name, {'form': form})

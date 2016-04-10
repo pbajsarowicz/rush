@@ -198,3 +198,56 @@ $(document).ready(function() {
     $('.modal-trigger').leanModal();
     $('.datetime').mask('99.99.9999 99:99', {placeholder: 'dd.mm.yyyy hh:mm'});
 });
+
+/*
+ * Parsing user data from js to html.
+ */
+function parseUserData(json) {
+    var fields_names = [
+        ['Nazwa użytkownika', 'username'], 
+        ['Email', 'email'],
+        ['Data rejestracji', 'date_joined'],
+        ['Aktywność', 'is_active'],
+        ['jest adminem', 'is_admin'],
+        ['Klub', 'club'],
+        ['Nazwa organizacji', 'organization_name'],
+        ['Adres organizacji', 'organization_address']
+    ]
+
+    var result = '<ul>';
+    for(var i = 0; i < fields_names.length; ++i) {
+        result += '<li>';
+        result += fields_names[i][0]+': ';
+        result += json[fields_names[i][1]];
+        result += '</li>'
+    }
+    result += '</ul>';
+
+    return result;
+}
+
+/*
+ * Handling user info request and inserting data into html container.
+ */
+function getUserInfo(user) {
+    var el=document.getElementById('content' + user);
+    var display_state = el.getAttribute('display');
+
+    if (display_state == 'none') {
+        $.ajax({
+            url: '/api/v1/users/' + user,
+            dataType: 'json',
+            success: function(json){
+                user_data = parseUserData(json);
+
+                el.innerHTML = user_data;
+                el.setAttribute('display', 'inline');
+            }
+        });
+    }
+    else {
+        el.innerHTML = '';
+        el.setAttribute('display', 'none');
+    }
+}
+
