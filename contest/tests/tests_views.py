@@ -4,6 +4,10 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import (
+    Group,
+    Permission,
+)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -16,6 +20,7 @@ from contest.forms import (
     LoginForm,
     RegistrationForm,
     SettingPasswordForm,
+    ContestForm,
 )
 from contest.models import (
     Contestant,
@@ -115,7 +120,6 @@ class PasswordSettingTests(TestCase):
             email='ddd@ddd.pl', first_name='Łukasz', last_name='Ślązak',
             is_active=True
         )
-        self.user_1.set_password('password123')
         self.user_1.save()
 
         self.user_2 = RushUser.objects.create(
@@ -140,6 +144,7 @@ class PasswordSettingTests(TestCase):
             isinstance(response.context['form'], SettingPasswordForm)
         )
 
+    def test_resend_on_wrong_token(self):
         wrong_token = default_token_generator.make_token(self.user_2)
         response = self.client.get(
             reverse(
@@ -147,8 +152,9 @@ class PasswordSettingTests(TestCase):
                 kwargs={'uidb64': self.user1_uid, 'token': wrong_token}
             )
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
+    def test_resend_on_wrong_uid(self):
         wrong_uid = urlsafe_base64_encode(force_bytes(self.user_2.pk))
         response = self.client.get(
             reverse(
@@ -156,9 +162,20 @@ class PasswordSettingTests(TestCase):
                 kwargs={'uidb64': wrong_uid, 'token': self.user1_token}
             )
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(SetPasswordView._get_user('00'))
 
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': 'XX', 'token': self.user1_token}
+            )
+        )
+        self.assertEqual(
+            response.context['message'], 'Użytkownik nie istnieje.'
+        )
+
+    def test_password_already_set(self):
         self.client.login(
             username='username_taken', password='Password_already_set'
         )
@@ -546,3 +563,92 @@ class EditContestantViewTestCase(TestCase):
         self.assertEqual(response.context['school'], 'School')
         self.assertEqual(response.context['gender'], 'F')
         self.assertEqual(response.context['age'], 11)
+
+
+class ContestAddTestCase(TestCase):
+    def setUp(self):
+        self.user_1 = RushUser.objects.create_user(
+            email='d@d.pl', is_active=True, username='wrong', password='pass12'
+        )
+        self.user_2 = RushUser.objects.create_user(
+            email='c@c.pl', is_active=True, username='right', password='pass12'
+        )
+        self.user_1.groups.add(Group.objects.get(name='Moderators'))
+        self.user_2.groups.add(Group.objects.get(name='Moderators'))
+        self.user_2.user_permissions.add(
+            Permission.objects.get(name='Can add contest')
+        )
+        club = Club.objects.create(name='abc')
+        Organizer.objects.create(name='Organizator', club=club)
+        self.form_data = {
+            'date': '31.12.2100 16:00',
+            'place': 'Majorka',
+            'deadline': '29.12.2100 23:59',
+            'age_min': 14,
+            'age_max': 17,
+            'description': 'Zapraszamy na zawody!',
+            'organizer': 1
+        }
+
+    def test_has_access(self):
+        self.client.login(username='wrong', password='pass12')
+        response = self.client.get(reverse('contest:contest-add'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            '{}?next=/zawody/dodaj'.format(reverse('contest:login'))
+        )
+
+        self.client.login(username='right', password='pass12')
+        response = self.client.get(reverse('contest:contest-add'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(isinstance(response.context['form'], ContestForm))
+
+    def test_post_success(self):
+        self.client.login(username='right', password='pass12')
+        response = self.client.post(
+            reverse('contest:contest-add'), data=self.form_data
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            'Dziękujemy! Możesz teraz dodać zawodników.'
+        )
+        self.assertTrue(Contest.objects.filter(place='Majorka').exists())
+
+    def test_post_errors(self):
+        self.client.login(username='right', password='pass12')
+        self.form_data['deadline'] = '01.04.2200 16:00'
+        response = self.client.post(
+            reverse('contest:contest-add'), data=self.form_data
+        )
+        self.assertEqual(
+            response.context['form'].errors['deadline'],
+            [
+                'Ostateczny termin dodawania zawodników nie może być później '
+                'niż data zawodów.'
+            ]
+        )
+
+        self.form_data['age_min'] = 80
+        self.form_data['date'] = '02.04.2016 16:00'
+        self.form_data['deadline'] = '01.04.2016 16:00'
+        response = self.client.post(
+            reverse('contest:contest-add'), data=self.form_data
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['form'].errors['date'],
+            ['Data zawodów nie może być wcześniejsza niż dzień dzisiejszy.']
+        )
+        self.assertEqual(
+            response.context['form'].errors['deadline'],
+            ['Termin dodawania zwodników musi być dłuższy niż podana data.']
+        )
+        self.assertEqual(
+            response.context['form'].errors['age_max'],
+            [
+                'Przedział wiekowy jest niepoprawny. '
+                'Popraw wartości i spróbuj ponownie.'
+            ]
+        )

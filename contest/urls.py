@@ -58,6 +58,11 @@ urlpatterns = [
         name='contestant-edit'
     ),
     url(
+        r'^zawody/dodaj$',
+        login_required(views.ContestAddView.as_view()),
+        name='contest-add'
+    ),
+    url(
         r'^api/v1/',
         include('api.urls'),
         name='contest-api'
