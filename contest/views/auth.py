@@ -39,9 +39,7 @@ class RegisterView(View):
         """
         Returning the list of admins
         """
-        admins = RushUser.objects.filter(is_admin=True)
-
-        return admins
+        return RushUser.objects.filter(is_admin=True)
 
     @staticmethod
     def send_email_with_new_user(
