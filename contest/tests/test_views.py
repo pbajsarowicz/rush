@@ -36,14 +36,10 @@ from contest.models import (
     Organizer,
     RushUser,
 )
-<<<<<<< HEAD:contest/tests/tests_views.py
 from contest.views import (
     RegisterView,
-    SetPasswordView
 )
-=======
 from contest.views import SetResetPasswordView
->>>>>>> bd60da98db622ec6ca8aceb53177fa5a150c7614:contest/tests/test_views.py
 
 
 class HomeViewTests(TestCase):
@@ -247,14 +243,13 @@ class SetResetPasswordViewTestCase(TestCase):
             'Hasło ustawione, można się zalogować.'
         )
 
-<<<<<<< HEAD:contest/tests/tests_views.py
-        def test_sending_mail(self):
-            RegisterView.send_email_with_new_user(
-                'Janek', 'Kowalski',
-                ['admin@admin.pl'], 'www.rush.pl')
-            self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual(mail.outbox[0].to, ['admin@admin.pl'])
-=======
+    def test_sending_mail(self):
+        RegisterView.send_email_with_new_user(
+            'Janek', 'Kowalski',
+            ['admin@admin.pl'], 'www.rush.pl')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['admin@admin.pl'])
+
     def test_reset_password_successful_get(self):
         user_2_uid = urlsafe_base64_encode(force_bytes(self.user_2.pk))
         user_2_token = default_token_generator.make_token(self.user_2)
@@ -366,7 +361,6 @@ class ResetPasswordEmailViewTestCase(TestCase):
                 )]
             }
         )
->>>>>>> bd60da98db622ec6ca8aceb53177fa5a150c7614:contest/tests/test_views.py
 
 
 class AccountsViewTestCase(TestCase):
@@ -736,7 +730,7 @@ class EditContestantViewTestCase(TestCase):
             response.context['form'].cleaned_data['last_name'], 'Kowalski')
         self.assertEqual(
             response.context['form'].cleaned_data['school'], 'School'
-            )
+        )
         self.assertEqual(response.context['form'].cleaned_data['gender'], 'F')
         self.assertEqual(response.context['form'].cleaned_data['age'], 11)
 

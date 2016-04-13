@@ -92,13 +92,10 @@ class RegisterView(View):
                 user_name, user_lastname, emails, page
             )
             return render(
-<<<<<<< HEAD
                 request, 'contest/confirmation.html',
                 {'email': settings.SUPPORT_EMAIL},
-=======
                 request, 'contest/auth/register_confirmation.html',
                 {'email': settings.SUPPORT_EMAIL}
->>>>>>> bd60da98db622ec6ca8aceb53177fa5a150c7614
             )
         else:
             return render(request, self.template_name, {'form': form})
