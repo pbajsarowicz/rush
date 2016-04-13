@@ -117,14 +117,17 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         """
         self.delete()
 
-    def send_reset_email(self, request):
+    def send_reset_password_email(self, request, initialization=False):
         """
         Sends an email with a link to reset password.
         """
+        url_type = 'contest:{}'.format(
+            'set-password' if initialization else 'reset-password'
+        )
         reset_url = urljoin(
             'http://{}'.format(request.get_host()),
             reverse(
-                'contest:set-password',
+                url_type,
                 kwargs={
                     'uidb64': urlsafe_base64_encode(force_bytes(self.pk)),
                     'token': default_token_generator.make_token(self)
@@ -135,15 +138,15 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
             'user': self.get_full_name(),
             'url': reset_url,
         }
-        text = loader.render_to_string(
-            'email/password_reset_email.html', context
+        template = (
+            'email/password_set_email.html' if initialization else
+            'email/password_reset_email.html'
         )
-        msg = EmailMessage(
-            'Rush - ustawienie hasła',
-            text,
-            'email_from@rush.pl',
-            [self.email],
+        subject = 'Rush - {} hasła'.format(
+            'ustawienie' if initialization else 'resetowanie'
         )
+        text = loader.render_to_string(template, context)
+        msg = EmailMessage(subject, text, 'email_from@rush.pl', [self.email])
         msg.content_subtype = 'html'
         msg.send()
 

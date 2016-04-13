@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
-from django.forms import formset_factory
 from django.core.urlresolvers import reverse
+from django.forms import formset_factory
 from django.shortcuts import(
     render,
     redirect,
@@ -18,12 +18,10 @@ from django.views.generic import (
     View,
 )
 
-
 from contest.models import (
     Contest,
     Contestant,
 )
-
 from contest.forms import (
     ContestantForm,
     ContestForm,
@@ -142,9 +140,9 @@ class ContestantAddView(View):
                 contestant.contest = contest
                 contestant.save()
                 contestants.append(contestant)
+
             self.send_email_with_contestant(
-                contestants, request.user.email,
-                link,
+                contestants, request.user.email, link,
             )
 
             msg = (
@@ -170,6 +168,7 @@ class ContestantListView(View):
         contestants = Contestant.objects.filter(
             contest=contest_id, moderator=request.user,
         )
+
         if contestants:
             return render(
                 request, self.template_name, {'contestants': contestants}
@@ -184,7 +183,6 @@ class EditContestantView(View):
     """
     Edit contestant page.
     """
-
     template_name = 'contest/contestant_edit.html'
     form_class = ContestantForm
 

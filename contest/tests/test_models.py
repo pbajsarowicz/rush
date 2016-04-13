@@ -58,10 +58,12 @@ class UserMethodTests(TestCase):
 
 
 class ContestTestCase(TestCase):
+    fixtures = ['organizers.json', 'clubs.json']
+
     def setUp(self):
         self.now = timezone.now()
         self.contest = Contest.objects.create(
-            organizer=Organizer(id=1), date=self.now, place='Szkoła',
+            organizer=Organizer.objects.last(), date=self.now, place='Szkoła',
             age_min=11, age_max=16, deadline=self.now
         )
 
@@ -84,11 +86,13 @@ class OrganizerTestCase(TestCase):
 
 
 class ContestantTestCase(TestCase):
+    fixtures = ['organizers.json', 'contests.json', 'clubs.json', 'users.json']
+
     def setUp(self):
         self.contestant = Contestant.objects.create(
-            moderator=RushUser(id=1), first_name='Adam', last_name='Kowalski',
-            gender='M', age=15, school='Szkoła', styles_distances='10m żabka',
-            contest=Contest(id=1)
+            moderator=RushUser.objects.first(), first_name='Adam',
+            last_name='Kowalski', gender='M', age=15, school='Szkoła',
+            styles_distances='10m żabka', contest=Contest.objects.first()
         )
 
     def test_contestant_methods(self):
