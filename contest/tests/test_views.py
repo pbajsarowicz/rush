@@ -517,7 +517,10 @@ class ContestantAddViewTestCase(TestCase):
 
     def test_get(self):
         response = self.client.get(
-            reverse('contest:contestant-add', kwargs={'id': self.contest.id}),
+            reverse(
+                'contest:contestant-add',
+                kwargs={'contest_id': self.contest.id}
+            )
         )
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(
@@ -525,7 +528,7 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         response = self.client.get(
-            reverse('contest:contestant-add', kwargs={'id': 865}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 865}),
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -536,8 +539,8 @@ class ContestantAddViewTestCase(TestCase):
         response = self.client.get(
             reverse(
                 'contest:contestant-add',
-                kwargs={'id': self.contest_done.id}
-            ),
+                kwargs={'contest_id': self.contest_done.id}
+            )
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -548,8 +551,8 @@ class ContestantAddViewTestCase(TestCase):
         response = self.client.get(
             reverse(
                 'contest:contestant-add',
-                kwargs={'id': self.contest_deadline.id}
-            ),
+                kwargs={'contest_id': self.contest_deadline.id}
+            )
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -559,7 +562,10 @@ class ContestantAddViewTestCase(TestCase):
 
     def test_post_with_success(self):
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': self.contest.id}),
+            reverse(
+                'contest:contestant-add',
+                kwargs={'contest_id': self.contest.id}
+            ),
             data=self.form_data
         )
 
@@ -573,7 +579,7 @@ class ContestantAddViewTestCase(TestCase):
 
     def test_post_with_validation_error(self):
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': 865}),
+            reverse('contest:contestant-add', kwargs={'contest_id': 865}),
             data=self.form_data
         )
         self.assertEqual(response.status_code, 200)
@@ -584,7 +590,10 @@ class ContestantAddViewTestCase(TestCase):
 
         self.form_data['form-0-age'] = 99
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': self.contest.id}),
+            reverse(
+                'contest:contestant-add',
+                kwargs={'contest_id': self.contest.id}
+            ),
             data=self.form_data
         )
 
@@ -598,7 +607,10 @@ class ContestantAddViewTestCase(TestCase):
         self.form_data['form-0-age'] = 15
         self.form_data['form-0-gender'] = 'WRONG'
         response = self.client.post(
-            reverse('contest:contestant-add', kwargs={'id': self.contest.id}),
+            reverse(
+                'contest:contestant-add',
+                kwargs={'contest_id': self.contest.id}
+            ),
             data=self.form_data
         )
         expected_error = {
@@ -608,7 +620,7 @@ class ContestantAddViewTestCase(TestCase):
             )]
         }
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         self.assertFalse(response.context['formset'].is_valid())
         self.assertEqual(
             response.context['formset'].errors, [expected_error, {}]
@@ -616,6 +628,117 @@ class ContestantAddViewTestCase(TestCase):
         self.assertFalse(
             Contestant.objects.filter(moderator=self.user).exists()
         )
+
+
+class ContestantListViewTestCase(TestCase):
+
+    def setUp(self):
+        self.user = RushUser(
+            email='test@cos.pl', username='test_test',
+            password='P@ssw0rd', is_active=True
+        )
+        self.user.set_password('P@ssw0rd')
+        self.user.save()
+
+        self.client.login(username='test_test', password='P@ssw0rd')
+
+        club = Club.objects.create(name='adam', code=12345)
+        organizer = Organizer.objects.create(
+            name='Adam', club=club
+        )
+
+        self.contest = Contest.objects.create(
+            organizer=organizer,
+            date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2048, 11, 20))
+        )
+        self.contestant = Contestant.objects.create(
+            moderator=self.user, first_name='Adam', last_name='Nowak',
+            gender='M', age=14, school='Szkoła', styles_distances='100m motyl',
+            contest=self.contest
+        )
+
+    def test_get(self):
+        response = self.client.get(
+            reverse(
+                'contest:contestant-list',
+                kwargs={'contest_id': self.contest.id}
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['contestants']), 1)
+
+
+class EditContestantViewTestCase(TestCase):
+    fixtures = [
+        'organizers.json', 'contests.json', 'clubs.json', 'users.json',
+    ]
+
+    def setUp(self):
+        self.user = RushUser(
+            email='root@root.pl', username='root',
+            password='R@ootroot', is_active=True
+        )
+        self.user.set_password('R@ootroot')
+        self.user.save()
+        self.contestant = Contestant.objects.create(
+            first_name='Adam',
+            last_name='Nowak',
+            gender='M',
+            age=14,
+            school='Szkoła',
+            styles_distances='100m motyl',
+            contest=Contest.objects.first(),
+            moderator=self.user
+        )
+
+        self.client.login(username='root', password='R@ootroot')
+
+    def test_get(self):
+        response = self.client.get(
+            reverse(
+                'contest:contestant-edit',
+                kwargs={'contestant_id': self.contestant.id}
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['form'].initial['first_name'], 'Adam'
+        )
+        self.assertEqual(
+            response.context['form'].initial['last_name'], 'Nowak'
+        )
+        self.assertEqual(response.context['form'].initial['gender'], 'M')
+        self.assertEqual(response.context['form'].initial['school'], 'Szkoła')
+        self.assertEqual(
+            response.context['form'].initial['styles_distances'], '100m motyl'
+        )
+        self.assertEqual(response.context['form'].initial['age'], 14)
+
+    def test_post(self):
+        response = self.client.post(
+            reverse(
+                'contest:contestant-edit',
+                kwargs={'contestant_id': self.contestant.id}
+            ),
+            data={
+                'first_name': 'Karol', 'last_name': 'Kowalski',
+                'school': 'School', 'gender': 'F', 'age': 11,
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            response.context['form'].cleaned_data['first_name'], 'Karol'
+        )
+        self.assertEqual(
+            response.context['form'].cleaned_data['last_name'], 'Kowalski')
+        self.assertEqual(
+            response.context['form'].cleaned_data['school'], 'School'
+            )
+        self.assertEqual(response.context['form'].cleaned_data['gender'], 'F')
+        self.assertEqual(response.context['form'].cleaned_data['age'], 11)
 
 
 class ContestAddTestCase(TestCase):

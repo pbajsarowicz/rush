@@ -1,0 +1,21 @@
+{% extends "contest/base.html" %}
+
+{% block container %}
+
+    <div class="container">
+        {{ msg }}
+        {% if contestants %}
+            {% for contestant in contestants %}
+                <ul class="collection">
+                    <li class="collection-item">
+                        {{ contestant.first_name }} {{ contestant.last_name }}
+                        <a class="secondary-content" href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">
+                            <i class="waves-effect waves-light btn">Edytuj</i>
+                        </a>
+                    </li>
+                </ul>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+{% endblock container %}
