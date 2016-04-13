@@ -30,7 +30,7 @@ class AccountsView(View):
         try:
             user = RushUser.objects.get(pk=user_id)
             user.activate()
-            user.send_reset_email(request)
+            user.send_reset_password_email(request, True)
         except RushUser.DoesNotExist:
             return HttpResponse(status=500)
         return HttpResponse(status=201)
