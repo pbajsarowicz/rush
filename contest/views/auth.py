@@ -35,6 +35,15 @@ class RegisterView(View):
     template_name = 'contest/register.html'
 
     @staticmethod
+    def the_list_of_admins():
+        """
+        Returning the list of admins
+        """
+        admins = RushUser.objects.filter(is_admin=True)
+
+        return admins
+
+    @staticmethod
     def send_email_with_new_user(
             name, last_name,
             email, page, *args, **kwargs):
@@ -70,7 +79,7 @@ class RegisterView(View):
         if form.is_valid():
             form.save()
             emails = []
-            admins = RushUser.objects.filter(is_admin=True)
+            admins = self.the_list_of_admins()
             for admin in admins:
                 emails.append(admin.email)
             user_name = form.cleaned_data['first_name']
@@ -80,7 +89,8 @@ class RegisterView(View):
                 reverse('contest:accounts')
             )
             self.send_email_with_new_user(
-                user_name, user_lastname, emails, page)
+                user_name, user_lastname, emails, page
+            )
             return render(
                 request, 'contest/confirmation.html',
                 {'email': settings.SUPPORT_EMAIL},

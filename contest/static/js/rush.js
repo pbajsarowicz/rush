@@ -203,51 +203,47 @@ $(document).ready(function() {
  * Parsing user data from js to html.
  */
 function parseUserData(json) {
-    var fields_names = [
-        ['Nazwa użytkownika', 'username'], 
+    var fieldsNames = [
         ['Email', 'email'],
         ['Data rejestracji', 'date_joined'],
-        ['Aktywność', 'is_active'],
-        ['jest adminem', 'is_admin'],
         ['Klub', 'club'],
         ['Nazwa organizacji', 'organization_name'],
         ['Adres organizacji', 'organization_address']
     ]
 
-    var result = '<ul>';
-    for(var i = 0; i < fields_names.length; ++i) {
-        result += '<li>';
-        result += fields_names[i][0]+': ';
-        result += json[fields_names[i][1]];
-        result += '</li>'
-    }
-    result += '</ul>';
+    var fragment = document.createDocumentFragment();
+    var elementUl = element = document.createElement('ul');
+    var elementLi;
 
-    return result;
+    fieldsNames.forEach(function(field) {
+        elementLi = document.createElement('li');
+        elementLi.appendChild(document.createTextNode(field[0] + ': ' + json[field[1]]));
+        elementUl.appendChild(elementLi);
+    })
+    fragment.appendChild(elementUl);
+
+    return fragment
 }
 
 /*
  * Handling user info request and inserting data into html container.
  */
 function getUserInfo(user) {
-    var el=document.getElementById('content' + user);
-    var display_state = el.getAttribute('display');
-
-    if (display_state == 'none') {
+    if ($('#content' + user).css('display') == 'none' || $('#content' + user).css('display') == 'block') {
         $.ajax({
             url: '/api/v1/users/' + user,
             dataType: 'json',
             success: function(json){
                 user_data = parseUserData(json);
 
-                el.innerHTML = user_data;
-                el.setAttribute('display', 'inline');
+                $('#content' + user).html(user_data);
+                $('#content' + user).removeClass('invisible').addClass('inline');
             }
         });
     }
     else {
-        el.innerHTML = '';
-        el.setAttribute('display', 'none');
+        $('#content' + user).html('');
+        $('#content' + user).removeClass('inline').addClass('invisible');
     }
 }
 

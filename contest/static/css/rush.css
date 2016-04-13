@@ -56,6 +56,10 @@ Base elements
     display: inherit;
 }
 
+.inline {
+    display: inline;
+}
+
 #errors p {
     text-align: center;
 }
