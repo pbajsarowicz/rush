@@ -558,11 +558,18 @@ class EditContestantViewTestCase(TestCase):
                 'school': 'School', 'gender': 'F', 'age': 11,
             }
         )
-        self.assertEqual(response.context['first_name'], 'Karol')
-        self.assertEqual(response.context['last_name'], 'Kowalski')
-        self.assertEqual(response.context['school'], 'School')
-        self.assertEqual(response.context['gender'], 'F')
-        self.assertEqual(response.context['age'], 11)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            response.context['form'].cleaned_data['first_name'], 'Karol'
+        )
+        self.assertEqual(
+            response.context['form'].cleaned_data['last_name'], 'Kowalski')
+        self.assertEqual(
+            response.context['form'].cleaned_data['school'], 'School'
+            )
+        self.assertEqual(response.context['form'].cleaned_data['gender'], 'F')
+        self.assertEqual(response.context['form'].cleaned_data['age'], 11)
 
 
 class ContestAddTestCase(TestCase):
