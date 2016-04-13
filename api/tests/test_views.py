@@ -11,8 +11,10 @@ from contest.models import RushUser
 
 class ContestTestsAPI(APITestCase):
     fixtures = [
-        'organizers.json', 'contests.json', 'clubs.json',
-        'users.json'
+        'contest/fixtures/organizers.json',
+        'contest/fixtures/contests.json',
+        'contest/fixtures/clubs.json',
+        'contest/fixtures/users.json',
     ]
 
     def setUp(self):
@@ -40,8 +42,11 @@ class ContestTestsAPI(APITestCase):
 
 class ContestantTestsAPI(APITestCase):
     fixtures = [
-        'contestants.json', 'organizers.json', 'contests.json', 'clubs.json',
-        'users.json'
+        'contest/fixtures/contestants.json',
+        'contest/fixtures/organizers.json',
+        'contest/fixtures/contests.json',
+        'contest/fixtures/clubs.json',
+        'contest/fixtures/users.json',
     ]
 
     def setUp(self):
@@ -62,7 +67,7 @@ class ContestantTestsAPI(APITestCase):
 
 
 class ClubTestsAPI(APITestCase):
-    fixtures = ['clubs.json']
+    fixtures = ['contest/fixtures/clubs.json']
 
     def setUp(self):
         self.client = APIClient()
@@ -82,7 +87,10 @@ class ClubTestsAPI(APITestCase):
 
 
 class OrganizerTestsAPI(APITestCase):
-    fixtures = ['organizers.json', 'clubs.json']
+    fixtures = [
+        'contest/fixtures/organizers.json',
+        'contest/fixtures/clubs.json',
+    ]
 
     def setUp(self):
         self.client = APIClient()
@@ -102,7 +110,10 @@ class OrganizerTestsAPI(APITestCase):
 
 
 class UserTestsAPI(APITestCase):
-    fixtures = ['clubs.json', 'users.json']
+    fixtures = [
+        'contest/fixtures/clubs.json',
+        'contest/fixtures/users.json'
+    ]
 
     def setUp(self):
         self.client = APIClient()

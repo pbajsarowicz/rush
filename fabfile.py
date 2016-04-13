@@ -22,7 +22,7 @@ def test(test_path=''):
 
     e.g.
     [all] fab test
-    [one] fab test:"contest.tests.tests_views.AccountsViewTestCase.test_post"
+    [one] fab test:"contest.tests.test_views.AccountsViewTestCase.test_post"
 
     """
     local(
