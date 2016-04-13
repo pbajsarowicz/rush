@@ -64,9 +64,19 @@ urlpatterns = [
         name='accounts'
     ),
     url(
-        r'^zawodnicy/dodaj/(?P<id>[0-9]+)/?$',
+        r'^zawodnicy/(?P<contest_id>[0-9]+)/?$',
+        login_required(views.ContestantListView.as_view()),
+        name='contestant-list'
+    ),
+    url(
+        r'^zawodnicy/dodaj/(?P<contest_id>[0-9]+)/?$',
         login_required(views.ContestantAddView.as_view()),
         name='contestant-add'
+    ),
+    url(
+        r'^zawodnicy/edytuj/(?P<contestant_id>[0-9]+)/?$',
+        login_required(views.EditContestantView.as_view()),
+        name='contestant-edit'
     ),
     url(
         r'^zawody/dodaj/?$',

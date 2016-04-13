@@ -22,7 +22,7 @@
                 {% for contest in upcoming %}
                 <li class="collection-item contest-item">
                     <div class="contest-item">
-                        <a class="text" href="{% url 'contest:contestant-add' id=contest.pk %}">{{ contest }}</a>
+                        <a class="text" href="{% url 'contest:contestant-add' contest_id=contest.pk %}">{{ contest }}</a>
                         <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}" onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
                         <div id="modal{{contest.pk}}" class="modal">
                             <div class="modal-content">

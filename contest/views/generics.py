@@ -4,8 +4,12 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
+from django.core.urlresolvers import reverse
 from django.forms import formset_factory
-from django.shortcuts import render
+from django.shortcuts import(
+    render,
+    redirect,
+)
 from django.template import loader
 from django.utils import timezone
 from django.utils.functional import curry
@@ -14,11 +18,14 @@ from django.views.generic import (
     View,
 )
 
+from contest.models import (
+    Contest,
+    Contestant,
+)
 from contest.forms import (
     ContestantForm,
     ContestForm,
 )
-from contest.models import Contest
 
 
 class HomeView(TemplateView):
@@ -64,12 +71,14 @@ class ContestantAddView(View):
         return formset_class(data) if data else formset_class()
 
     @staticmethod
-    def send_email_with_contestant(contestants, email, *args, **kwargs):
+    def send_email_with_contestant(contestants, email, link, *args, **kwargs):
         """
         Sends an email with a list contestants
         """
         text = loader.render_to_string(
-            'email/contestant_add.html', {'contestants': contestants},
+            'email/contestant_add.html', {
+                'contestants': contestants, 'link': link
+            },
         )
         msg = EmailMessage(
             'Potwierdzenie dodania zawodników',
@@ -80,14 +89,14 @@ class ContestantAddView(View):
         msg.content_subtype = 'html'
         msg.send()
 
-    def get(self, request, id, *args, **kwargs):
+    def get(self, request, contest_id, *args, **kwargs):
         """
         Return adding a contestant form on site.
         """
-        formset = self.get_formset(id)
+        formset = self.get_formset(contest_id)
 
         try:
-            contest = Contest.objects.get(pk=id)
+            contest = Contest.objects.get(pk=contest_id)
         except Contest.DoesNotExist:
             return render(
                 request, self.template_name, {'message': self._get_message()}
@@ -103,18 +112,25 @@ class ContestantAddView(View):
             request, self.template_name, {'formset': formset, 'name': contest}
         )
 
-    def post(self, request, id, *args, **kwargs):
+    def post(self, request, contest_id, *args, **kwargs):
         """
         Create a contestant.
         """
-        formset = self.get_formset(id, request.POST)
+        formset = self.get_formset(contest_id, request.POST)
 
         try:
-            contest = Contest.objects.get(pk=id)
+            contest = Contest.objects.get(pk=contest_id)
         except Contest.DoesNotExist:
             return render(
                 request, self.template_name, {'message': self._get_message()}
             )
+
+        link = 'http://{}{}'.format(
+            request.get_host(),
+            reverse(
+                'contest:contestant-list', kwargs={'contest_id': contest_id}
+            )
+        )
 
         if formset.is_valid():
             contestants = []
@@ -124,7 +140,10 @@ class ContestantAddView(View):
                 contestant.contest = contest
                 contestant.save()
                 contestants.append(contestant)
-            self.send_email_with_contestant(contestants, request.user.email)
+
+            self.send_email_with_contestant(
+                contestants, request.user.email, link,
+            )
 
             msg = (
                 'Dziękujemy! Potwierdzenie zapisów zostało wysłane na email '
@@ -134,6 +153,81 @@ class ContestantAddView(View):
             return render(request, self.template_name, {'message': msg})
 
         return render(request, self.template_name, {'formset': formset})
+
+
+class ContestantListView(View):
+    """
+    View with list of added contestants.
+    """
+    template_name = 'contest/contestant_list.html'
+
+    def get(self, request, contest_id, *args, **kwargs):
+        """
+        Get contestants data.
+        """
+        contestants = Contestant.objects.filter(
+            contest=contest_id, moderator=request.user,
+        )
+
+        if contestants:
+            return render(
+                request, self.template_name, {'contestants': contestants}
+            )
+        return render(
+            request, self.template_name,
+            {'msg': 'Nie dodałeś zawodników do tych zawodów.'},
+        )
+
+
+class EditContestantView(View):
+    """
+    Edit contestant page.
+    """
+    template_name = 'contest/contestant_edit.html'
+    form_class = ContestantForm
+
+    def get(self, request, contestant_id, *args, **kwargs):
+        """
+        Return form with filled fields.
+        """
+        contestant = Contestant.objects.get(id=contestant_id)
+
+        form = self.form_class(
+            instance=contestant, contest_id=contestant.contest.id
+        )
+
+        if not contestant.moderator == request.user:
+            return render(
+                request, self.template_name,
+                {'msg': 'Nie możesz edytować tego zawodnika.'},
+            )
+        return render(
+            request, self.template_name,
+            {'contestant': contestant, 'form': form},
+        )
+
+    def post(self, request, contestant_id, *args, **kwargs):
+        """
+        Submit contestant data.
+        """
+        contestant = Contestant.objects.get(id=contestant_id)
+        form = self.form_class(
+            request.POST, instance=contestant, contest_id=contestant.contest.id
+        )
+        if form.has_changed():
+            if form.is_valid():
+                form.save()
+                return redirect(
+                    'contest:contestant-list', contest_id=contestant.contest.id
+                )
+            return render(
+                request, self.template_name,
+                {'contestant': contestant, 'form': form},
+            )
+        return redirect(
+            'contest:contestant-list',
+            contest_id=contestant.contest.id,
+        )
 
 
 class ContestAddView(PermissionRequiredMixin, View):
