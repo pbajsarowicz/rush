@@ -36,9 +36,7 @@ from contest.models import (
     Organizer,
     RushUser,
 )
-from contest.views import (
-    RegisterView,
-)
+from contest.views import RegisterView
 from contest.views import SetResetPasswordView
 
 
