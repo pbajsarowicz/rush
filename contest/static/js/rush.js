@@ -233,7 +233,7 @@ function getUserInfo(user) {
         $.ajax({
             url: '/api/v1/users/' + user,
             dataType: 'json',
-            success: function(json){
+            success: function(json) {
                 user_data = parseUserData(json);
 
                 $('#content' + user).html(user_data);

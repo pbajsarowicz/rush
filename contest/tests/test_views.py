@@ -243,8 +243,8 @@ class SetResetPasswordViewTestCase(TestCase):
 
     def test_sending_mail(self):
         RegisterView.send_email_with_new_user(
-            'Janek', 'Kowalski',
-            ['admin@admin.pl'], 'www.rush.pl')
+            'Janek', 'Kowalski', ['admin@admin.pl'], 'www.rush.pl'
+        )
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ['admin@admin.pl'])
 

@@ -44,9 +44,7 @@ class RegisterView(View):
         return RushUser.objects.filter(is_admin=True)
 
     @staticmethod
-    def send_email_with_new_user(
-            name, last_name,
-            email, page, *args, **kwargs):
+    def send_email_with_new_user(name, last_name, email, page):
         """
         Sends an email with new user to admins.
         """
@@ -55,10 +53,7 @@ class RegisterView(View):
             {'first_name': name, 'last_name': last_name, 'page': page}
         )
         msg = EmailMessage(
-            'Nowe zapytanie o konto',
-            text,
-            settings.SUPPORT_EMAIL,
-            email,
+            'Nowe zapytanie o konto', text, settings.SUPPORT_EMAIL, email
         )
         msg.content_subtype = 'html'
         msg.send()
@@ -91,14 +86,12 @@ class RegisterView(View):
             self.send_email_with_new_user(
                 user_name, user_lastname, emails, page
             )
+
             return render(
-                request, 'contest/confirmation.html',
-                {'email': settings.SUPPORT_EMAIL},
                 request, 'contest/auth/register_confirmation.html',
                 {'email': settings.SUPPORT_EMAIL}
             )
-        else:
-            return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form})
 
 
 class LoginView(View):
