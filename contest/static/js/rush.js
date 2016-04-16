@@ -198,3 +198,52 @@ $(document).ready(function() {
     $('.modal-trigger').leanModal();
     $('.datetime').mask('99.99.9999 99:99', {placeholder: 'dd.mm.yyyy hh:mm'});
 });
+
+/*
+ * Parsing user data from js to html.
+ */
+function parseUserData(json) {
+    var fieldsNames = [
+        ['Email', 'email'],
+        ['Data rejestracji', 'date_joined'],
+        ['Klub', 'club'],
+        ['Nazwa organizacji', 'organization_name'],
+        ['Adres organizacji', 'organization_address']
+    ]
+
+    var fragment = document.createDocumentFragment();
+    var elementUl = element = document.createElement('ul');
+    var elementLi;
+
+    fieldsNames.forEach(function(field) {
+        elementLi = document.createElement('li');
+        elementLi.appendChild(document.createTextNode(field[0] + ': ' + json[field[1]]));
+        elementUl.appendChild(elementLi);
+    })
+    fragment.appendChild(elementUl);
+
+    return fragment
+}
+
+/*
+ * Handling user info request and inserting data into html container.
+ */
+function getUserInfo(user) {
+    if ($('#content' + user).css('display') == 'none' || $('#content' + user).css('display') == 'block') {
+        $.ajax({
+            url: '/api/v1/users/' + user,
+            dataType: 'json',
+            success: function(json) {
+                user_data = parseUserData(json);
+
+                $('#content' + user).html(user_data);
+                $('#content' + user).removeClass('invisible').addClass('inline');
+            }
+        });
+    }
+    else {
+        $('#content' + user).html('');
+        $('#content' + user).removeClass('inline').addClass('invisible');
+    }
+}
+
