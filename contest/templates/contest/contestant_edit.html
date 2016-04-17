@@ -1,20 +1,19 @@
 {% extends "contest/base.html" %}
 
 {% block container %}
-
-    <div class="container">
-        <div class="center">
-            {{ msg }}
-            {% if contestant %}
-            <div class="row center">
-                <form class="col s6" role="form" method="post" name="edit_form">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <a  href="{% url 'contest:contestant-list' contest_id=contestant.contest.id %}" class="pull-left btn btn-primary">Anuluj</a>
-                    <button type="submit" class="pull-right btn btn-primary">Zapisz</button>
-                </form>
-            </div>
-            {% endif %}
-        </div>
-    </div>
+<div class="container">
+  <div class="center">
+    {{ msg }}
+    {% if contestant %}
+      <div class="row center">
+        <form class="col s6" role="form" method="post" name="edit_form">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <a  href="{% url 'contest:contestant-list' contest_id=contestant.contest.id %}" class="pull-left btn btn-primary">Anuluj</a>
+          <button type="submit" class="pull-right btn btn-primary">Zapisz</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

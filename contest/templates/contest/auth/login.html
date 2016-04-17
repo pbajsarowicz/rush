@@ -2,15 +2,15 @@
 
 {% block container %}
 <div class="container">
-    <div class="row center">
-        <form class="col s6" action="?next={{next}}" role="form" method="post">
-            <div class="row center">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <a href="{% url 'contest:reset-email' %}"><button type="button" class="pull-right waves-effect waves-teal btn-flat">Nie pamiętam hasła</button></a>
-                <button type="submit" class="pull-right btn btn-primary">Zaloguj się</button>
-            </div>
-        </form>
-    </div>
+  <div class="row center">
+    <form class="col s6" action="?next={{next}}" role="form" method="post">
+      <div class="row center">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <a href="{% url 'contest:reset-email' %}"><button type="button" class="pull-right waves-effect waves-teal btn-flat">Nie pamiętam hasła</button></a>
+        <button type="submit" class="pull-right btn btn-primary">Zaloguj się</button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
