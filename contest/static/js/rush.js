@@ -87,7 +87,7 @@ function validateContestantForm() {
         $('#' + id + '> p:eq(0)').append(paragraph);
     }
     else{
-        $('#first_name_error').remove('.red-text');
+        $('#first_name_error').remove();
     }
 
     if(!lastName) {
