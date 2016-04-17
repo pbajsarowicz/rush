@@ -8,9 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Rush</title>
     {% block styles %}
-      <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.css' %}"  media="screen,projection"/>
-      <link type="text/css" rel="stylesheet" href="{% static 'css/template.css' %}"  media="screen,projection"/>
-      <link type="text/css" rel="stylesheet" href="{% static 'css/rush.css' %}"  media="screen,projection"/>
+      <link rel="stylesheet" href="{% static 'css/materialize.css' %}"  media="screen,projection"/>
+      <link rel="stylesheet" href="{% static 'css/template.css' %}"  media="screen,projection"/>
+      <link rel="stylesheet" href="{% static 'css/rush.css' %}"  media="screen,projection"/>
     {% endblock styles %}
   </head>
 
@@ -67,11 +67,11 @@
     {% endblock footer %}
 
     {% block scripts %}
-      <script type="text/javascript" src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
-      <script type="text/javascript" src="{% static 'js/jquery.maskedinput.js' %}"></script>
-      <script type="text/javascript" src="{% static 'js/materialize.js' %}"></script>
-      <script type="text/javascript" src="{% static 'js/template.js' %}"></script>
-      <script type="text/javascript" src="{% static 'js/rush.js' %}"></script>
+      <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+      <script src="{% static 'js/jquery.maskedinput.js' %}"></script>
+      <script src="{% static 'js/materialize.js' %}"></script>
+      <script src="{% static 'js/template.js' %}"></script>
+      <script src="{% static 'js/rush.js' %}"></script>
     {% endblock scripts %}
   </body>
 </html>
