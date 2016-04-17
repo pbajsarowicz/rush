@@ -70,66 +70,98 @@ function validateContestantForm() {
     var school = document.forms['contestants'][id + '-school'].value;
     var styles = document.forms['contestants'][id + '-styles_distances'].value
 
-    var errorMessage = document.createDocumentFragment();
-    var paragraph;
-
     var checkName = RegExp('[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]{3,}');
 
     if(!firstName) {
-        paragraph = document.createElement('p');
+        var paragraph = document.createElement('p');
+        paragraph.className = 'red-text';
+        paragraph.id = 'first_name_error';
         paragraph.innerHTML = 'Pole <b>Imie</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
+        $('#' + id + '> p:eq(0)').append(paragraph);
     }
     else if (!checkName.test(firstName)) {
-        paragraph = document.createElement('p');
+        var paragraph = document.createElement('p');
+        paragraph.className = 'red-text';
+        paragraph.id = 'first_name_error';
         paragraph.appendChild(document.createTextNode('Wprowadzone imie jest nieprawidłowe.'));
-        errorMessage.appendChild(paragraph);
+        $('#' + id + '> p:eq(0)').append(paragraph);
+    }
+    else{
+        $('#first_name_error').remove('.red-text');
     }
 
     if(!lastName) {
-        paragraph = document.createElement('p');
+        var paragraph = document.createElement('p');
+        paragraph.className = 'red-text';
+        paragraph.id = 'last_name_error';
         paragraph.innerHTML = 'Pole <b>Nazwisko</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
+        $('#' + id + '> p:eq(1)').append(paragraph);
     }
     else if (!checkName.test(lastName)) {
-        paragraph = document.createElement('p');
+        var paragraph = document.createElement('p');
+        paragraph.className = 'red-text';
+        paragraph.id = 'last_name_error';
         paragraph.appendChild(document.createTextNode('Wprowadzone nazwisko jest nieprawidłowe.'));
-        errorMessage.appendChild(paragraph);
+        $('#' + id + '> p:eq(1)').append(paragraph);
+    }
+    else{
+        $('#last_name_error').remove();
     }
 
+
     if(gender != 'F' && gender != 'M') {
-        paragraph = document.createElement('p');
+        var paragraph = document.createElement('p');
+        paragraph.className = 'red-text';
+        paragraph.id = 'gender_error';
         paragraph.appendChild(document.createTextNode('Wybierz poprawną płeć.'));
-        errorMessage.appendChild(paragraph);
+        $('#' + id + '> p:eq(2)').append(paragraph);
+    }
+    else{
+        $('#gender_error').remove();
     }
 
     if(!age) {
-        paragraph = document.createElement('p');
+        var paragraph = document.createElement('p');
+        paragraph.className = 'red-text';
+        paragraph.id = 'age_error';
         paragraph.innerHTML = 'Pole <b>Wiek</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
+        $('#' + id + '> p:eq(3)').append(paragraph);
     }
     else if(age < minAge || age > maxAge ) {
-        paragraph = document.createElement('p');
+        var paragraph = document.createElement('p');
+        paragraph.className = 'red-text';
+        paragraph.id = 'age_error';
         paragraph.appendChild(document.createTextNode('Wiek zawodnika nie mieści się ' +
         'w przedziale przeznaczonym dla tego konkursu.'));
-        errorMessage.appendChild(paragraph);
+        $('#' + id + '> p:eq(3)').append(paragraph);
+    }
+    else{
+        $('#age_error').remove();
     }
 
     if(!school) {
-        paragraph = document.createElement('p');
+        var paragraph = document.createElement('p');
+        paragraph.className = 'red-text';
+        paragraph.id = 'school_error';
         paragraph.innerHTML = 'Pole <b>Rodzaj szkoły</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
+        $('#' + id + '> p:eq(4)').append(paragraph);
+    }
+    else{
+        $('#school_error').remove();
     }
 
     if(!styles) {
-        paragraph = document.createElement('p');
+        var paragraph = document.createElement('p');
+        paragraph.className = 'red-text';
+        paragraph.id = 'styles_error';
         paragraph.innerHTML = 'Pole <b>Style i dystanse</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
+        $('#' + id + '> p:eq(5)').append(paragraph);
+    }
+    else{
+        $('#styles_error').remove();
     }
 
-    $('#errors').html(errorMessage);
-    if(paragraph) {
-        $('html, body').animate({ scrollTop: 0 });
+    if($('.red-text').length > 0) {
         return false;
     }
     return true;
