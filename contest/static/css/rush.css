@@ -2,16 +2,16 @@
 Contest
 *******/
 .contest-item {
-    vertical-align: middle;
+  vertical-align: middle;
 }
 
 .contest-item .text {
-    line-height: 38px;
+  line-height: 38px;
 }
 
 .contest-item .button {
-    margin-left: 20px;
-    float: right;
+  float: right;
+  margin-left: 20px;
 }
 
 /************
@@ -20,52 +20,52 @@ Base elements
 
 /* Footer */
 .page-footer {
-   bottom: 0px;
-   height: 220px;
-   position: fixed;
-   z-index: -1;
-   width: 100%;
+  bottom: 0;
+  height: 220px;
+  position: fixed;
+  width: 100%;
+  z-index: -1;
 }
 
 .page-footer .row {
-    padding-top: 40px;
+  padding-top: 40px;
 }
 
 .page-footer .footer-copyright {
-    bottom: 0;
-    padding: 0;
-    margin: 0;
-    position: fixed;
-    width: 100%;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  width: 100%;
 }
 
 /* Page content */
 #page-content {
-    background-color: #fff;
-    margin-bottom: 220px;
-    padding-bottom: 50px;
-    z-index: 1;
+  background-color: #fff;
+  margin-bottom: 220px;
+  padding-bottom: 50px;
+  z-index: 1;
 }
 
 /* General */
 .invisible {
-    display: none;
+  display: none;
 }
 
 .visible {
-    display: inherit;
+  display: inherit;
 }
 
 .inline {
-    display: inline;
+  display: inline;
 }
 
 #errors p {
-    text-align: center;
+  text-align: center;
 }
 
 .nav-margin {
-    margin-bottom: 40px !important;
+  margin-bottom: 40px !important;
 }
 
 .errorlist {
