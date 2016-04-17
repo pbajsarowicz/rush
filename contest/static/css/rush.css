@@ -67,3 +67,7 @@ Base elements
 .nav-margin {
   margin-bottom: 40px !important;
 }
+
+.errorlist {
+  color: red;
+}
