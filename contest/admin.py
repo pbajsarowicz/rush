@@ -6,7 +6,6 @@ from django.contrib import admin
 from contest.models import (
     Contestant,
     RushUser,
-    Organizer,
     Contest,
     Club,
     School,
@@ -38,14 +37,16 @@ class RushUserAdmin(admin.ModelAdmin):
             queryset.delete()
     cancel.short_description = 'Usuń'
 
-    exclude = (
-        'password', 'date_joined', 'last_login', 'status', 'is_superuser',
-        'is_staff', 'is_active', 'is_admin',
-    )
+    fields = [
+        'username', 'email', 'first_name', 'last_name', 'organization_name',
+        'organization_address', 'club', 'date_joined', 'last_login',
+        'groups', 'user_permissions'
+    ]
     list_display = ('first_name', 'last_name', 'is_active')
     readonly_fields = ('last_login', 'date_joined')
     actions = [create, cancel]
     list_filter = ('is_active',)
+    filter_horizontal = ['user_permissions']
 
 
 class ContestantInline(admin.StackedInline):
@@ -59,7 +60,6 @@ class ContestAdmin(admin.ModelAdmin):
 
 admin.site.register(RushUser, RushUserAdmin)
 admin.site.register(Contestant)
-admin.site.register(Organizer)
 admin.site.register(Contest, ContestAdmin)
 admin.site.register(Club)
 admin.site.register(School)

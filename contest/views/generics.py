@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
 from django.forms import formset_factory
 from django.shortcuts import render
@@ -13,7 +14,10 @@ from django.views.generic import (
     View,
 )
 
-from contest.forms import ContestantForm
+from contest.forms import (
+    ContestantForm,
+    ContestForm,
+)
 from contest.models import Contest
 
 
@@ -130,3 +134,30 @@ class ContestantAddView(View):
             return render(request, self.template_name, {'message': msg})
 
         return render(request, self.template_name, {'formset': formset})
+
+
+class ContestAddView(PermissionRequiredMixin, View):
+    """
+    View for adding contests.
+    """
+    permission_required = 'contest.add_contest'
+    template_name = 'contest/contest_add.html'
+    form_class = ContestForm
+
+    def get(self, request):
+        """
+        Return clear form.
+        """
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        """
+        Create new Contest.
+        """
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
+            return render(request, self.template_name, {'message': msg})
+        return render(request, self.template_name, {'form': form})

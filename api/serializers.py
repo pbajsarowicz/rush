@@ -5,52 +5,79 @@ from rest_framework import serializers
 
 
 from contest.models import (
+    Contact,
     Contest,
-    Organizer,
     Club,
+    School,
     Contestant,
     RushUser,
 )
 
 
-class ClubSerializer(serializers.HyperlinkedModelSerializer):
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = ('email', 'website', 'phone_number')
+
+
+class ClubSerializer(serializers.ModelSerializer):
+    contact = ContactSerializer()
+
     class Meta:
         model = Club
-        fields = ('name', 'code')
+        fields = ('name', 'code', 'contact')
 
 
-class OrganizerSerializer(serializers.HyperlinkedModelSerializer):
-    club = ClubSerializer()
+class SchoolSerializer(serializers.ModelSerializer):
+    contact = ContactSerializer()
 
     class Meta:
-        model = Organizer
-        fields = (
-            'name', 'email', 'website', 'phone_number', 'creation_date', 'club'
-        )
+        model = School
+        fields = ('name', 'contact')
+
+
+class SchoolClubRelatedField(serializers.RelatedField):
+    """
+    A custom field to use for the `SchoolClub` generic relationship.
+    """
+
+    def to_representation(self, value):
+        """
+        Serialize club instances using a club serializer,
+        and school instances using a school serializer.
+        """
+        if isinstance(value, Club):
+            serializer = ClubSerializer(value)
+        elif isinstance(value, School):
+            serializer = SchoolSerializer(value)
+        else:
+            raise Exception('Unexpected type of tagged object')
+
+        return serializer.data
 
 
 class ContestSerializer(serializers.HyperlinkedModelSerializer):
-    organizer = OrganizerSerializer()
     deadline = serializers.DateTimeField(format='%d.%m.%Y %X')
     date = serializers.DateTimeField(format='%d.%m.%Y %X')
+    organizer = SchoolClubRelatedField(read_only=True)
 
     class Meta:
         model = Contest
         fields = (
             'pk', 'date', 'place', 'age_min', 'age_max', 'deadline',
-            'description', 'organizer'
+            'description', 'organizer',
         )
 
 
 class RushUserSerializer(serializers.HyperlinkedModelSerializer):
-    club = ClubSerializer()
+    unit = SchoolClubRelatedField(read_only=True)
 
     class Meta:
         model = RushUser
         fields = (
-            'username', 'email', 'first_name', 'last_name', 'date_joined',
-            'is_active', 'is_admin', 'club', 'organization_name',
-            'organization_address'
+            'username', 'email', 'first_name', 'last_name',
+            'date_joined', 'is_active', 'is_admin', 'unit',
+            'organization_name', 'organization_address'
         )
 
 
