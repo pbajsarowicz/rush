@@ -76,7 +76,7 @@ class RushResetPasswordForm(SetPasswordForm):
     Form for resetting user's password.
     """
     new_password1 = forms.CharField(
-        label=_('Hasło'),
+        label=_('Nowe Hasło'),
         widget=forms.PasswordInput
     )
     new_password2 = forms.CharField(
@@ -103,6 +103,10 @@ class RushSetPasswordForm(RushResetPasswordForm):
     """
     Form for setting user's password.
     """
+    new_password1 = forms.CharField(
+        label=_('Hasło'),
+        widget=forms.PasswordInput
+    )
     username = forms.CharField(label=_('Nazwa użytkownika'))
 
     field_order = ['username', 'new_password1', 'new_password2']

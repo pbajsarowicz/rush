@@ -199,6 +199,9 @@ class SetResetPasswordView(View):
         """
         Set user's password.
         """
+        if request.user.is_authenticated():
+            logout(request)
+
         user = self._get_user(uidb64)
 
         if user and default_token_generator.check_token(user, token):
@@ -210,7 +213,18 @@ class SetResetPasswordView(View):
                     request, self.template_name,
                     {'message': 'Hasło ustawione, można się zalogować.'}
                 )
-        return render(request, self.template_name, {'form': form})
+            return render(request, self.template_name, {'form': form})
+        return render(
+            request, self.template_name,
+            {
+                'issue': True,
+                'message': (
+                    'Wystąpiły problemy z resetowaniem hasła. '
+                    'Spróbuj ponownie kliknąć w link przesłany w mailu lub '
+                    'skorzystaj z przycisku poniżej.'
+                )
+            }
+        )
 
 
 class ResetPasswordEmailView(View):
