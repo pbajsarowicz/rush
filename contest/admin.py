@@ -42,7 +42,7 @@ class RushUserAdmin(admin.ModelAdmin):
         'groups', 'user_permissions'
     ]
     list_display = ('first_name', 'last_name', 'is_active')
-    readonly_fields = ('last_login', 'date_joined')
+    readonly_fields = ('last_login', 'date_joined', 'club')
     actions = [create, cancel]
     list_filter = ('is_active',)
     filter_horizontal = ['user_permissions']

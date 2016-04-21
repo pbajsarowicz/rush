@@ -453,6 +453,9 @@ class RegisterViewTests(TestCase):
             }
         )
         self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
+        self.assertEqual(
+            RushUser.objects.get(email='abc@tmp.com').club.name, 'School'
+        )
 
 
 class ContestantAddViewTestCase(TestCase):

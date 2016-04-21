@@ -74,18 +74,19 @@ class RegisterView(View):
         if form.is_valid():
             form.save()
             emails = []
-            admins = self.the_list_of_admins()
-            for admin in admins:
+            for admin in self.the_list_of_admins():
                 emails.append(admin.email)
-            user_name = form.cleaned_data['first_name']
-            user_lastname = form.cleaned_data['last_name']
+            user = RushUser.objects.get(email=form.cleaned_data['email'])
             page = urljoin(
                 'http://{}'.format(request.get_host()),
                 reverse('contest:accounts')
             )
             self.send_email_with_new_user(
-                user_name, user_lastname, emails, page
+                user.first_name, user.last_name, emails, page
             )
+            if user.club:
+                user.club.name = user.organization_name
+                user.club.save()
 
             return render(
                 request, 'contest/auth/register_confirmation.html',
