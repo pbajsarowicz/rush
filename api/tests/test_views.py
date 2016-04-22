@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.core.urlresolvers import reverse
 
 from rest_framework.test import (
     APITestCase,
@@ -9,10 +10,31 @@ from rest_framework.test import (
 from contest.models import RushUser
 
 
+class ContactTestsAPI(APITestCase):
+    fixtures = ['contact.json']
+
+    def setUp(self):
+        self.client = APIClient()
+        url = reverse('contest:contact-list')
+        self.response = self.client.get(url)
+        self.admin = RushUser.objects.create_superuser(
+            username='admin', email='test@bb.cc', password='password'
+        )
+        self.client.login(username='admin', password='password')
+        self.response_2 = self.client.get(url)
+
+    def test_getting_info(self):
+        self.assertEqual(
+            self.response.data['detail'],
+            'Nie podano danych uwierzytelniających.'
+        )
+        self.assertEqual(len(self.response_2.data['results']), 2)
+
+
 class ContestTestsAPI(APITestCase):
     fixtures = [
-        'organizers.json', 'contests.json', 'clubs.json',
-        'users.json'
+        'contests.json', 'clubs.json',
+        'schools.json', 'users.json'
     ]
 
     def setUp(self):
@@ -30,18 +52,14 @@ class ContestTestsAPI(APITestCase):
             self.response.data['results'][1]['place'],
             'Basen Wodnik w Poznaniu'
         )
-        self.assertEqual(
-            self.response.data['results'][0]['organizer']['website'],
-            'http://www.google.pl'
-        )
         self.assertEqual(self.response.data['results'][0]['age_min'], 10)
         self.assertEqual(self.response.data['results'][0]['age_max'], 20)
 
 
 class ContestantTestsAPI(APITestCase):
     fixtures = [
-        'contestants.json', 'organizers.json', 'contests.json', 'clubs.json',
-        'users.json'
+        'contestants.json', 'contests.json', 'clubs.json',
+        'schools.json', 'users.json'
     ]
 
     def setUp(self):
@@ -81,17 +99,17 @@ class ClubTestsAPI(APITestCase):
         self.assertEqual(len(self.response_2.data['results']), 2)
 
 
-class OrganizerTestsAPI(APITestCase):
-    fixtures = ['organizers.json', 'clubs.json']
+class SchoolTestsAPI(APITestCase):
+    fixtures = ['schools.json']
 
     def setUp(self):
         self.client = APIClient()
-        self.response = self.client.get('/api/v1/organizers/?format=json')
+        self.response = self.client.get('/api/v1/schools/?format=json')
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get('/api/v1/organizers/?format=json')
+        self.response_2 = self.client.get('/api/v1/schools/?format=json')
 
     def test_getting_info(self):
         self.assertEqual(

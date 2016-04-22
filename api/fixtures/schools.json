@@ -1,0 +1,16 @@
+[
+  {
+      "model": "contest.school",
+      "pk": 1,
+      "fields": {
+        "name": "ZSP1 w Pile"
+      }
+  },
+  {
+      "model": "contest.school",
+      "pk": 2,
+      "fields": {
+        "name": "Klub wodnika"
+      }
+  }
+]

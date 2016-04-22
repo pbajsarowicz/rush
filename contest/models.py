@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -16,26 +17,25 @@ from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils import timezone
-from unidecode import unidecode
 
 from contest.manager import RushUserManager
 
 UNIT_LIMIT = (
-        Q(app_label='contest', model='club') |
-        Q(app_label='contest', model='school')
-    )
+    Q(app_label='contest', model='club') |
+    Q(app_label='contest', model='school')
+)
 
 
 class Contact(models.Model):
     """
     Model with contact details.
     """
-    email = models.EmailField('adres email', unique=True)
+    email = models.EmailField('adres email')
     website = models.URLField('strona internetowa', blank=True)
     phone_number = models.CharField('numer telefonu', max_length=9, blank=True)
 
     def __unicode__(self):
-        return str(self.website)
+        return self.website
 
 
 class School(models.Model):
@@ -43,7 +43,6 @@ class School(models.Model):
     Stores sport clubs data.
     """
     name = models.CharField('nazwa szkoły', max_length=255)
-
     contact = models.OneToOneField(
         Contact,
         on_delete=models.CASCADE,
@@ -60,7 +59,6 @@ class Club(models.Model):
     """
     name = models.CharField('nazwa klubu', max_length=255)
     code = models.IntegerField('kod klubu', default=0)
-
     contact = models.OneToOneField(
         Contact,
         on_delete=models.CASCADE,
@@ -68,10 +66,10 @@ class Club(models.Model):
     )
 
     def __unicode__(self):
-        return str(self.name)
+        return self.name
 
 
-class RushUser(AbstractBaseUser):
+class RushUser(AbstractBaseUser, PermissionsMixin):
     """
     User model for Rush users.
     """
@@ -95,7 +93,9 @@ class RushUser(AbstractBaseUser):
         blank=True, null=True
     )
     object_id = models.PositiveIntegerField(blank=True, null=True)
-    unit = GenericForeignKey('content_type', 'object_id')
+    unit = GenericForeignKey(
+        'content_type', 'object_id',
+    )
 
     objects = RushUserManager()
 
@@ -121,7 +121,9 @@ class RushUser(AbstractBaseUser):
         """
         Return True if user have specified permission.
         """
-        return True
+        if self.groups.filter(name='Administrators') or self.is_staff:
+            return True
+        return super(RushUser, self).has_perm(perm, obj)
 
     def has_module_perms(self, app_label):
         """
@@ -142,13 +144,12 @@ class RushUser(AbstractBaseUser):
         """
         return self.is_admin
 
-    def _get_username(self):
+    @property
+    def is_creator(self):
         """
-        Returns username for an active user.
+        Return True if user has permission to add contests.
         """
-        return unidecode(
-            '{}{}'.format(self.first_name[0], self.last_name)
-        ).lower()
+        return self.has_perm('contest.add_contest')
 
     def activate(self):
         """
@@ -194,26 +195,10 @@ class RushUser(AbstractBaseUser):
         msg.send()
 
 
-class Organizer(models.Model):
-    """
-    Model for contest organizer.
-    """
-    name = models.CharField(max_length=255)
-    email = models.EmailField(blank=True)
-    website = models.URLField(blank=True)
-    phone_number = models.CharField(max_length=9, blank=True)
-    creation_date = models.DateTimeField(auto_now_add=True)
-    club = models.OneToOneField(Club)
-
-    def __unicode__(self):
-        return self.name
-
-
 class Contest(models.Model):
     """
     Model for Contest.
     """
-    organizer = models.ForeignKey(Organizer)
     date = models.DateTimeField()
     place = models.CharField(max_length=255)
     age_min = models.SmallIntegerField()
