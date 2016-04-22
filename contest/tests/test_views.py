@@ -12,6 +12,7 @@ from django.contrib.auth.models import (
     Permission,
 )
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -649,15 +650,13 @@ class ContestantListViewTestCase(TestCase):
         self.client.login(username='test_test', password='P@ssw0rd')
 
         club = Club.objects.create(name='adam', code=12345)
-        organizer = Organizer.objects.create(
-            name='Adam', club=club
-        )
 
         self.contest = Contest.objects.create(
-            organizer=organizer,
             date=make_aware(datetime(2050, 12, 31)),
             place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2048, 11, 20))
+            deadline=make_aware(datetime(2048, 11, 20)),
+            content_type=ContentType.objects.get_for_model(club),
+            object_id=club.pk
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
@@ -775,7 +774,7 @@ class ContestAddTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
             response.url,
-            '{}?next=/zawody/dodaj'.format(reverse('contest:login'))
+            '{}/?next=/zawody/dodaj'.format(reverse('contest:login'))
         )
 
         self.client.login(username='right', password='pass12')

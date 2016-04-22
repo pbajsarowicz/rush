@@ -235,5 +235,5 @@ class ContestForm(forms.ModelForm):
         model = Contest
         fields = [
             'date', 'place', 'deadline', 'age_min',
-            'age_max', 'description', 'organizer'
+            'age_max', 'description',
         ]

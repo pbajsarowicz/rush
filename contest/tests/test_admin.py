@@ -10,9 +10,13 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.http import HttpRequest
+from mock import patch
 
 from contest.admin import RushUserAdmin
-from contest.models import RushUser
+from contest.models import (
+    Club,
+    RushUser,
+)
 
 
 class AdminMethodTests(TestCase):
@@ -20,20 +24,25 @@ class AdminMethodTests(TestCase):
         self.initial_user1_username = str(uuid.uuid4())
         self.initial_user_2_username = str(uuid.uuid4())
 
+        club = Club.objects.create(name='Klub', code=15545)
+
         self.user_1 = RushUser.objects.create_user(
             email='aaa@aaa.pl', first_name='Łukasz', last_name='Ślązak',
             organization_name='School', organization_address='Address',
-            password='Password', username=self.initial_user1_username
+            password='Password', username=self.initial_user1_username,
+            unit=club
         )
         self.user_2 = RushUser.objects.create_user(
             email='bbb@bbb.pl', first_name='Adam', last_name='Ślowacki',
             organization_name='School', organization_address='Address',
-            password='Password', username=self.initial_user_2_username
+            password='Password', username=self.initial_user_2_username,
+            unit=club
         )
         self.user_3 = RushUser.objects.create_user(
             email='ccc@ccc.pl', first_name='Ewa', last_name='Kowalska',
             organization_name='School', organization_address='Address',
-            password='Password', username='random_login'
+            password='Password', username='random_login',
+            unit=club
         )
 
         self.request = HttpRequest()
@@ -55,6 +64,7 @@ class AdminMethodTests(TestCase):
         self.assertEqual(mail.outbox[1].to, [self.user_2.email])
         uid = urlsafe_base64_encode(force_bytes(self.user_1.pk))
         token = default_token_generator.make_token(self.user_1)
+
         reset_url = reverse(
             'contest:set-password',
             kwargs={'uidb64': uid, 'token': token}

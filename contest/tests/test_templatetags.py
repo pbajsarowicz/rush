@@ -44,19 +44,19 @@ class ToJSONTestCase(TestCase):
         self.assertEqual(
             result_json,
             {
+                'content_type': None,
                 'email': 'test@user.pl',
                 'first_name': 'Test',
                 'groups': [],
-                'id': 1,
                 'is_active': True,
                 'is_admin': False,
                 'is_superuser': False,
                 'last_login': None,
                 'last_name': 'Anonymous',
+                'object_id': None,
                 'organization_address': '',
                 'organization_name': '',
                 'user_permissions': [],
-                'username': '',
-                'object_id': None,
+                'username': ''
             }
         )
