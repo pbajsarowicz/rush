@@ -33,8 +33,10 @@ class ContactTestsAPI(APITestCase):
 
 class ContestTestsAPI(APITestCase):
     fixtures = [
-        'contests.json', 'clubs.json',
-        'schools.json', 'users.json'
+        'contest/fixtures/organizers.json',
+        'contest/fixtures/contests.json',
+        'contest/fixtures/clubs.json',
+        'contest/fixtures/users.json',
     ]
 
     def setUp(self):
@@ -58,8 +60,11 @@ class ContestTestsAPI(APITestCase):
 
 class ContestantTestsAPI(APITestCase):
     fixtures = [
-        'contestants.json', 'contests.json', 'clubs.json',
-        'schools.json', 'users.json'
+        'contest/fixtures/contestants.json',
+        'contest/fixtures/organizers.json',
+        'contest/fixtures/contests.json',
+        'contest/fixtures/clubs.json',
+        'contest/fixtures/users.json',
     ]
 
     def setUp(self):
@@ -80,7 +85,7 @@ class ContestantTestsAPI(APITestCase):
 
 
 class ClubTestsAPI(APITestCase):
-    fixtures = ['clubs.json']
+    fixtures = ['contest/fixtures/clubs.json']
 
     def setUp(self):
         self.client = APIClient()
@@ -120,7 +125,10 @@ class SchoolTestsAPI(APITestCase):
 
 
 class UserTestsAPI(APITestCase):
-    fixtures = ['clubs.json', 'users.json']
+    fixtures = [
+        'contest/fixtures/clubs.json',
+        'contest/fixtures/users.json'
+    ]
 
     def setUp(self):
         self.client = APIClient()

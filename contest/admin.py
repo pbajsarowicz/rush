@@ -25,7 +25,7 @@ class RushUserAdmin(admin.ModelAdmin):
             if user.is_active:
                 continue
             user.activate()
-            user.send_reset_email(request)
+            user.send_reset_password_email(request, True)
 
     create.short_description = 'Stwórz konto'
 
