@@ -1,6 +1,7 @@
 {% extends "contest/base.html" %}
 
 {% block container %}
+<<<<<<< HEAD
   <div class="container">
     <div class="row center">
       {% if message %}
@@ -20,4 +21,25 @@
       {% endif %}
     </div>
   </div>
+=======
+<div class="container">
+    <div class="row center">
+        {% if message %}
+            {{ message }}
+            <div class="row center">
+                <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Ok</a>
+            </div>
+        {% else %}
+            <form class="col s6" action="?next={{next}}" role="form" method="post">
+                <div class="row center">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <a class="waves-effect waves-light btn modal-trigger" href="{% url 'contest:home' %}" >Anuluj</a>
+                    <button type="submit" class="pull-right btn btn-primary">Gotowe</button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
 {% endblock %}

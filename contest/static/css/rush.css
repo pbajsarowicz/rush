@@ -2,6 +2,7 @@
 Contest
 *******/
 .contest-item {
+<<<<<<< HEAD
   vertical-align: middle;
 }
 
@@ -12,6 +13,18 @@ Contest
 .contest-item .button {
   float: right;
   margin-left: 20px;
+=======
+    vertical-align: middle;
+}
+
+.contest-item .text {
+    line-height: 38px;
+}
+
+.contest-item .button {
+    margin-left: 20px;
+    float: right;
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
 }
 
 /************
@@ -20,6 +33,7 @@ Base elements
 
 /* Footer */
 .page-footer {
+<<<<<<< HEAD
   bottom: 0;
   height: 220px;
   position: fixed;
@@ -37,21 +51,46 @@ Base elements
   padding: 0;
   position: fixed;
   width: 100%;
+=======
+   bottom: 0px;
+   height: 220px;
+   position: fixed;
+   z-index: -1;
+   width: 100%;
+}
+
+.page-footer .row {
+    padding-top: 40px;
+}
+
+.page-footer .footer-copyright {
+    bottom: 0;
+    padding: 0;
+    margin: 0;
+    position: fixed;
+    width: 100%;
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
 }
 
 /* Page content */
 #page-content {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
     background-color: #fff;
     margin-bottom: 220px;
     padding-bottom: 50px;
     z-index: 1;
+<<<<<<< HEAD
 =======
   background-color: #fff;
   margin-bottom: 220px;
   padding-bottom: 50px;
   z-index: 1;
 >>>>>>> 9615c710d7a541011851fa283529f0d3a43733bd
+=======
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
 }
 
 /* General */
@@ -73,6 +112,7 @@ Base elements
 
 .nav-margin {
 <<<<<<< HEAD
+<<<<<<< HEAD
     margin-bottom: 40px !important;
 =======
   margin-bottom: 40px !important;
@@ -81,4 +121,7 @@ Base elements
 .errorlist {
   color: red;
 >>>>>>> 9615c710d7a541011851fa283529f0d3a43733bd
+=======
+    margin-bottom: 40px !important;
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
 }

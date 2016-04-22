@@ -33,10 +33,15 @@ class ContactTestsAPI(APITestCase):
 
 class ContestTestsAPI(APITestCase):
     fixtures = [
+<<<<<<< HEAD
         'contest/fixtures/organizers.json',
         'contest/fixtures/contests.json',
         'contest/fixtures/clubs.json',
         'contest/fixtures/users.json',
+=======
+        'contests.json', 'clubs.json',
+        'schools.json', 'users.json'
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
     ]
 
     def setUp(self):
@@ -60,11 +65,16 @@ class ContestTestsAPI(APITestCase):
 
 class ContestantTestsAPI(APITestCase):
     fixtures = [
+<<<<<<< HEAD
         'contest/fixtures/contestants.json',
         'contest/fixtures/organizers.json',
         'contest/fixtures/contests.json',
         'contest/fixtures/clubs.json',
         'contest/fixtures/users.json',
+=======
+        'contestants.json', 'contests.json', 'clubs.json',
+        'schools.json', 'users.json'
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
     ]
 
     def setUp(self):

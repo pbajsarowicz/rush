@@ -208,7 +208,10 @@ class ContestForm(forms.ModelForm):
     def clean_deadline(self):
         deadline = self.cleaned_data.get('deadline')
         date = self.cleaned_data.get('date')
+<<<<<<< HEAD
 
+=======
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
         if deadline < timezone.now():
             raise forms.ValidationError(
                 'Termin dodawania zwodników musi być dłuższy niż podana data.'
@@ -235,5 +238,9 @@ class ContestForm(forms.ModelForm):
         model = Contest
         fields = [
             'date', 'place', 'deadline', 'age_min',
+<<<<<<< HEAD
             'age_max', 'description', 'organizer'
+=======
+            'age_max', 'description'
+>>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
         ]
