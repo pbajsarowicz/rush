@@ -17,22 +17,14 @@ from django.views.generic import (
     TemplateView,
     View,
 )
-<<<<<<< HEAD
 from contest.models import (
     Contest,
     Contestant,
 )
-=======
-
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
 from contest.forms import (
     ContestantForm,
     ContestForm,
 )
-<<<<<<< HEAD
-=======
-from contest.models import Contest
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
 
 
 class HomeView(TemplateView):
@@ -162,7 +154,6 @@ class ContestantAddView(View):
         return render(request, self.template_name, {'formset': formset})
 
 
-<<<<<<< HEAD
 class ContestantListView(View):
     """
     View with list of added contestants.
@@ -238,8 +229,6 @@ class EditContestantView(View):
         )
 
 
-=======
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
 class ContestAddView(PermissionRequiredMixin, View):
     """
     View for adding contests.

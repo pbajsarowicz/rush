@@ -25,24 +25,15 @@ from contest.forms import (
     ContestForm,
     LoginForm,
     RegistrationForm,
-    SettingPasswordForm,
-    ContestForm,
-<<<<<<< HEAD:contest/tests/test_views.py
     RushResetPasswordEmailForm,
     RushResetPasswordForm,
     RushSetPasswordForm,
-=======
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501:contest/tests/tests_views.py
 )
 from contest.models import (
     Club,
     Contest,
     Contestant,
     RushUser,
-<<<<<<< HEAD:contest/tests/test_views.py
-=======
-    Contest,
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501:contest/tests/tests_views.py
 )
 from contest.views import RegisterView
 from contest.views import SetResetPasswordView
@@ -645,7 +636,6 @@ class ContestantAddViewTestCase(TestCase):
         )
 
 
-<<<<<<< HEAD:contest/tests/test_views.py
 class ContestantListViewTestCase(TestCase):
 
     def setUp(self):
@@ -758,11 +748,6 @@ class EditContestantViewTestCase(TestCase):
 
 
 class ContestAddTestCase(TestCase):
-    fixtures = ['organizers.json', 'clubs.json']
-
-=======
-class ContestAddTestCase(TestCase):
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501:contest/tests/tests_views.py
     def setUp(self):
         self.user_1 = RushUser.objects.create_user(
             email='d@d.pl', is_active=True, username='wrong', password='pass12'
@@ -775,10 +760,6 @@ class ContestAddTestCase(TestCase):
         self.user_2.user_permissions.add(
             Permission.objects.get(name='Can add contest')
         )
-<<<<<<< HEAD:contest/tests/test_views.py
-
-=======
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501:contest/tests/tests_views.py
         self.form_data = {
             'date': '31.12.2100 16:00',
             'place': 'Majorka',
@@ -794,11 +775,7 @@ class ContestAddTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
             response.url,
-<<<<<<< HEAD:contest/tests/test_views.py
-            '{}/?next=/zawody/dodaj'.format(reverse('contest:login'))
-=======
             '{}?next=/zawody/dodaj'.format(reverse('contest:login'))
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501:contest/tests/tests_views.py
         )
 
         self.client.login(username='right', password='pass12')

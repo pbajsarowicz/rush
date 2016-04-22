@@ -47,10 +47,7 @@ class ToJSONTestCase(TestCase):
                 'email': 'test@user.pl',
                 'first_name': 'Test',
                 'groups': [],
-<<<<<<< HEAD:contest/tests/test_templatetags.py
-=======
                 'id': 1,
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501:contest/tests/tests_templatetags.py
                 'is_active': True,
                 'is_admin': False,
                 'is_superuser': False,

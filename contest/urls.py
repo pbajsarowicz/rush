@@ -74,16 +74,7 @@ urlpatterns = [
         name='contestant-add'
     ),
     url(
-<<<<<<< HEAD
-        r'^zawodnicy/edytuj/(?P<contestant_id>[0-9]+)/?$',
-        login_required(views.EditContestantView.as_view()),
-        name='contestant-edit'
-    ),
-    url(
-        r'^zawody/dodaj/?$',
-=======
         r'^zawody/dodaj$',
->>>>>>> d6a9d13112f8b65819d11477b8bead0654927501
         login_required(views.ContestAddView.as_view()),
         name='contest-add'
     ),
