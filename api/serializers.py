@@ -17,7 +17,7 @@ from contest.models import (
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
-        fields = ('email', 'website', 'phone_number')
+        fields = ('email', 'website', 'phone_number',)
 
 
 class ClubSerializer(serializers.ModelSerializer):
@@ -25,7 +25,7 @@ class ClubSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Club
-        fields = ('name', 'code', 'contact')
+        fields = ('name', 'code', 'contact',)
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -33,7 +33,7 @@ class SchoolSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = School
-        fields = ('name', 'contact')
+        fields = ('name', 'contact',)
 
 
 class SchoolClubRelatedField(serializers.RelatedField):

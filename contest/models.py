@@ -44,13 +44,11 @@ class School(models.Model):
     """
     name = models.CharField('nazwa szkoły', max_length=255)
     contact = models.OneToOneField(
-        Contact,
-        on_delete=models.CASCADE,
-        null=True,
+        Contact, on_delete=models.CASCADE, null=True,
     )
 
     def __unicode__(self):
-        return str(self.name)
+        return self.name
 
 
 class Club(models.Model):
@@ -60,9 +58,7 @@ class Club(models.Model):
     name = models.CharField('nazwa klubu', max_length=255)
     code = models.IntegerField('kod klubu', default=0)
     contact = models.OneToOneField(
-        Contact,
-        on_delete=models.CASCADE,
-        null=True,
+        Contact, on_delete=models.CASCADE, null=True,
     )
 
     def __unicode__(self):
@@ -89,13 +85,10 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
     is_admin = models.BooleanField(default=False)
     content_type = models.ForeignKey(
-        ContentType, limit_choices_to=UNIT_LIMIT,
-        blank=True, null=True
+        ContentType, limit_choices_to=UNIT_LIMIT, blank=True, null=True
     )
     object_id = models.PositiveIntegerField(blank=True, null=True)
-    unit = GenericForeignKey(
-        'content_type', 'object_id',
-    )
+    unit = GenericForeignKey('content_type', 'object_id')
 
     objects = RushUserManager()
 

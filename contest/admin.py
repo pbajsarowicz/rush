@@ -39,8 +39,8 @@ class RushUserAdmin(admin.ModelAdmin):
 
     fields = [
         'username', 'email', 'first_name', 'last_name', 'organization_name',
-        'organization_address', 'club', 'date_joined', 'last_login',
-        'groups', 'user_permissions'
+        'organization_address', 'content_type', 'object_id', 'date_joined',
+        'last_login', 'groups', 'user_permissions',
     ]
     list_display = ('first_name', 'last_name', 'is_active')
     readonly_fields = ('last_login', 'date_joined')

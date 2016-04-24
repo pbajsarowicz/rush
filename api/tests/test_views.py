@@ -10,28 +10,32 @@ from rest_framework.test import (
 from contest.models import RushUser
 
 
-class ContactTestsAPI(APITestCase):
-    fixtures = ['contact.json']
+class ApiTestCasesMixin(object):
 
     def setUp(self):
         self.client = APIClient()
-        url = reverse('contest:contact-list')
-        self.response = self.client.get(url)
+
+
+class ContactTestsAPI(ApiTestCasesMixin, APITestCase):
+    fixtures = ['contact.json']
+
+    def test_getting_info(self):
+        url = reverse('api:contact-list')
+        response = self.client.get(url)
+        self.assertEqual(
+            response.data['detail'], 'Nie podano danych uwierzytelniających.'
+        )
+
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get(url)
+        response = self.client.get(url)
 
-    def test_getting_info(self):
-        self.assertEqual(
-            self.response.data['detail'],
-            'Nie podano danych uwierzytelniających.'
-        )
-        self.assertEqual(len(self.response_2.data['results']), 2)
+        self.assertEqual(len(response.data['results']), 2)
 
 
-class ContestTestsAPI(APITestCase):
+class ContestTestsAPI(ApiTestCasesMixin, APITestCase):
     fixtures = [
         'contest/fixtures/organizers.json',
         'contest/fixtures/contests.json',
@@ -39,26 +43,23 @@ class ContestTestsAPI(APITestCase):
         'contest/fixtures/users.json',
     ]
 
-    def setUp(self):
-        self.client = APIClient()
-        self.response = self.client.get('/api/v1/contests/?format=json')
-
     def test_getting_info(self):
-        self.assertEqual(self.response.status_code, 200)
-        self.assertEqual(len(self.response.data['results']), 3)
+        response = self.client.get(reverse('api:contest-list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 3)
         self.assertEqual(
-            self.response.data['results'][2]['place'],
+            response.data['results'][2]['place'],
             'Basen Wodnik w Pile'
         )
         self.assertEqual(
-            self.response.data['results'][1]['place'],
+            response.data['results'][1]['place'],
             'Basen Wodnik w Poznaniu'
         )
-        self.assertEqual(self.response.data['results'][0]['age_min'], 10)
-        self.assertEqual(self.response.data['results'][0]['age_max'], 20)
+        self.assertEqual(response.data['results'][0]['age_min'], 10)
+        self.assertEqual(response.data['results'][0]['age_max'], 20)
 
 
-class ContestantTestsAPI(APITestCase):
+class ContestantTestsAPI(ApiTestCasesMixin, APITestCase):
     fixtures = [
         'contest/fixtures/contestants.json',
         'contest/fixtures/organizers.json',
@@ -67,81 +68,73 @@ class ContestantTestsAPI(APITestCase):
         'contest/fixtures/users.json',
     ]
 
-    def setUp(self):
-        self.client = APIClient()
-        self.response = self.client.get('/api/v1/contestants/?format=json')
+    def test_getting_info(self):
+        response = self.client.get(reverse('api:contestant-list'))
+        self.assertEqual(
+            response.data['detail'],
+            'Nie podano danych uwierzytelniających.'
+        )
+
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get('/api/v1/contestants/?format=json')
-
-    def test_getting_info(self):
-        self.assertEqual(
-            self.response.data['detail'],
-            'Nie podano danych uwierzytelniających.'
-        )
-        self.assertEqual(len(self.response_2.data['results']), 4)
+        response = self.client.get(reverse('api:contestant-list'))
+        self.assertEqual(len(response.data['results']), 4)
 
 
-class ClubTestsAPI(APITestCase):
+class ClubTestsAPI(ApiTestCasesMixin, APITestCase):
     fixtures = ['contest/fixtures/clubs.json']
 
-    def setUp(self):
-        self.client = APIClient()
-        self.response = self.client.get('/api/v1/clubs/?format=json')
+    def test_getting_info(self):
+        response = self.client.get(reverse('api:club-list'))
+        self.assertEqual(
+            response.data['detail'],
+            'Nie podano danych uwierzytelniających.'
+        )
+
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get('/api/v1/clubs/?format=json')
-
-    def test_getting_info(self):
-        self.assertEqual(
-            self.response.data['detail'],
-            'Nie podano danych uwierzytelniających.'
-        )
-        self.assertEqual(len(self.response_2.data['results']), 2)
+        response = self.client.get(reverse('api:club-list'))
+        self.assertEqual(len(response.data['results']), 2)
 
 
-class SchoolTestsAPI(APITestCase):
+class SchoolTestsAPI(ApiTestCasesMixin, APITestCase):
     fixtures = ['schools.json']
 
-    def setUp(self):
-        self.client = APIClient()
-        self.response = self.client.get('/api/v1/schools/?format=json')
+    def test_getting_info(self):
+        response = self.client.get(reverse('api:school-list'))
+        self.assertEqual(
+            response.data['detail'],
+            'Nie podano danych uwierzytelniających.'
+        )
+
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get('/api/v1/schools/?format=json')
-
-    def test_getting_info(self):
-        self.assertEqual(
-            self.response.data['detail'],
-            'Nie podano danych uwierzytelniających.'
-        )
-        self.assertEqual(len(self.response_2.data['results']), 2)
+        response = self.client.get(reverse('api:school-list'))
+        self.assertEqual(len(response.data['results']), 2)
 
 
-class UserTestsAPI(APITestCase):
+class UserTestsAPI(ApiTestCasesMixin, APITestCase):
     fixtures = [
         'contest/fixtures/clubs.json',
         'contest/fixtures/users.json'
     ]
 
-    def setUp(self):
-        self.client = APIClient()
-        self.response = self.client.get('/api/v1/users/?format=json')
+    def test_getting_info(self):
+        response = self.client.get(reverse('api:rushuser-list'))
+        self.assertEqual(
+            response.data['detail'],
+            'Nie podano danych uwierzytelniających.'
+        )
+
         self.admin = RushUser.objects.create_superuser(
             username='admin', email='test@bb.cc', password='password'
         )
         self.client.login(username='admin', password='password')
-        self.response_2 = self.client.get('/api/v1/users/?format=json')
-
-    def test_getting_info(self):
-        self.assertEqual(
-            self.response.data['detail'],
-            'Nie podano danych uwierzytelniających.'
-        )
-        self.assertEqual(len(self.response_2.data['results']), 3)
+        response = self.client.get(reverse('api:rushuser-list'))
+        self.assertEqual(len(response.data['results']), 3)
