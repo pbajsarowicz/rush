@@ -22,5 +22,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^', include('contest.urls', namespace='contest')),
+    url(r'^api/v1/', include('api.urls', namespace='api')),
     url(r'^admin/', admin.site.urls),
 ]
