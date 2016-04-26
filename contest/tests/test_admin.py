@@ -10,7 +10,6 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.http import HttpRequest
-from mock import patch
 
 from contest.admin import RushUserAdmin
 from contest.models import (
