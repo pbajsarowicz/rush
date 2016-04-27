@@ -1,4 +1,6 @@
 var clubCodeInput = document.getElementById('id_club_code');
+var contestantsPreview = document.getElementById('contestants-preview');
+var visibleContestFormId = '0';
 
 /*
  * Creates an account.
@@ -34,6 +36,7 @@ function manageUser(user, create) {
  * Hides club code input.
  */
 function hideClubCode() {
+    'use strict';
     if (document.register_form.club_checkbox.checked) {
         clubCodeInput.className = 'visible';
         clubCodeInput.required = true;
@@ -47,22 +50,22 @@ function hideClubCode() {
 /*
  * Supports initialization of club code in case of validation errors appear.
  */
-    function onClubCodeValidation() {
-        if (clubCodeInput && clubCodeInput.value) {
-            document.register_form.club_checkbox.checked = true;
-            clubCodeInput.className = 'visible';
-            clubCodeInput.required = true;
-        }
+function onClubCodeValidation() {
+    'use strict';
+    if (clubCodeInput && clubCodeInput.value) {
+        document.register_form.club_checkbox.checked = true;
+        clubCodeInput.className = 'visible';
+        clubCodeInput.required = true;
     }
+}
 
 /*
  * Checking whether add_contestant form has validation errors.
  */
 
-function validateContestantForm() {
-    var form_idx = $('#id_form-TOTAL_FORMS').val();
-    var id = 'id_form-' + (parseInt(form_idx) - 1);
-
+function validateContestantForm(formID) {
+    'use strict';
+    var id = 'id_form-' + formID;
     var firstName = document.forms['contestants'][id + '-first_name'].value;
     var lastName = document.forms['contestants'][id + '-last_name'].value;
     var gender = document.forms['contestants'][id + '-gender'].value;
@@ -136,23 +139,110 @@ function validateContestantForm() {
 }
 
 /*
+ * Loads cached form.
+ */
+function loadCachedContestant(formId) {
+    'use strict';
+    var contestantForm = document.getElementById('id_form-' + formId);
+    var contestantFormList = document.getElementsByClassName('contestant-form');
+    var totalForms = parseInt($('#id_form-TOTAL_FORMS').val());
+    var isLatestForm = (parseInt(formId - visibleContestFormId) <= 1);
+
+    if(!isLatestForm && !validateContestantForm(visibleContestFormId)) {
+        return false;
+    }
+    updateTextOfContestantPreview(visibleContestFormId);
+
+    for (var i = 0, len = contestantFormList.length; i < len; i++) {
+        if (contestantFormList[i].style.display !== 'none') {
+            contestantFormList[i].style.display = 'none';
+        }
+    }
+
+    contestantForm.style = '';
+    visibleContestFormId = formId;
+    console.log(visibleContestFormId);
+}
+
+/*
+ * Updates contestant's preview text with value provided in form.
+ */
+function updateTextOfContestantPreview(formId) {
+    'use strict';
+    var preview = document.getElementById('preview-' + formId);
+    var firstName = document.forms['contestants']['id_form-' + formId + '-first_name'].value;
+    var lastName = document.forms['contestants']['id_form-' + formId + '-last_name'].value;
+
+    if (preview) {
+        preview.textContent = firstName + ' ' + lastName;
+    }
+}
+
+/*
+ * Appends a new item to the list of added contestans.
+ */
+function appendToContestantsPreview(formId) {
+    'use strict';
+    var firstName = document.forms['contestants']['id_form-' + formId + '-first_name'].value;
+    var lastName = document.forms['contestants']['id_form-' + formId + '-last_name'].value;
+    var elementLi = document.createElement('li');
+    var span = document.createElement('span');
+    var contestantsPreviewUl = contestantsPreview.getElementsByClassName('collection')[0];
+
+    if (contestantsPreview.className.indexOf('invisible') > -1) {
+        contestantsPreview.className = contestantsPreview.className.replace('invisible', '');
+    }
+
+    span.className = 'chip';
+    span.id = 'preview-' + formId;
+    span.addEventListener('click', function() {
+        loadCachedContestant(formId);
+    }, false);
+    span.appendChild(document.createTextNode(firstName + ' ' + lastName));
+
+    elementLi.className = 'collection-item';
+    elementLi.appendChild(span);
+
+    contestantsPreviewUl.appendChild(elementLi);
+}
+
+/*
  * Generates formset. Moreover, handles MaterializeCSS selects.
  */
 $('#add_more').click(function() {
+    'use strict';
+    var formId = '';
 
-    if(!validateContestantForm()) {
+    if(!validateContestantForm(visibleContestFormId)) {
         return false;
     }
+    updateTextOfContestantPreview(visibleContestFormId);
+
+    formId = parseInt($('#id_form-TOTAL_FORMS').val());
 
     $('select').material_select('destroy');
 
-    var form_idx = $('#id_form-TOTAL_FORMS').val();
-    $('#id_form-' + (parseInt(form_idx) - 1)).hide();
-    $('#formset').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    // Hides visible form
+    $('#id_form-' + visibleContestFormId).hide();
 
+    // If visible form is the one with the highest id then appends it to preview list and adds a new form
+    // otherwise shows that form.
+    if (parseInt(formId - visibleContestFormId) <= 1) {
+        appendToContestantsPreview(formId - 1);
+
+        $('#formset').append($('#empty_form').html().replace(/__prefix__/g, formId));
+        $('#id_form-' + formId).show();
+        $('#id_form-TOTAL_FORMS').val(formId + 1);
+
+        $('html, body').animate({ scrollTop: 0 });
+    } else {
+        formId -= 1;
+        $('#id_form-' + formId).show();
+    }
     $('select').material_select();
-    $('html, body').animate({ scrollTop: 0 });
+
+    // Upon adding new contestant, a visible form is always the one with the highest id number
+    visibleContestFormId = formId;
 });
 
 
@@ -160,6 +250,7 @@ $('#add_more').click(function() {
  * Populates modal with contest info.
  */
 function getContestInfo(pk) {
+    'use strict';
     var organizer = '';
     var contact = '';
     var organizer_contact = '';
@@ -211,6 +302,7 @@ $(document).ready(function() {
  * Parsing user data from js to html.
  */
 function parseUserData(json) {
+    'use strict';
     var fieldsNames = [
         ['Email', 'email'],
         ['Data rejestracji', 'date_joined'],
@@ -218,7 +310,6 @@ function parseUserData(json) {
         ['Nazwa organizacji', 'organization_name'],
         ['Adres organizacji', 'organization_address']
     ]
-
     var fragment = document.createDocumentFragment();
     var elementUl = element = document.createElement('ul');
     var elementLi;
@@ -227,7 +318,7 @@ function parseUserData(json) {
         elementLi = document.createElement('li');
         elementLi.appendChild(document.createTextNode(field[0] + ': ' + json[field[1]]));
         elementUl.appendChild(elementLi);
-    })
+    });
     fragment.appendChild(elementUl);
 
     return fragment
@@ -237,6 +328,7 @@ function parseUserData(json) {
  * Handling user info request and inserting data into html container.
  */
 function getUserInfo(user) {
+    'use strict';
     if ($('#content' + user).css('display') == 'none' || $('#content' + user).css('display') == 'block') {
         $.ajax({
             url: '/api/v1/users/' + user,

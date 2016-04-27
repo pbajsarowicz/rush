@@ -14,6 +14,33 @@ Contest
   margin-left: 20px;
 }
 
+
+/**********
+Contestants
+***********/
+/*@keyframes contestants-animation {
+    0%   {display: none;}
+    100% {display: inherit;}
+}
+*/
+#contestants-preview {
+  background-color: white;
+  bottom: 0;
+  margin: 0;
+  position: fixed;
+  right: 0;
+  width: 200px;
+}
+
+#contestants-preview span {
+  cursor: pointer;
+}
+
+#contestants-preview ul {
+  margin: 0;
+}
+
+
 /************
 Base elements
 *************/
