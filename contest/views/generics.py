@@ -60,13 +60,13 @@ class ContestantAddView(View):
         return 'Zawody się już skończyły.'
 
     @staticmethod
-    def get_formset(contest_id, data=None):
+    def get_formset(contest_id, user, data=None):
         """
         Returns formset of `ContestantForm` forms.
         """
         formset_class = formset_factory(ContestantForm, extra=1)
         formset_class.form = staticmethod(
-            curry(ContestantForm, contest_id=contest_id)
+            curry(ContestantForm, contest_id=contest_id, user=user)
         )
         return formset_class(data) if data else formset_class()
 
@@ -93,7 +93,9 @@ class ContestantAddView(View):
         """
         Return adding a contestant form on site.
         """
-        formset = self.get_formset(contest_id)
+        user = request.user
+        organization = request.user.email
+        formset = self.get_formset(contest_id, user)
 
         try:
             contest = Contest.objects.get(pk=contest_id)
@@ -109,14 +111,18 @@ class ContestantAddView(View):
                 {'message': self._get_message(contest)}
             )
         return render(
-            request, self.template_name, {'formset': formset, 'name': contest}
+            request, self.template_name, {
+                'formset': formset,
+                'name': contest,
+                'organization': organization,
+            }
         )
 
     def post(self, request, contest_id, *args, **kwargs):
         """
         Create a contestant.
         """
-        formset = self.get_formset(contest_id, request.POST)
+        formset = self.get_formset(contest_id, request.user, request.POST)
 
         try:
             contest = Contest.objects.get(pk=contest_id)
