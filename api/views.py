@@ -5,16 +5,18 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from api.serializers import (
+    ContactSerializer,
     ContestSerializer,
-    OrganizerSerializer,
     ClubSerializer,
+    SchoolSerializer,
     ContestantSerializer,
     RushUserSerializer,
 )
 from contest.models import (
+    Contact,
     Contest,
-    Organizer,
     Club,
+    School,
     Contestant,
     RushUser,
 )
@@ -29,12 +31,12 @@ class ContestViewSet(viewsets.ModelViewSet):
     serializer_class = ContestSerializer
 
 
-class OrganizerViewSet(viewsets.ModelViewSet):
+class ContactViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allow to view Organizers.
+    API endpoint that allow to view Clubs.
     """
-    queryset = Organizer.objects.all()
-    serializer_class = OrganizerSerializer
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
 
 
 class ClubViewSet(viewsets.ModelViewSet):
@@ -43,6 +45,14 @@ class ClubViewSet(viewsets.ModelViewSet):
     """
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
+
+
+class SchoolViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allow to view Clubs.
+    """
+    queryset = School.objects.all()
+    serializer_class = SchoolSerializer
 
 
 class ContestantViewSet(viewsets.ModelViewSet):

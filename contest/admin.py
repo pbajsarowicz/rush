@@ -6,9 +6,10 @@ from django.contrib import admin
 from contest.models import (
     Contestant,
     RushUser,
-    Organizer,
     Contest,
     Club,
+    School,
+    Contact,
 )
 
 
@@ -38,8 +39,8 @@ class RushUserAdmin(admin.ModelAdmin):
 
     fields = [
         'username', 'email', 'first_name', 'last_name', 'organization_name',
-        'organization_address', 'club', 'date_joined', 'last_login',
-        'groups', 'user_permissions'
+        'organization_address', 'content_type', 'object_id', 'date_joined',
+        'last_login', 'groups', 'user_permissions',
     ]
     list_display = ('first_name', 'last_name', 'is_active')
     readonly_fields = ('last_login', 'date_joined', 'club')
@@ -59,6 +60,7 @@ class ContestAdmin(admin.ModelAdmin):
 
 admin.site.register(RushUser, RushUserAdmin)
 admin.site.register(Contestant)
-admin.site.register(Organizer)
 admin.site.register(Contest, ContestAdmin)
 admin.site.register(Club)
+admin.site.register(School)
+admin.site.register(Contact)

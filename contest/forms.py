@@ -190,7 +190,11 @@ class ContestForm(forms.ModelForm):
     """
 
     def __init__(self, *args, **kwargs):
+        if 'user' in kwargs:
+            self.user = kwargs.pop('user')
+
         super(ContestForm, self).__init__(*args, **kwargs)
+
         self.fields['date'].widget.attrs = {'class': 'datetime'}
         self.fields['deadline'].widget.attrs = {'class': 'datetime'}
         self.fields['description'].widget.attrs = {
@@ -231,9 +235,20 @@ class ContestForm(forms.ModelForm):
             )
         return age_max
 
+    def save(self, commit=True):
+        contest = super(ContestForm, self).save(commit=False)
+
+        contest.content_type = self.user.content_type
+        contest.object_id = self.user.object_id
+
+        if commit:
+            contest.save()
+
+        return contest
+
     class Meta:
         model = Contest
         fields = [
             'date', 'place', 'deadline', 'age_min',
-            'age_max', 'description', 'organizer'
+            'age_max', 'description',
         ]

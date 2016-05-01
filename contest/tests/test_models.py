@@ -7,10 +7,11 @@ from django.utils import timezone
 
 from contest.models import (
     RushUser,
-    Organizer,
     Contest,
     Club,
     Contestant,
+    School,
+    Contact,
 )
 
 
@@ -63,7 +64,7 @@ class ContestTestCase(TestCase):
     def setUp(self):
         self.now = timezone.now()
         self.contest = Contest.objects.create(
-            organizer=Organizer.objects.last(), date=self.now, place='Szkoła',
+            date=self.now, place='Szkoła',
             age_min=11, age_max=16, deadline=self.now
         )
 
@@ -72,17 +73,6 @@ class ContestTestCase(TestCase):
             self.contest.__unicode__(),
             'Szkoła {}'.format(datetime.strftime(self.now, '%d.%m.%Y %X'))
         )
-
-
-class OrganizerTestCase(TestCase):
-    def setUp(self):
-        club = Club.objects.create(name='adam', code=12345)
-        self.organizer = Organizer.objects.create(
-            name='Adam', club=club
-        )
-
-    def test_organizer_methods(self):
-        self.assertEqual(self.organizer.__unicode__(), 'Adam')
 
 
 class ContestantTestCase(TestCase):
@@ -105,3 +95,22 @@ class ClubTestCase(TestCase):
 
     def test_club_methods(self):
         self.assertEqual(self.club.__unicode__(), 'Klub')
+
+
+class SchoolTestCase(TestCase):
+    def setUp(self):
+        self.school = School.objects.create(name='Szkola')
+
+    def test_club_methods(self):
+        self.assertEqual(self.school.__unicode__(), 'Szkola')
+
+
+class ContactTestCase(TestCase):
+    def setUp(self):
+        self.contact = Contact.objects.create(
+            email='email@wp.pl', website='www.example.com',
+            phone_number='123456789'
+        )
+
+    def test_club_methods(self):
+        self.assertEqual(self.contact.__unicode__(), 'www.example.com')
