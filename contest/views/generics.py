@@ -197,9 +197,11 @@ class EditContestantView(View):
         Return form with filled fields.
         """
         contestant = Contestant.objects.get(id=contestant_id)
+        user = request.user
 
         form = self.form_class(
-            instance=contestant, contest_id=contestant.contest.id
+            instance=contestant, contest_id=contestant.contest.id,
+            user = user
         )
 
         if not contestant.moderator == request.user:
@@ -209,7 +211,7 @@ class EditContestantView(View):
             )
         return render(
             request, self.template_name,
-            {'contestant': contestant, 'form': form},
+            {'contestant': contestant, 'form': form, 'user': user},
         )
 
     def post(self, request, contestant_id, *args, **kwargs):
@@ -218,7 +220,7 @@ class EditContestantView(View):
         """
         contestant = Contestant.objects.get(id=contestant_id)
         form = self.form_class(
-            request.POST, instance=contestant, contest_id=contestant.contest.id
+            request.POST, user=request.user, instance=contestant, contest_id=contestant.contest.id
         )
         if form.has_changed():
             if form.is_valid():
