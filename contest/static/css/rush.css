@@ -18,11 +18,11 @@ Contest
 /**********
 Contestants
 ***********/
-/*@keyframes contestants-animation {
-    0%   {display: none;}
-    100% {display: inherit;}
+@keyframes show-up {
+    from {opacity: 0;}
+    to {opacity: 1;}
 }
-*/
+
 #contestants-preview {
   background-color: white;
   bottom: 0;
@@ -38,6 +38,11 @@ Contestants
 
 #contestants-preview ul {
   margin: 0;
+}
+
+.contestant-form.animation {
+  animation-name: show-up;
+  animation-duration: 0.5s;
 }
 
 

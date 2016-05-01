@@ -16,7 +16,7 @@
             {% csrf_token %}
             {{ formset.management_form }}
             {% for form in formset %}
-              <div id="id_{{ form.prefix}}" class="contestant-form">
+              <div id="id_{{ form.prefix}}" class="contestant-form animation">
                 {{ form.as_p }}
               </div>
             {% endfor %}
@@ -38,7 +38,7 @@
     </div>
   </div>
   <div id="empty_form" style="display: none;">
-    <div id="id_{{ formset.empty_form.prefix}}" class="contestant-form">
+    <div id="id_{{ formset.empty_form.prefix}}" class="contestant-form animation">
       {{ formset.empty_form.as_p }}
     </div>
   </div>
