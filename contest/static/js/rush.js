@@ -1,6 +1,5 @@
 var clubCodeInput = document.getElementById('id_club_code');
-var contestantsPreview = document.getElementById('contestants-preview');
-var visibleContestFormId = '0';
+var contestant;
 
 /*
  * Creates an account.
@@ -59,190 +58,266 @@ function onClubCodeValidation() {
     }
 }
 
+
 /*
- * Checking whether add_contestant form has validation errors.
+ * Contestant prototype.
  */
-
-function validateContestantForm(formID) {
-    'use strict';
-    var id = 'id_form-' + formID;
-    var firstName = document.forms['contestants'][id + '-first_name'].value;
-    var lastName = document.forms['contestants'][id + '-last_name'].value;
-    var gender = document.forms['contestants'][id + '-gender'].value;
-    var age = document.forms['contestants'][id + '-age'].value;
-    var school = document.forms['contestants'][id + '-school'].value;
-    var styles = document.forms['contestants'][id + '-styles_distances'].value
-
-    var errorMessage = document.createDocumentFragment();
-    var paragraph;
-
-    var checkName = RegExp('[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]{3,}');
-
-    if(!firstName) {
-        paragraph = document.createElement('p');
-        paragraph.innerHTML = 'Pole <b>Imie</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
-    }
-    else if (!checkName.test(firstName)) {
-        paragraph = document.createElement('p');
-        paragraph.appendChild(document.createTextNode('Wprowadzone imie jest nieprawidłowe.'));
-        errorMessage.appendChild(paragraph);
-    }
-
-    if(!lastName) {
-        paragraph = document.createElement('p');
-        paragraph.innerHTML = 'Pole <b>Nazwisko</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
-    }
-    else if (!checkName.test(lastName)) {
-        paragraph = document.createElement('p');
-        paragraph.appendChild(document.createTextNode('Wprowadzone nazwisko jest nieprawidłowe.'));
-        errorMessage.appendChild(paragraph);
-    }
-
-    if(gender != 'F' && gender != 'M') {
-        paragraph = document.createElement('p');
-        paragraph.appendChild(document.createTextNode('Wybierz poprawną płeć.'));
-        errorMessage.appendChild(paragraph);
-    }
-
-    if(!age) {
-        paragraph = document.createElement('p');
-        paragraph.innerHTML = 'Pole <b>Wiek</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
-    }
-    else if(age < minAge || age > maxAge ) {
-        paragraph = document.createElement('p');
-        paragraph.appendChild(document.createTextNode('Wiek zawodnika nie mieści się ' +
-        'w przedziale przeznaczonym dla tego konkursu.'));
-        errorMessage.appendChild(paragraph);
-    }
-
-    if(!school) {
-        paragraph = document.createElement('p');
-        paragraph.innerHTML = 'Pole <b>Rodzaj szkoły</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
-    }
-
-    if(!styles) {
-        paragraph = document.createElement('p');
-        paragraph.innerHTML = 'Pole <b>Style i dystanse</b> nie może być puste.';
-        errorMessage.appendChild(paragraph);
-    }
-
-    $('#errors').html(errorMessage);
-    if(paragraph) {
-        $('html, body').animate({ scrollTop: 0 });
-        return false;
-    }
-    return true;
+function Contestant() {
+    this.visibleContestFormId = '0';  // Stores id of the currently visible form.
+    this.savedFormsIds = [];
+    this.contestantFormList = document.getElementsByClassName('contestant-form');
+    this.contestantsPreview = document.getElementById('contestants-preview');
 }
 
-/*
- * Loads cached form.
- */
-function loadCachedContestant(formId) {
-    'use strict';
-    var contestantForm = document.getElementById('id_form-' + formId);
-    var contestantFormList = document.getElementsByClassName('contestant-form');
-    var totalForms = parseInt($('#id_form-TOTAL_FORMS').val());
-    var isLatestForm = (parseInt(formId - visibleContestFormId) <= 1);
+Contestant.prototype = {
+    /*
+     * Checking whether add_contestant form has validation errors.
+     */
+    validateForm: function(formId) {
+        'use strict';
+        var formId = this.getForm(formId);
+        var totalForms = document.getElementById('id_form-TOTAL_FORMS').value;
+        var id = 'id_form-' + (formId !== undefined ? formId : parseInt(totalForms - 1));
+        var firstName = document.forms['contestants'][id + '-first_name'].value;
+        var lastName = document.forms['contestants'][id + '-last_name'].value;
+        var gender = document.forms['contestants'][id + '-gender'].value;
+        var age = document.forms['contestants'][id + '-age'].value;
+        var school = document.forms['contestants'][id + '-school'].value;
+        var styles = document.forms['contestants'][id + '-styles_distances'].value;
+        var errorMessage = document.createDocumentFragment();
+        var paragraph;
 
-    if(!isLatestForm && !validateContestantForm(visibleContestFormId)) {
-        return false;
-    }
-    updateTextOfContestantPreview(visibleContestFormId);
+        var checkName = RegExp('[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]{3,}');
 
-    for (var i = 0, len = contestantFormList.length; i < len; i++) {
-        if (contestantFormList[i].style.display !== 'none') {
-            contestantFormList[i].style.display = 'none';
+        if(!firstName) {
+            paragraph = document.createElement('p');
+            paragraph.innerHTML = 'Pole <b>Imie</b> nie może być puste.';
+            errorMessage.appendChild(paragraph);
         }
-    }
+        else if (!checkName.test(firstName)) {
+            paragraph = document.createElement('p');
+            paragraph.appendChild(document.createTextNode('Wprowadzone imie jest nieprawidłowe.'));
+            errorMessage.appendChild(paragraph);
+        }
 
-    contestantForm.style = '';
-    visibleContestFormId = formId;
-    console.log(visibleContestFormId);
+        if(!lastName) {
+            paragraph = document.createElement('p');
+            paragraph.innerHTML = 'Pole <b>Nazwisko</b> nie może być puste.';
+            errorMessage.appendChild(paragraph);
+        }
+        else if (!checkName.test(lastName)) {
+            paragraph = document.createElement('p');
+            paragraph.appendChild(document.createTextNode('Wprowadzone nazwisko jest nieprawidłowe.'));
+            errorMessage.appendChild(paragraph);
+        }
+
+        if(gender != 'F' && gender != 'M') {
+            paragraph = document.createElement('p');
+            paragraph.appendChild(document.createTextNode('Wybierz poprawną płeć.'));
+            errorMessage.appendChild(paragraph);
+        }
+
+        if(!age) {
+            paragraph = document.createElement('p');
+            paragraph.innerHTML = 'Pole <b>Wiek</b> nie może być puste.';
+            errorMessage.appendChild(paragraph);
+        }
+        else if(age < minAge || age > maxAge ) {
+            paragraph = document.createElement('p');
+            paragraph.appendChild(document.createTextNode('Wiek zawodnika nie mieści się ' +
+            'w przedziale przeznaczonym dla tego konkursu.'));
+            errorMessage.appendChild(paragraph);
+        }
+
+        if(!school) {
+            paragraph = document.createElement('p');
+            paragraph.innerHTML = 'Pole <b>Rodzaj szkoły</b> nie może być puste.';
+            errorMessage.appendChild(paragraph);
+        }
+
+        if(!styles) {
+            paragraph = document.createElement('p');
+            paragraph.innerHTML = 'Pole <b>Style i dystanse</b> nie może być puste.';
+            errorMessage.appendChild(paragraph);
+        }
+
+        $('#errors').html(errorMessage);
+        if(paragraph) {
+            $('html, body').animate({ scrollTop: 0 });
+            return false;
+        }
+        return true;
+    },
+    /*
+     * Returns currently visible form if any was given as an argument.
+     */
+    getForm: function(formId) {
+        return formId === undefined ? this.visibleContestFormId : formId;
+    },
+    /*
+     * Checks if given form has been already saved.
+     * @default - currently visible form.
+     */
+    isAlreadySavedForm: function(formId) {
+        var formId = this.getForm(formId);
+
+        return this.savedFormsIds.indexOf(formId) > -1;
+    },
+    /*
+     * Checks if given form is latest in an enumeration.
+     */
+    isLastForm: function(formId) {
+        var formId = this.getForm(formId);
+
+        return parseInt(this.getTotalForms() - formId) === 1;
+    },
+    /*
+     * Returns value of TOTAL_FORMS.
+     */
+    getTotalForms: function() {
+        return parseInt(document.getElementById('id_form-TOTAL_FORMS').value);
+    },
+    /*
+     * Clears errors.
+     */
+    clearErrors: function() {
+        document.getElementById('errors').innerHTML = '';
+    },
+    /*
+     * Removes last form from the set.
+     */
+    removeLastForm: function() {
+        'use strict';
+        var totalForms = this.getTotalForms();
+
+        document.getElementById('id_form-' + parseInt(totalForms - 1)).remove()
+        document.getElementById('id_form-TOTAL_FORMS').value -= 1;
+    },
+    /*
+     * Loads cached form.
+     * Handles the following scenarios upon changing active form from the preview list:
+     * 1. If it's not the very last form the validation is ran.
+     * 2. If this is the latest form and it's hasn't been saved yet removes it.
+     * 3. Otherwise, it updates preview of active form.
+     * Finally, clears errors and brings `visibleContestFormId` up-to-date.
+     */
+    loadCachedContestant: function(formId) {
+        'use strict';
+        var contestantForm = document.getElementById('id_form-' + formId);
+        var totalForms = this.getTotalForms();
+        var isLastForm = this.isLastForm();
+        var isAlreadySavedForm = this.isAlreadySavedForm();
+
+        if(isAlreadySavedForm && !this.validateForm()) {
+            return false;
+        } else if (isLastForm && !isAlreadySavedForm) {
+            this.removeLastForm();
+        } else {
+            this.updateTextOfContestantPreview();
+        }
+
+        this.clearErrors();
+
+        for (var i = 0, len = this.contestantFormList.length; i < len; i++) {
+            if (this.contestantFormList[i].style.display !== 'none') {
+                this.contestantFormList[i].style.display = 'none';
+            }
+        }
+
+        contestantForm.style = '';
+        this.visibleContestFormId = formId;
+    },
+    /*
+     * Updates contestant's preview text with value provided in form.
+     */
+    updateTextOfContestantPreview: function(formId) {
+        'use strict';
+        var formId = this.getForm(formId);
+        var preview = document.getElementById('preview-' + formId);
+        var firstName = document.forms['contestants']['id_form-' + formId + '-first_name'].value;
+        var lastName = document.forms['contestants']['id_form-' + formId + '-last_name'].value;
+
+        if (preview) {
+            preview.textContent = firstName + ' ' + lastName;
+        }
+    },
+    /*
+     * Updates list of currently added forms, which is used to maintain already applied forms.
+     */
+    updateSavedFromsIds: function(formId) {
+        this.savedFormsIds.push(formId);
+    },
+    /*
+     * Appends a new item to the list of added contestans.
+     */
+    appendToContestantsPreview: function(formId) {
+        'use strict';
+        var firstName = document.forms['contestants']['id_form-' + formId + '-first_name'].value;
+        var lastName = document.forms['contestants']['id_form-' + formId + '-last_name'].value;
+        var elementLi = document.createElement('li');
+        var span = document.createElement('span');
+        var contestantsPreviewUl = this.contestantsPreview.getElementsByClassName('collection')[0];
+        var contestant = this;
+
+        if (this.contestantsPreview.className.indexOf('invisible') > -1) {
+            this.contestantsPreview.className = this.contestantsPreview.className.replace('invisible', '');
+        }
+
+        span.className = 'chip';
+        span.id = 'preview-' + formId;
+
+        span.addEventListener('click', function() {
+            contestant.loadCachedContestant(formId);
+        }, false);
+        span.appendChild(document.createTextNode(firstName + ' ' + lastName));
+
+        elementLi.className = 'collection-item';
+        elementLi.appendChild(span);
+
+        contestantsPreviewUl.appendChild(elementLi);
+    },
+    /*
+     * Runs the following scenario:
+     * 1. Validates visible form.
+     * 2. Appends or updates its preview.
+     * 3. Adds a new empty form.
+     * 4. Sets a just added form as visible one.
+     */
+    addNextContestant: function() {
+        'use strict';
+        var newFormId = this.getTotalForms();
+
+        if(!this.validateForm(this.visibleContestFormId)) {
+            return false;
+        }
+
+        $('select').material_select('destroy');
+        document.getElementById('id_form-' + this.visibleContestFormId).style.display = 'none';
+
+        if (!this.isAlreadySavedForm()) {
+            this.updateSavedFromsIds(this.visibleContestFormId);
+            this.appendToContestantsPreview(this.visibleContestFormId);
+        } else {
+            this.updateTextOfContestantPreview(this.visibleContestFormId);
+        }
+
+        $('#formset').append($('#empty_form').html().replace(/__prefix__/g, newFormId));
+        document.getElementById('id_form-' + newFormId).style.display = 'inherit';
+        document.getElementById('id_form-TOTAL_FORMS').value = parseInt(newFormId + 1);
+
+        $('html, body').animate({ scrollTop: 0 });
+        $('select').material_select();
+
+        this.visibleContestFormId = newFormId;
+    }
 }
 
 /*
- * Updates contestant's preview text with value provided in form.
- */
-function updateTextOfContestantPreview(formId) {
-    'use strict';
-    var preview = document.getElementById('preview-' + formId);
-    var firstName = document.forms['contestants']['id_form-' + formId + '-first_name'].value;
-    var lastName = document.forms['contestants']['id_form-' + formId + '-last_name'].value;
-
-    if (preview) {
-        preview.textContent = firstName + ' ' + lastName;
-    }
-}
-
-/*
- * Appends a new item to the list of added contestans.
- */
-function appendToContestantsPreview(formId) {
-    'use strict';
-    var firstName = document.forms['contestants']['id_form-' + formId + '-first_name'].value;
-    var lastName = document.forms['contestants']['id_form-' + formId + '-last_name'].value;
-    var elementLi = document.createElement('li');
-    var span = document.createElement('span');
-    var contestantsPreviewUl = contestantsPreview.getElementsByClassName('collection')[0];
-
-    if (contestantsPreview.className.indexOf('invisible') > -1) {
-        contestantsPreview.className = contestantsPreview.className.replace('invisible', '');
-    }
-
-    span.className = 'chip';
-    span.id = 'preview-' + formId;
-    span.addEventListener('click', function() {
-        loadCachedContestant(formId);
-    }, false);
-    span.appendChild(document.createTextNode(firstName + ' ' + lastName));
-
-    elementLi.className = 'collection-item';
-    elementLi.appendChild(span);
-
-    contestantsPreviewUl.appendChild(elementLi);
-}
-
-/*
- * Generates formset. Moreover, handles MaterializeCSS selects.
+ * Calls a method that handles adding a new form.
  */
 $('#add_more').click(function() {
     'use strict';
-    var formId = '';
-
-    if(!validateContestantForm(visibleContestFormId)) {
-        return false;
-    }
-    updateTextOfContestantPreview(visibleContestFormId);
-
-    formId = parseInt($('#id_form-TOTAL_FORMS').val());
-
-    $('select').material_select('destroy');
-
-    // Hides visible form
-    $('#id_form-' + visibleContestFormId).hide();
-
-    // If visible form is the one with the highest id then appends it to preview list and adds a new form
-    // otherwise shows that form.
-    if (parseInt(formId - visibleContestFormId) <= 1) {
-        appendToContestantsPreview(formId - 1);
-
-        $('#formset').append($('#empty_form').html().replace(/__prefix__/g, formId));
-        $('#id_form-' + formId).show();
-        $('#id_form-TOTAL_FORMS').val(formId + 1);
-
-        $('html, body').animate({ scrollTop: 0 });
-    } else {
-        formId -= 1;
-        $('#id_form-' + formId).show();
-    }
-    $('select').material_select();
-
-    // Upon adding new contestant, a visible form is always the one with the highest id number
-    visibleContestFormId = formId;
+    contestant.addNextContestant();
 });
 
 
@@ -292,6 +367,8 @@ function getContestInfo(pk) {
  * Action on document ready.
  */
 $(document).ready(function() {
+    contestant = new Contestant();
+
     onClubCodeValidation();
     $('select').material_select();
     $('.modal-trigger').leanModal();
@@ -346,4 +423,3 @@ function getUserInfo(user) {
         $('#content' + user).removeClass('inline').addClass('invisible');
     }
 }
-
