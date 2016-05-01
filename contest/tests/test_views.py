@@ -43,7 +43,6 @@ from contest.views import SetResetPasswordView
 class HomeViewTests(TestCase):
     fixtures = [
         'clubs.json',
-        'organizers.json',
     ]
 
     def setUp(self):
@@ -474,7 +473,7 @@ class RegisterViewTests(TestCase):
 
 
 class ContestantAddViewTestCase(TestCase):
-    fixtures = ['organizers.json', 'clubs.json']
+    fixtures = ['clubs.json']
 
     def setUp(self):
         self.user = RushUser(
@@ -677,7 +676,7 @@ class ContestantListViewTestCase(TestCase):
 
 class EditContestantViewTestCase(TestCase):
     fixtures = [
-        'organizers.json', 'contests.json', 'clubs.json', 'users.json',
+        'contests.json', 'clubs.json', 'users.json',
     ]
 
     def setUp(self):
