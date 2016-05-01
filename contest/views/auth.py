@@ -84,9 +84,6 @@ class RegisterView(View):
             self.send_email_with_new_user(
                 user.first_name, user.last_name, emails, page
             )
-            if user.club:
-                user.club.name = user.organization_name
-                user.club.save()
 
             return render(
                 request, 'contest/auth/register_confirmation.html',

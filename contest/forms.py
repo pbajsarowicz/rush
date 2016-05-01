@@ -9,6 +9,7 @@ from django.contrib.auth.forms import (
     PasswordResetForm,
     SetPasswordForm,
 )
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -17,6 +18,7 @@ from contest.models import (
     Club,
     Contest,
     Contestant,
+    School,
     RushUser,
 )
 
@@ -42,10 +44,22 @@ class RegistrationForm(forms.ModelForm):
         user = super(RegistrationForm, self).save(commit=False)
         user.username = uuid.uuid4()
         club_code = self.cleaned_data['club_code']
+        organization = self.cleaned_data['organization_name']
 
         if club_code:
-            club, __ = Club.objects.get_or_create(code=club_code)
-            user.club = club
+            club, created = Club.objects.get_or_create(code=club_code)
+            if created:
+                club.name = organization
+                club.save()
+            user.content_type = ContentType.objects.get_for_model(club)
+            user.object_id = club.id
+        else:
+            school, created = School.objects.get_or_create(name=organization)
+            if created:
+                school.name = organization
+                school.save()
+            user.content_type = ContentType.objects.get_for_model(school)
+            user.object_id = school.id
 
         user.save()
 
