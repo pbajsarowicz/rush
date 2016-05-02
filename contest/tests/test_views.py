@@ -12,6 +12,7 @@ from django.contrib.auth.models import (
     Permission,
 )
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -33,7 +34,6 @@ from contest.models import (
     Club,
     Contest,
     Contestant,
-    Organizer,
     RushUser,
 )
 from contest.views import RegisterView
@@ -48,15 +48,13 @@ class HomeViewTests(TestCase):
 
     def setUp(self):
         self.contest = Contest.objects.create(
-            organizer=Organizer.objects.first(),
-            date=make_aware(datetime(2050, 12, 31)), place='Szkoła',
-            age_min=11, age_max=16, description='Opis',
+            date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
-            organizer=Organizer.objects.last(),
-            date=make_aware(datetime(2008, 12, 31)), place='Szkoła',
-            age_min=11, age_max=16, description='Opis',
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
         self.user = RushUser.objects.create_superuser(
@@ -180,6 +178,26 @@ class SetResetPasswordViewTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertFalse(SetResetPasswordView._get_user('00'))
+
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': 'XX', 'token': self.user1_token}
+            )
+        )
+        self.assertEqual(
+            response.context['message'], 'Użytkownik nie istnieje.'
+        )
+
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={'uidb64': 'XX', 'token': self.user1_token}
+            )
+        )
+        self.assertEqual(
+            response.context['message'], 'Użytkownik nie istnieje.'
+        )
 
         response = self.client.get(
             reverse(
@@ -489,21 +507,18 @@ class ContestantAddViewTestCase(TestCase):
         }
 
         self.contest = Contest.objects.create(
-            organizer=Organizer.objects.get(id=1),
-            date=make_aware(datetime(2050, 12, 31)), place='Szkoła',
-            age_min=11, age_max=16, description='Opis',
+            date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
-            organizer=Organizer.objects.get(id=2),
-            date=make_aware(datetime(2008, 12, 31)), place='Szkoła',
-            age_min=11, age_max=16, description='Opis',
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
         self.contest_deadline = Contest.objects.create(
-            organizer=Organizer.objects.get(id=2),
-            date=make_aware(datetime(2050, 12, 31)), place='Szkoła',
-            age_min=11, age_max=16, description='Opis',
+            date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
 
@@ -635,15 +650,13 @@ class ContestantListViewTestCase(TestCase):
         self.client.login(username='test_test', password='P@ssw0rd')
 
         club = Club.objects.create(name='adam', code=12345)
-        organizer = Organizer.objects.create(
-            name='Adam', club=club
-        )
 
         self.contest = Contest.objects.create(
-            organizer=organizer,
             date=make_aware(datetime(2050, 12, 31)),
             place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2048, 11, 20))
+            deadline=make_aware(datetime(2048, 11, 20)),
+            content_type=ContentType.objects.get_for_model(club),
+            object_id=club.pk
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
@@ -734,8 +747,6 @@ class EditContestantViewTestCase(TestCase):
 
 
 class ContestAddTestCase(TestCase):
-    fixtures = ['organizers.json', 'clubs.json']
-
     def setUp(self):
         self.user_1 = RushUser.objects.create_user(
             email='d@d.pl', is_active=True, username='wrong', password='pass12'
@@ -748,8 +759,6 @@ class ContestAddTestCase(TestCase):
         self.user_2.user_permissions.add(
             Permission.objects.get(name='Can add contest')
         )
-        club = Club.objects.create(name='abc')
-        organizer = Organizer.objects.create(name='Organizator', club=club)
         self.form_data = {
             'date': '31.12.2100 16:00',
             'place': 'Majorka',
@@ -757,7 +766,6 @@ class ContestAddTestCase(TestCase):
             'age_min': 14,
             'age_max': 17,
             'description': 'Zapraszamy na zawody!',
-            'organizer': organizer.id
         }
 
     def test_has_access(self):
@@ -780,7 +788,6 @@ class ContestAddTestCase(TestCase):
             reverse('contest:contest-add'), data=self.form_data
         )
         self.assertEqual(response.status_code, 200)
-
         self.assertEqual(
             response.context['message'],
             'Dziękujemy! Możesz teraz dodać zawodników.'

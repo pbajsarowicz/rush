@@ -233,27 +233,35 @@ $('#add_more').click(function() {
 function getContestInfo(pk) {
     var organizer = '';
     var contact = '';
-    var result = ''
+    var organizer_contact = '';
+    var result = '';
+
     $.ajax({
         url: '/api/v1/contests/' + pk + '/?format=json',
         dataType: 'json',
         success: function(json){
-            organizer = json['organizer'];
-            if(organizer['phone_number']){
-                contact += '<br> Telefon: ' + organizer['phone_number'];
-            }
-            if(organizer['email']){
-                contact += '<br> Email: ' + organizer['email'];
-            }
-            if(organizer['website']){
-                contact += '<br> Strona Internetowa: <a href="' + organizer['website'] + '">' +
-                organizer['website'] + '</a>';
-            }
-
             result = 'Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od ' + json['age_min'] + ' do ' + json['age_max'] + ' lat' +
-            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Organizator: ' +
-            organizer['name'] + contact + '<br> Opis: ' + json['description'];
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'];
+
+            organizer = json['organizer'];
+            if (organizer) {
+                organizer_contact = organizer['contact'];
+                if (organizer_contact) {
+                    if(organizer['phone_number']){
+                        contact += '<br> Telefon: ' + organizer_contact['phone_number'];
+                    }
+                    contact += '<br> Email: ' + organizer_contact['email'];
+                    if(organizer_contact['website']){
+                        contact += '<br> Strona Internetowa: <a href="' + organizer_contact['website'] + '">' +
+                        organizer_contact['website'] + '</a>';
+                    }
+                }
+
+                result += '<br> Organizator: ' + organizer['name'] + ', ' + contact;
+            }
+
+            result += '<br> Opis: ' + (json['description'] ? json['description'] : 'Brak');
 
             document.getElementById('text' + pk).innerHTML = result;
         }
