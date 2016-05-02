@@ -1,4 +1,5 @@
 var clubCodeInput = document.getElementById('id_club_code');
+var contestantValidation;
 
 /*
  * Creates an account.
@@ -55,163 +56,153 @@ function hideClubCode() {
         }
     }
 
-/*
- * Checking whether add_contestant form has validation errors.
- */
 
-function validateContestantForm() {
-    var form_idx = $('#id_form-TOTAL_FORMS').val();
-    var id = 'id_form-' + (parseInt(form_idx) - 1);
+function ContestantValidation() {
+    this.validationRaised = false;
+    this.firstName = '';
+    this.lastName = '';
+    this.gender = '';
+    this.age = '';
+    this.school = '';
+    this.stylesDistances = '';
 
-    var firstName = document.forms['contestants'][id + '-first_name'].value;
-    var lastName = document.forms['contestants'][id + '-last_name'].value;
-    var gender = document.forms['contestants'][id + '-gender'].value;
-    var age = document.forms['contestants'][id + '-age'].value;
-    var school = document.forms['contestants'][id + '-school'].value;
-    var styles = document.forms['contestants'][id + '-styles_distances'].value;
+    this.checkName = RegExp('[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]{3,}');
+}
 
-    var checkName = RegExp('[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]{3,}');
-    var paragraph;
+ContestantValidation.prototype = {
+    /*
+     * Initializes validation.
+     */
+    initialize: function() {
+        this.validationRaised = false;
+    },
+    /*
+     * Checking whether add_contestant form has validation errors.
+     */
+    raiseValidation: function(fullFormId, message) {
+        var message = message !== undefined ? message : 'To pole zawiera niepoprawną wartość';
 
-    if(!firstName) {
-        if ($('#first_name_error_blank').length == 0){
-            if ($('#first_name_error_invalid').length == 1){$('#first_name_error_invalid').remove()};
-            paragraph = document.createElement('p');
-            paragraph.className = 'red-text';
-            paragraph.id = 'first_name_error_blank';
-            paragraph.innerHTML = 'Pole <b>Imie</b> nie może być puste.';
-            $('#' + id + '> p:eq(0)').append(paragraph);
-        }
-    }
-    else if (!checkName.test(firstName)) {
-        if($('#first_name_error_invalid').length == 0){
-            if ($('#first_name_error_blank').length == 1){$('#first_name_error_blank').remove()};
-            paragraph = document.createElement('p');
-            paragraph.className = 'red-text';   
-            paragraph.id = 'first_name_error_invalid';
-            paragraph.appendChild(document.createTextNode('Wprowadzone imie jest nieprawidłowe.'));
-            $('#' + id + '> p:eq(0)').append(paragraph);
-        }
-    }
-    else {
-        if ($('#first_name_error_blank').length == 1){
-            $('#first_name_error_blank').remove();
-        }
-        else if ($('#first_name_error_invalid').length == 1) {
-            $('#first_name_error_invalid').remove();  
-        }
-    }
+        $('#' + fullFormId).attr('class', 'validate invalid');
+        $('label[for="' + fullFormId + '"]')
+            .attr('data-error', message)
+            .attr('class', 'error-message');
 
-    if (!lastName) {
-        if ($('#last_name_error_blank').length == 0){
-            if ($('#last_name_error_invalid').length == 1){$('#last_name_error_invalid').remove()};
-            paragraph = document.createElement('p');
-            paragraph.className = 'red-text';
-            paragraph.id = 'last_name_error_blank';
-            paragraph.innerHTML = 'Pole <b>Nazwisko</b> nie może być puste.';
-            $('#' + id + '> p:eq(1)').append(paragraph);
-        }
-    }
-    else if (!checkName.test(lastName)) {
-        if($('#last_name_error_invalid').length == 0){
-            if ($('#last_name_error_blank').length == 1){$('#last_name_error_blank').remove()};
-            paragraph = document.createElement('p');
-            paragraph.className = 'red-text';
-            paragraph.id = 'last_name_error_invalid';
-            paragraph.appendChild(document.createTextNode('Wprowadzone nazwisko jest nieprawidłowe.'));
-            $('#' + id + '> p:eq(1)').append(paragraph);
-        }
-    }
-    else {
-         if ($('#last_name_error_blank').length == 1){
-            $('#last_name_error_blank').remove();
-        }
-        else if ($('#last_name_error_invalid').length == 1) {
-            $('#last_name_error_invalid').remove();  
-        }
-    }
+        this.validationRaised = true;
+    },
+    /*
+     * Checking whether add_contestant form has validation errors.
+     */
+    clearValidation: function(fullFormId) {
+        $('#' + fullFormId).attr('class', 'validate valid');
+        $('label[for="' + fullFormId + '"]').attr('class', '');
+    },
+    /*
+     * Validates first name.
+     */
+    validateFirstName: function(formId) {
+        this.firstName = document.forms['contestants'][formId + '-first_name'].value;
 
+        if(!this.firstName) {
+            this.raiseValidation(formId + '-first_name', 'Pole Imię nie może być puste.');
+        }
+        else if (!this.checkName.test(this.firstName)) {
+            this.raiseValidation(formId + '-first_name', 'Wprowadzone imię jest nieprawidłowe.');
+        } else {
+            this.clearValidation(formId + '-first_name');
+        }
+    },
+    /*
+     * Validates last name.
+     */
+    validateLastName: function(formId) {
+        this.lastName = document.forms['contestants'][formId + '-last_name'].value;
 
-    if(gender != 'F' && gender != 'M') {
-        if($('#gender_error').length == 0){
-            paragraph = document.createElement('p');
-            paragraph.className = 'red-text';
-            paragraph.id = 'gender_error';
-            paragraph.appendChild(document.createTextNode('Wybierz poprawną płeć.'));
-            $('#' + id + '> p:eq(2)').append(paragraph);
+        if (!this.lastName) {
+            this.raiseValidation(formId + '-last_name', 'Pole Nazwisko nie może być puste.');
         }
-    }
-    else{
-        $('#gender_error').remove();
-    }
+        else if (!this.checkName.test(this.lastName)) {
+            this.raiseValidation(formId + '-last_name', 'Wprowadzone nazwisko jest nieprawidłowe.');
+        } else {
+            this.clearValidation(formId + '-last_name');
+        }
+    },
+    /*
+     * Validates gender.
+     */
+    validateGender: function(formId) {
+        this.gender = document.forms['contestants'][formId + '-gender'].value;
 
-    if (!age) {
-        if ($('#age_error_blank').length == 0){
-            if ($('#age_error_invalid').length == 1){$('#age_error_invalid').remove()};
-            paragraph = document.createElement('p');
-            paragraph.className = 'red-text';
-            paragraph.id = 'age_error_blank';
-            paragraph.innerHTML = 'Pole <b>Wiek</b> nie może być puste.';
-            $('#' + id + '> p:eq(3)').append(paragraph);
+        if(this.gender != 'F' && this.gender != 'M') {
+            this.raiseValidation(formId + '-gender', 'Wybierz płeć.');
+        } else {
+            this.clearValidation(formId + '-gender');
         }
-    }
-    else if (age < minAge || age > maxAge ) {
-        if ($('#age_error_invalid').length == 0){
-            if ($('#age_error_blank').length == 1){$('#age_error_blank').remove()};
-            paragraph = document.createElement('p');
-            paragraph.className = 'red-text';
-            paragraph.id = 'age_error';
-            paragraph.appendChild(document.createTextNode('Wiek zawodnika nie mieści się ' +
-            'w przedziale przeznaczonym dla tego konkursu.'));
-            $('#' + id + '> p:eq(3)').append(paragraph);
-        }
-    }
-    else {
-        if ($('#age_error_blank').length == 1){
-            $('#age_error_blank').remove();
-        }
-        else if ($('#age_error_invalid').length == 1) {
-            $('#age_error_invalid').remove();  
-        }    }
+    },
+    /*
+     * Validates age.
+     */
+    validateAge: function(formId) {
+        this.age = document.forms['contestants'][formId + '-age'].value;
 
-    if (!school) {
-        if ($('#school_error').length == 0){
-            paragraph = document.createElement('p');
-            paragraph.className = 'red-text';
-            paragraph.id = 'school_error';
-            paragraph.innerHTML = 'Pole <b>Rodzaj szkoły</b> nie może być puste.';
-            $('#' + id + '> p:eq(4)').append(paragraph);
+        if (!this.age) {
+            this.raiseValidation(formId + '-age', 'Pole Wiek nie może być puste.');
         }
-    }
-    else {
-        $('#school_error').remove();
-    }
-
-    if (!styles) {
-        if ($('#styles_error').length == 0){
-            paragraph = document.createElement('p');
-            paragraph.className = 'red-text';
-            paragraph.id = 'styles_error';
-            paragraph.innerHTML = 'Pole <b>Style i dystanse</b> nie może być puste.';
-            $('#' + id + '> p:eq(5)').append(paragraph);
+        else if (this.age < minAge || this.age > maxAge ) {
+            this.raiseValidation(formId + '-age', 'Wiek zawodnika nie mieści się w przedziale przeznaczonym dla tego konkursu.');
+        } else {
+            this.clearValidation(formId + '-age');
         }
-    }
-    else {
-        $('#styles_error').remove();
-    }
+    },
+    /*
+     * Validates school.
+     */
+    validateSchool: function(formId) {
+        this.school = document.forms['contestants'][formId + '-school'].value;
 
-    if ($('.red-text').length > 0) {
-        return false;
+        if (!this.school) {
+            this.raiseValidation(formId + '-school', 'Pole Rodzaj Szkoły nie może być puste.');
+        } else {
+            this.clearValidation(formId + '-school');
+        }
+    },
+    /*
+     * Validates styles and distances.
+     */
+    validateStylesDistances: function(formId) {
+        this.stylesDistances = document.forms['contestants'][formId + '-styles_distances'].value;
+
+        if (!this.stylesDistances) {
+            this.raiseValidation(formId + '-styles_distances', 'Pole Style i dystanse nie może być puste.');
+        } else {
+            this.clearValidation(formId + '-styles_distances');
+        }
+    },
+    /*
+     * Checking whether add_contestant form has validation errors.
+     */
+    validateContestantForm: function() {
+        this.initialize();
+
+        var form_idx = $('#id_form-TOTAL_FORMS').val();
+        var id = 'id_form-' + (parseInt(form_idx) - 1);
+        var validators = [
+            'validateFirstName', 'validateLastName', 'validateGender',
+            'validateAge', 'validateSchool', 'validateStylesDistances'
+        ]
+
+        for (var i = 0, len = validators.length ; i < len; i++) {
+            this[validators[i]](id);
+        }
+
+        return !this.validationRaised;
     }
-    return true;
 }
 
 /*
  * Generates formset. Moreover, handles MaterializeCSS selects.
  */
 $('#add_more').click(function() {
-
-    if(!validateContestantForm()) {
+    if(!contestantValidation.validateContestantForm()) {
         return false;
     }
 
@@ -272,6 +263,8 @@ function getContestInfo(pk) {
  * Action on document ready.
  */
 $(document).ready(function() {
+    contestantValidation = new ContestantValidation();
+
     onClubCodeValidation();
     $('select').material_select();
     $('.modal-trigger').leanModal();
