@@ -144,12 +144,13 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         """
         return self.has_perm('contest.add_contest')
 
-    def unit_name(self):
+    def get_unit_name(self):
         """
         Return name of user's unit.
         """
         return self.unit.name
-    unit_name.short_description = "Klub/Szkoła"
+    get_unit_name.short_description = 'Szkoła/Klub'
+    unit_name = property(get_unit_name)
 
     def activate(self):
         """

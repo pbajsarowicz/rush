@@ -469,7 +469,7 @@ class RegisterViewTests(TestCase):
         )
         self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
         self.assertEqual(
-            RushUser.objects.get(email='abc@tmp.com').unit_name(), 'Club'
+            RushUser.objects.get(email='abc@tmp.com').unit_name, 'Club'
         )
         response = self.client.post(
             reverse('contest:register'),
@@ -481,7 +481,7 @@ class RegisterViewTests(TestCase):
         )
         self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
         self.assertEqual(
-            RushUser.objects.get(email='abc2@tmp.com').unit_name(), 'School'
+            RushUser.objects.get(email='abc2@tmp.com').unit_name, 'School'
         )
 
 
