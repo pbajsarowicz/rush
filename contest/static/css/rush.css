@@ -71,3 +71,11 @@ Base elements
 .errorlist {
   color: red;
 }
+
+.error-message:after {
+  color: #F44336;
+  content: attr(data-error);
+  display: block;
+  margin-top: 45px;
+  position: absolute;
+}

@@ -18,7 +18,6 @@
         {% endblock scripts %}
         <p class="blue-text text-darken-2">Konkurs: {{ name }}</p>
         <form class="col s6" action="?next={{next}}" role="form" method="post" name="contestants" onsubmit="return validateContestantForm()">
-          <div id="errors" class="red-text"></div>
           <div id="formset" class="row center">
             {% csrf_token %}
             {{ formset.management_form }}
