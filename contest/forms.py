@@ -47,19 +47,14 @@ class RegistrationForm(forms.ModelForm):
         organization = self.cleaned_data['organization_name']
 
         if club_code:
-            club, created = Club.objects.get_or_create(code=club_code)
+            unit, created = Club.objects.get_or_create(code=club_code)
             if created:
-                club.name = organization
-                club.save()
-            user.content_type = ContentType.objects.get_for_model(club)
-            user.object_id = club.id
+                unit.name = organization
+                unit.save()
         else:
-            school, created = School.objects.get_or_create(name=organization)
-            if created:
-                school.name = organization
-                school.save()
-            user.content_type = ContentType.objects.get_for_model(school)
-            user.object_id = school.id
+            unit, __ = School.objects.get_or_create(name=organization)
+        user.content_type = ContentType.objects.get_for_model(unit)
+        user.object_id = unit.id
 
         user.save()
 
