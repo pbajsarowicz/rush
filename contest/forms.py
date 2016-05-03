@@ -188,7 +188,7 @@ class ContestForm(forms.ModelForm):
     """
     Form for creating Contests.
     """
-    organization = forms.CharField(label='organizacja', max_length=100)
+    organization = forms.CharField(label='organizacja', max_length=255)
 
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
@@ -202,7 +202,7 @@ class ContestForm(forms.ModelForm):
             'class': 'materialize-textarea'
         }
         self.fields['organization'].initial = self.user.unit
-        if self.user.unit is not None:
+        if self.user.unit:
             self.fields['organization'].widget.attrs['readonly'] = True
 
     def clean_date(self):
