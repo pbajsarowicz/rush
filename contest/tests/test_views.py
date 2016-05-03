@@ -20,7 +20,6 @@ from django.utils.timezone import make_aware
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from mock import patch
-
 from contest.forms import (
     ContestantForm,
     ContestForm,
@@ -465,11 +464,26 @@ class RegisterViewTests(TestCase):
             reverse('contest:register'),
             data={
                 'email': 'abc@tmp.com', 'first_name': 'Imie',
-                'last_name': 'Nazwisko', 'organization_name': 'School',
+                'last_name': 'Nazwisko', 'organization_name': 'Club',
                 'organization_address': 'Address', 'club_code': 12345,
             }
         )
         self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
+        self.assertEqual(
+            RushUser.objects.get(email='abc@tmp.com').unit_name, 'Club'
+        )
+        response = self.client.post(
+            reverse('contest:register'),
+            data={
+                'email': 'abc2@tmp.com', 'first_name': 'Imie2',
+                'last_name': 'Nazwisko2', 'organization_name': 'School',
+                'organization_address': 'Address'
+            }
+        )
+        self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
+        self.assertEqual(
+            RushUser.objects.get(email='abc2@tmp.com').unit_name, 'School'
+        )
 
 
 class ContestantAddViewTestCase(TestCase):
@@ -493,12 +507,14 @@ class ContestantAddViewTestCase(TestCase):
             'form-0-last_name': 'Kowalski',
             'form-0-school': 'Test',
             'form-0-styles_distances': '1000m',
+            'form-0-organization': self.user.unit,
             'form-1-age': '16',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
             'form-1-school': 'Test',
             'form-1-styles_distances': '500m',
+            'form-1-organization': self.user.unit,
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
             'form-MIN_NUM_FORMS': '0',
@@ -577,7 +593,6 @@ class ContestantAddViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         contestants = Contestant.objects.filter(moderator=self.user)
-
         self.assertEquals(len(contestants), 2)
 
         self.assertEqual(contestants[0].first_name, 'Jan')
@@ -748,10 +763,12 @@ class EditContestantViewTestCase(TestCase):
 class ContestAddTestCase(TestCase):
     def setUp(self):
         self.user_1 = RushUser.objects.create_user(
-            email='d@d.pl', is_active=True, username='wrong', password='pass12'
+            email='d@d.pl', is_active=True, username='wrong',
+            password='pass12', organization_name='plywanie'
         )
         self.user_2 = RushUser.objects.create_user(
-            email='c@c.pl', is_active=True, username='right', password='pass12'
+            email='c@c.pl', is_active=True, username='right',
+            password='pass12', organization_name='basen'
         )
         self.user_1.groups.add(Group.objects.get(name='Moderators'))
         self.user_2.groups.add(Group.objects.get(name='Moderators'))
@@ -765,6 +782,7 @@ class ContestAddTestCase(TestCase):
             'age_min': 14,
             'age_max': 17,
             'description': 'Zapraszamy na zawody!',
+            'organization': self.user_1.unit,
         }
 
     def test_has_access(self):

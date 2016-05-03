@@ -9,6 +9,7 @@ from django.contrib.auth.forms import (
     PasswordResetForm,
     SetPasswordForm,
 )
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -17,6 +18,7 @@ from contest.models import (
     Club,
     Contest,
     Contestant,
+    School,
     RushUser,
 )
 
@@ -42,10 +44,17 @@ class RegistrationForm(forms.ModelForm):
         user = super(RegistrationForm, self).save(commit=False)
         user.username = uuid.uuid4()
         club_code = self.cleaned_data['club_code']
+        organization = self.cleaned_data['organization_name']
 
         if club_code:
-            club, __ = Club.objects.get_or_create(code=club_code)
-            user.club = club
+            unit, created = Club.objects.get_or_create(code=club_code)
+            if created:
+                unit.name = organization
+                unit.save()
+        else:
+            unit, __ = School.objects.get_or_create(name=organization)
+        user.content_type = ContentType.objects.get_for_model(unit)
+        user.object_id = unit.id
 
         user.save()
 
@@ -163,9 +172,16 @@ class ContestantForm(forms.ModelForm):
     """
     Form for contestant creation.
     """
+    organization = forms.CharField(label='Klub/Szkoła', max_length=100)
+
     def __init__(self, *args, **kwargs):
         self.contest = kwargs.pop('contest_id')
+        self.user = kwargs.pop('user')
         super(ContestantForm, self).__init__(*args, **kwargs)
+
+        if self.user.unit:
+            self.fields['organization'].initial = self.user.unit
+            self.fields['organization'].widget.attrs['readonly'] = True
 
     def clean_age(self):
         age = self.cleaned_data.get('age')
@@ -188,6 +204,7 @@ class ContestForm(forms.ModelForm):
     """
     Form for creating Contests.
     """
+    organization = forms.CharField(label='organizacja', max_length=255)
 
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
@@ -200,6 +217,9 @@ class ContestForm(forms.ModelForm):
         self.fields['description'].widget.attrs = {
             'class': 'materialize-textarea'
         }
+        self.fields['organization'].initial = self.user.unit
+        if self.user.unit:
+            self.fields['organization'].widget.attrs['readonly'] = True
 
     def clean_date(self):
         date = self.cleaned_data.get('date')

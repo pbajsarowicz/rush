@@ -157,7 +157,7 @@ ContestantValidation.prototype = {
         this.age = document.forms['contestants'][formId + '-age'].value;
 
         if (!this.age) {
-            this.raiseValidation(formId + '-age', 'Pole Wiek nie może być puste.');
+            this.raiseValidation(formId + '-age', 'Pole Wiek nie może być puste i może zawierać tylko cyfry.');
         }
         else if (this.age < minAge || this.age > maxAge ) {
             this.raiseValidation(formId + '-age', 'Wiek zawodnika nie mieści się w przedziale przeznaczonym dla tego konkursu.');
