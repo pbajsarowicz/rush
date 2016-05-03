@@ -40,10 +40,7 @@ from contest.views import SetResetPasswordView
 
 
 class HomeViewTests(TestCase):
-    fixtures = [
-        'clubs.json',
-        'organizers.json',
-    ]
+    fixtures = ['clubs.json']
 
     def setUp(self):
         self.contest = Contest.objects.create(
@@ -465,15 +462,30 @@ class RegisterViewTests(TestCase):
             reverse('contest:register'),
             data={
                 'email': 'abc@tmp.com', 'first_name': 'Imie',
-                'last_name': 'Nazwisko', 'organization_name': 'School',
+                'last_name': 'Nazwisko', 'organization_name': 'Club',
                 'organization_address': 'Address', 'club_code': 12345,
             }
         )
         self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
+        self.assertEqual(
+            RushUser.objects.get(email='abc@tmp.com').unit_name, 'Club'
+        )
+        response = self.client.post(
+            reverse('contest:register'),
+            data={
+                'email': 'abc2@tmp.com', 'first_name': 'Imie2',
+                'last_name': 'Nazwisko2', 'organization_name': 'School',
+                'organization_address': 'Address'
+            }
+        )
+        self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
+        self.assertEqual(
+            RushUser.objects.get(email='abc2@tmp.com').unit_name, 'School'
+        )
 
 
 class ContestantAddViewTestCase(TestCase):
-    fixtures = ['organizers.json', 'clubs.json']
+    fixtures = ['clubs.json']
 
     def setUp(self):
         self.user = RushUser(
@@ -677,7 +689,7 @@ class ContestantListViewTestCase(TestCase):
 
 class EditContestantViewTestCase(TestCase):
     fixtures = [
-        'organizers.json', 'contests.json', 'clubs.json', 'users.json',
+        'contests.json', 'clubs.json', 'users.json',
     ]
 
     def setUp(self):
@@ -749,10 +761,12 @@ class EditContestantViewTestCase(TestCase):
 class ContestAddTestCase(TestCase):
     def setUp(self):
         self.user_1 = RushUser.objects.create_user(
-            email='d@d.pl', is_active=True, username='wrong', password='pass12'
+            email='d@d.pl', is_active=True, username='wrong',
+            password='pass12', organization_name='plywanie'
         )
         self.user_2 = RushUser.objects.create_user(
-            email='c@c.pl', is_active=True, username='right', password='pass12'
+            email='c@c.pl', is_active=True, username='right',
+            password='pass12', organization_name='basen'
         )
         self.user_1.groups.add(Group.objects.get(name='Moderators'))
         self.user_2.groups.add(Group.objects.get(name='Moderators'))
@@ -766,6 +780,7 @@ class ContestAddTestCase(TestCase):
             'age_min': 14,
             'age_max': 17,
             'description': 'Zapraszamy na zawody!',
+            'organization': self.user_1.unit,
         }
 
     def test_has_access(self):

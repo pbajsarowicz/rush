@@ -37,7 +37,6 @@ class ContactTestsAPI(ApiTestCasesMixin, APITestCase):
 
 class ContestTestsAPI(ApiTestCasesMixin, APITestCase):
     fixtures = [
-        'contest/fixtures/organizers.json',
         'contest/fixtures/contests.json',
         'contest/fixtures/clubs.json',
         'contest/fixtures/users.json',
@@ -62,7 +61,6 @@ class ContestTestsAPI(ApiTestCasesMixin, APITestCase):
 class ContestantTestsAPI(ApiTestCasesMixin, APITestCase):
     fixtures = [
         'contest/fixtures/contestants.json',
-        'contest/fixtures/organizers.json',
         'contest/fixtures/contests.json',
         'contest/fixtures/clubs.json',
         'contest/fixtures/users.json',
