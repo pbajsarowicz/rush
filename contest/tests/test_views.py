@@ -749,12 +749,12 @@ class EditContestantViewTestCase(TestCase):
 class ContestAddTestCase(TestCase):
     def setUp(self):
         self.user_1 = RushUser.objects.create_user(
-            email='d@d.pl', is_active=True, username='wrong', password='pass12'
-            , organization_name='plywanie'
+            email='d@d.pl', is_active=True, username='wrong',
+            password='pass12', organization_name='plywanie'
         )
         self.user_2 = RushUser.objects.create_user(
-            email='c@c.pl', is_active=True, username='right', password='pass12'
-            , organization_name='basen'
+            email='c@c.pl', is_active=True, username='right',
+            password='pass12', organization_name='basen'
         )
         self.user_1.groups.add(Group.objects.get(name='Moderators'))
         self.user_2.groups.add(Group.objects.get(name='Moderators'))
