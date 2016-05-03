@@ -171,7 +171,8 @@ class ContestantForm(forms.ModelForm):
         super(ContestantForm, self).__init__(*args, **kwargs)
 
         self.fields['club_or_school'].initial = self.user.unit
-        self.fields['club_or_school'].widget.attrs['readonly'] = True
+        if self.user.unit is not None:
+            self.fields['club_or_school'].widget.attrs['readonly'] = True
 
     def clean_age(self):
         age = self.cleaned_data.get('age')
