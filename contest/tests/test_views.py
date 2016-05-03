@@ -102,11 +102,15 @@ class LoginViewTests(TestCase):
         Checking if form is valid for correct data and invalid for
         wrong data or inactive user
         """
-        response = self.client.get(reverse('contest:login'))
+        response = self.client.get(
+            reverse('contest:login'), {'next': '/redirect/page/'}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
             isinstance(response.context['form'], LoginForm)
         )
+        self.assertEqual(response.context['next'], '/redirect/page/')
+
         self.assertEqual(list(LoginForm.base_fields), ['username', 'password'])
 
         form_data = {'username': 'username', 'password': 'wrong_password'}
@@ -120,9 +124,15 @@ class LoginViewTests(TestCase):
             ]
         )
 
-        form_data = {'username': 'username', 'password': 'Password'}
-        response = self.client.post(reverse('contest:login'), data=form_data)
+        data = {
+            'username': 'username',
+            'password': 'Password',
+            'next': '/redirect/page/',
+        }
+        response = self.client.post(reverse('contest:login'), data)
+
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/redirect/page/')
 
 
 class SetResetPasswordViewTestCase(TestCase):
