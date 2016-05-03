@@ -94,7 +94,7 @@ class ContestantAddView(View):
         Return adding a contestant form on site.
         """
         user = request.user
-        organization = request.user.email
+        organization = request.user.unit
         formset = self.get_formset(contest_id, user)
 
         try:
@@ -200,8 +200,9 @@ class EditContestantView(View):
         user = request.user
 
         form = self.form_class(
-            instance=contestant, contest_id=contestant.contest.id,
-            user = user
+            instance=contestant,
+            contest_id=contestant.contest.id,
+            user=user
         )
 
         if not contestant.moderator == request.user:
@@ -220,7 +221,10 @@ class EditContestantView(View):
         """
         contestant = Contestant.objects.get(id=contestant_id)
         form = self.form_class(
-            request.POST, user=request.user, instance=contestant, contest_id=contestant.contest.id
+            request.POST,
+            user=request.user,
+            instance=contestant,
+            contest_id=contestant.contest.id
         )
         if form.has_changed():
             if form.is_valid():
