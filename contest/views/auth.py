@@ -3,21 +3,21 @@ from __future__ import unicode_literals
 from urlparse import urljoin
 
 from django.conf import settings
+# from django.contrib.auth.views import login
 from django.contrib.auth import (
     login,
     logout,
+    REDIRECT_FIELD_NAME,
 )
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.template import loader
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.views.generic import View
-from django.shortcuts import (
-    redirect,
-    render,
-)
+from django.shortcuts import render
 
 from contest.forms import (
     LoginForm,
@@ -100,22 +100,45 @@ class LoginView(View):
     form_class = LoginForm
     template_name = 'contest/auth/login.html'
 
+    def _get_redirect_to(self):
+        return (
+            self.request.POST.get(REDIRECT_FIELD_NAME) or
+            self.request.GET.get(REDIRECT_FIELD_NAME, '') or
+            settings.LOGIN_REDIRECT_URL
+        )
+
     def get(self, request):
         """
         Displaying clear LoginForm on page.
         """
+        redirect_to = self._get_redirect_to()
         form = self.form_class()
-        return render(request, self.template_name, {'form': form})
+
+        return render(
+            request, self.template_name,
+            {
+                'form': form,
+                REDIRECT_FIELD_NAME: redirect_to,
+            }
+        )
 
     def post(self, request):
         """
         Log an user into app.
         """
+        redirect_to = self._get_redirect_to()
         form = self.form_class(request, data=request.POST)
+
         if form.is_valid():
             login(request, form.get_user())
-            return redirect('contest:home')
-        return render(request, self.template_name, {'form': form})
+            return HttpResponseRedirect(redirect_to)
+        return render(
+            request, self.template_name,
+            {
+                'form': form,
+                REDIRECT_FIELD_NAME: redirect_to,
+            }
+        )
 
 
 class SetResetPasswordView(View):
