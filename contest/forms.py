@@ -172,9 +172,16 @@ class ContestantForm(forms.ModelForm):
     """
     Form for contestant creation.
     """
+    organization = forms.CharField(label='Klub/Szkoła', max_length=100)
+
     def __init__(self, *args, **kwargs):
         self.contest = kwargs.pop('contest_id')
+        self.user = kwargs.pop('user')
         super(ContestantForm, self).__init__(*args, **kwargs)
+
+        if self.user.unit:
+            self.fields['organization'].initial = self.user.unit
+            self.fields['organization'].widget.attrs['readonly'] = True
 
     def clean_age(self):
         age = self.cleaned_data.get('age')

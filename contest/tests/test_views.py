@@ -20,7 +20,6 @@ from django.utils.timezone import make_aware
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from mock import patch
-
 from contest.forms import (
     ContestantForm,
     ContestForm,
@@ -506,12 +505,14 @@ class ContestantAddViewTestCase(TestCase):
             'form-0-last_name': 'Kowalski',
             'form-0-school': 'Test',
             'form-0-styles_distances': '1000m',
+            'form-0-organization': self.user.unit,
             'form-1-age': '16',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
             'form-1-school': 'Test',
             'form-1-styles_distances': '500m',
+            'form-1-organization': self.user.unit,
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
             'form-MIN_NUM_FORMS': '0',
@@ -590,7 +591,6 @@ class ContestantAddViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         contestants = Contestant.objects.filter(moderator=self.user)
-
         self.assertEquals(len(contestants), 2)
 
         self.assertEqual(contestants[0].first_name, 'Jan')
