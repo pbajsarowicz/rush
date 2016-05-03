@@ -14,6 +14,38 @@ Contest
   margin-left: 20px;
 }
 
+
+/**********
+Contestants
+***********/
+@keyframes show-up {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+#contestants-preview {
+  background-color: white;
+  bottom: 0;
+  margin: 0;
+  position: fixed;
+  right: 0;
+  width: 200px;
+}
+
+#contestants-preview span {
+  cursor: pointer;
+}
+
+#contestants-preview ul {
+  margin: 0;
+}
+
+.contestant-form.animation {
+  animation-name: show-up;
+  animation-duration: 0.5s;
+}
+
+
 /************
 Base elements
 *************/

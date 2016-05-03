@@ -40,7 +40,9 @@ from contest.views import SetResetPasswordView
 
 
 class HomeViewTests(TestCase):
-    fixtures = ['clubs.json']
+    fixtures = [
+        'clubs.json',
+    ]
 
     def setUp(self):
         self.contest = Contest.objects.create(
