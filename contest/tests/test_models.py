@@ -59,7 +59,7 @@ class UserMethodTests(TestCase):
 
 
 class ContestTestCase(TestCase):
-    fixtures = ['organizers.json', 'clubs.json']
+    fixtures = ['clubs.json']
 
     def setUp(self):
         self.now = timezone.now()
@@ -76,7 +76,7 @@ class ContestTestCase(TestCase):
 
 
 class ContestantTestCase(TestCase):
-    fixtures = ['organizers.json', 'contests.json', 'clubs.json', 'users.json']
+    fixtures = ['contests.json', 'clubs.json', 'users.json']
 
     def setUp(self):
         self.contestant = Contestant.objects.create(
