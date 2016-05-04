@@ -299,7 +299,7 @@ Contestant.prototype = {
             }
         }
 
-        contestantForm.style = '';
+        contestantForm.style.display = '';
         this.visibleContestFormId = formId;
     },
     /*
