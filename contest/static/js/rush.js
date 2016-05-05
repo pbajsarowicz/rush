@@ -505,3 +505,25 @@ function getUserInfo(user) {
         $('#content' + user).removeClass('inline').addClass('invisible');
     }
 }
+
+/*
+ * Creates an account.
+ */
+function removeContestant(userId) {
+    'use strict';
+    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+    $.ajax({
+        type: 'DELETE',
+        beforeSend: function(xhr, settings) {
+            xhr.setRequestHeader('X-CSRFToken', csrfToken);
+        },
+        url: '/api/v1/contestants/' + userId,
+        error: function() {
+            Materialize.toast('Ups... wystąpił problem', 4000);
+        },
+        success: function() {
+            location.reload();
+        }
+    });
+}
