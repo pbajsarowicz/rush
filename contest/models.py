@@ -203,12 +203,12 @@ class Contest(models.Model):
     """
     Model for Contest.
     """
-    date = models.DateTimeField()
-    place = models.CharField(max_length=255)
-    age_min = models.SmallIntegerField()
-    age_max = models.SmallIntegerField()
-    deadline = models.DateTimeField()
-    description = models.TextField(blank=True)
+    date = models.DateTimeField('Data')
+    place = models.CharField('Miejsce', max_length=255)
+    age_min = models.SmallIntegerField('Wiek minimalny')
+    age_max = models.SmallIntegerField('Wiek maksymalny')
+    deadline = models.DateTimeField('Czas do końca dodawania zgłoszeń')
+    description = models.TextField('Opis', blank=True)
     content_type = models.ForeignKey(
         ContentType, limit_choices_to=UNIT_LIMIT,
         blank=True, null=True
