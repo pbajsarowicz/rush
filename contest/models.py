@@ -242,12 +242,18 @@ class Contestant(models.Model):
     Model for Rush Contestant.
     """
     GENDERS = ((None, 'Wybierz płeć'), ('F', 'Kobieta'), ('M', 'Mężczyzna'))
+    SCHOOLS = (
+        (None, 'Wybierz typ szkoły'),
+        ('P', 'Szkoła podstawowa'),
+        ('G', 'Gimnazjum'),
+        ('S', 'Szkoła średnia')
+    )
     moderator = models.ForeignKey(RushUser)
     first_name = models.CharField('imię', max_length=32)
     last_name = models.CharField('nazwisko', max_length=32)
     gender = models.CharField('płeć', max_length=1, choices=GENDERS)
     age = models.IntegerField('wiek')
-    school = models.CharField('rodzaj szkoły', max_length=255)
+    school = models.CharField('rodzaj szkoły', max_length=1, choices=SCHOOLS)
     styles_distances = models.CharField('style i dystanse', max_length=255)
     contest = models.ForeignKey(Contest)
 
