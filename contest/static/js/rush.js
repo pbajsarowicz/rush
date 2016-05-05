@@ -507,7 +507,7 @@ function getUserInfo(user) {
 }
 
 /*
- * Creates an account.
+ * Deletes contestant.
  */
 function removeContestant(userId) {
     'use strict';
