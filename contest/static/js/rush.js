@@ -37,9 +37,11 @@ function manageUser(user, create) {
 function hideClubCode() {
     'use strict';
     if (document.register_form.club_checkbox.checked) {
+        $('label[for="id_club_code"').addClass('visible');
         clubCodeInput.className = 'visible';
         clubCodeInput.required = true;
     } else {
+        $('label[for="id_club_code"').removeClass('visible').addClass('invisible');
         clubCodeInput.className = 'invisible';
         clubCodeInput.required = false;
         clubCodeInput.value = '';
@@ -52,6 +54,7 @@ function hideClubCode() {
 function onClubCodeValidation() {
     'use strict';
     if (clubCodeInput && clubCodeInput.value) {
+        $('label[for="id_club_code"').removeClass('invisible').addClass('visible');
         document.register_form.club_checkbox.checked = true;
         clubCodeInput.className = 'visible';
         clubCodeInput.required = true;
@@ -452,6 +455,7 @@ $(document).ready(function() {
     contestant = new Contestant();
 
     onClubCodeValidation();
+    $('label[for="id_club_code"').addClass('invisible');
     $('select').material_select();
     $('.modal-trigger').leanModal();
     $('.datetime').mask('99.99.9999 99:99', {placeholder: 'dd.mm.yyyy hh:mm'});
