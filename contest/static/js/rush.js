@@ -505,3 +505,54 @@ function getUserInfo(user) {
         $('#content' + user).removeClass('inline').addClass('invisible');
     }
 }
+
+/*
+ * Parsing contestant data from js to html.
+ */
+function parseContestantData(json) {
+    'use strict';
+    var fieldsNames = [
+        ['Imię', 'first_name'],
+        ['Nazwisko', 'last_name'],
+        ['Płeć', 'gender'],
+        ['Wiek', 'age'],
+        ['Szkoła', 'school']
+        ['styl i dystans', 'styles_distances']
+    ]
+    var fragment = document.createDocumentFragment();
+    var element = document.createElement('ul');
+    var elementUl = element;
+    var elementLi;
+
+    fieldsNames.forEach(function(field) {
+        elementLi = document.createElement('li');
+        elementLi.appendChild(document.createTextNode(field[0] + ': ' + json[field[1]]));
+        elementUl.appendChild(elementLi);
+    });
+    fragment.appendChild(elementUl);
+
+    return fragment
+}
+
+/*
+ * Handling contestant info request and inserting data into html container.
+ */
+function getContestantInfo(contestant) {
+    'use strict';
+    if ($('#content' + contestant).css('display') == 'none' || $('#content' + contestant).css('display') == 'block') {
+        $.ajax({
+            url: '/api/v1/contestants/' + contestant,
+            dataType: 'json',
+            success: function(json) {
+                contestant_data = parseContestantData(json);
+
+                $('#content' + contestant).html(contestant_data);
+                $('#content' + contestant).removeClass('invisible').addClass('inline');
+            }
+        });
+    }
+    else {
+        $('#content' + contestant).html('');
+        $('#content' + contestant).removeClass('inline').addClass('invisible');
+    }
+}

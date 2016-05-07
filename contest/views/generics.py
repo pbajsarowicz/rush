@@ -172,7 +172,7 @@ class ContestantListView(View):
         Get contestants data.
         """
         contestants = Contestant.objects.filter(
-            contest=contest_id, moderator=request.user,
+            contest=contest_id
         )
 
         if contestants:
@@ -181,7 +181,7 @@ class ContestantListView(View):
             )
         return render(
             request, self.template_name,
-            {'msg': 'Nie dodałeś zawodników do tych zawodów.'},
+            {'msg': 'Nie zostali jeszcze dodani zawodnicy.'},
         )
 
 
