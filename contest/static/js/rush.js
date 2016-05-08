@@ -470,7 +470,7 @@ function parseUserData(json) {
         ['Adres organizacji', 'organization_address']
     ]
     var fragment = document.createDocumentFragment();
-    var elementUl = element = document.createElement('ul');
+    var elementUl = document.createElement('ul');
     var elementLi;
 
     fieldsNames.forEach(function(field) {
@@ -488,6 +488,8 @@ function parseUserData(json) {
  */
 function getUserInfo(user) {
     'use strict';
+    var user_data;
+
     if ($('#content' + user).css('display') == 'none' || $('#content' + user).css('display') == 'block') {
         $.ajax({
             url: '/api/v1/users/' + user,
