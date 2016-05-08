@@ -243,10 +243,10 @@ class Contestant(models.Model):
     """
     GENDERS = ((None, 'Wybierz płeć'), ('F', 'Kobieta'), ('M', 'Mężczyzna'))
     SCHOOLS = (
-        (None, 'Wybierz typ szkoły'),
+        (None, 'Wybierz rodzaj szkoły'),
         ('P', 'Szkoła podstawowa'),
         ('G', 'Gimnazjum'),
-        ('S', 'Szkoła średnia')
+        ('S', 'Szkoła średnia'),
     )
     moderator = models.ForeignKey(RushUser)
     first_name = models.CharField('imię', max_length=32)

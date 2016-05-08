@@ -684,7 +684,7 @@ class ContestantListViewTestCase(TestCase):
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
-            gender='M', age=14, school='Szkoła', styles_distances='100m motyl',
+            gender='M', age=14, school='S', styles_distances='100m motyl',
             contest=self.contest
         )
 
