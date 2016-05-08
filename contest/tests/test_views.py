@@ -516,14 +516,14 @@ class ContestantAddViewTestCase(TestCase):
             'form-0-first_name': 'Jan',
             'form-0-gender': 'M',
             'form-0-last_name': 'Kowalski',
-            'form-0-school': 'Test',
+            'form-0-school': 'P',
             'form-0-styles_distances': '1000m',
             'form-0-organization': self.user.unit,
             'form-1-age': '16',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
-            'form-1-school': 'Test',
+            'form-1-school': 'P',
             'form-1-styles_distances': '500m',
             'form-1-organization': self.user.unit,
             'form-INITIAL_FORMS': '0',
@@ -685,7 +685,7 @@ class ContestantListViewTestCase(TestCase):
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
-            gender='M', age=14, school='Szkoła', styles_distances='100m motyl',
+            gender='M', age=14, school='S', styles_distances='100m motyl',
             contest=self.contest
         )
 
@@ -717,7 +717,7 @@ class EditContestantViewTestCase(TestCase):
             last_name='Nowak',
             gender='M',
             age=14,
-            school='Szkoła',
+            school='P',
             styles_distances='100m motyl',
             contest=Contest.objects.first(),
             moderator=self.user
@@ -740,7 +740,7 @@ class EditContestantViewTestCase(TestCase):
             response.context['form'].initial['last_name'], 'Nowak'
         )
         self.assertEqual(response.context['form'].initial['gender'], 'M')
-        self.assertEqual(response.context['form'].initial['school'], 'Szkoła')
+        self.assertEqual(response.context['form'].initial['school'], 'P')
         self.assertEqual(
             response.context['form'].initial['styles_distances'], '100m motyl'
         )
@@ -754,7 +754,7 @@ class EditContestantViewTestCase(TestCase):
             ),
             data={
                 'first_name': 'Karol', 'last_name': 'Kowalski',
-                'school': 'School', 'gender': 'F', 'age': 11,
+                'school': 'P', 'gender': 'F', 'age': 11,
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -765,7 +765,7 @@ class EditContestantViewTestCase(TestCase):
         self.assertEqual(
             response.context['form'].cleaned_data['last_name'], 'Kowalski')
         self.assertEqual(
-            response.context['form'].cleaned_data['school'], 'School'
+            response.context['form'].cleaned_data['school'], 'P'
         )
         self.assertEqual(response.context['form'].cleaned_data['gender'], 'F')
         self.assertEqual(response.context['form'].cleaned_data['age'], 11)

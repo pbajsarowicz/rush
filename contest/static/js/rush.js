@@ -176,7 +176,7 @@ ContestantValidation.prototype = {
         this.school = document.forms['contestants'][formId + '-school'].value;
 
         if (!this.school) {
-            this.raiseValidation(formId + '-school', 'Pole Rodzaj Szkoły nie może być puste.');
+            this.raiseValidation(formId + '-school', 'Wybierz rodzaj szkoły.');
         } else {
             this.clearValidation(formId + '-school');
         }
@@ -474,7 +474,7 @@ function parseUserData(json) {
         ['Adres organizacji', 'organization_address']
     ]
     var fragment = document.createDocumentFragment();
-    var elementUl = element = document.createElement('ul');
+    var elementUl = document.createElement('ul');
     var elementLi;
 
     fieldsNames.forEach(function(field) {
@@ -492,6 +492,8 @@ function parseUserData(json) {
  */
 function getUserInfo(user) {
     'use strict';
+    var user_data;
+
     if ($('#content' + user).css('display') == 'none' || $('#content' + user).css('display') == 'block') {
         $.ajax({
             url: '/api/v1/users/' + user,
