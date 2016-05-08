@@ -465,6 +465,7 @@ class RegisterViewTests(TestCase):
             {
                 'first_name': ['To pole jest wymagane.'],
                 'last_name': ['To pole jest wymagane.'],
+                'organization_name': ['To pole jest wymagane.'],
                 'organization_address': ['To pole jest wymagane.'],
                 'email': ['To pole jest wymagane.']
             }
