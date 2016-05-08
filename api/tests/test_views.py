@@ -17,7 +17,7 @@ class ApiTestCasesMixin(object):
 
 
 class ContactTestsAPI(ApiTestCasesMixin, APITestCase):
-    fixtures = ['contact.json']
+    fixtures = ['contest/fixtures/contact.json']
 
     def test_getting_info(self):
         url = reverse('api:contact-list')
@@ -100,7 +100,7 @@ class ClubTestsAPI(ApiTestCasesMixin, APITestCase):
 
 
 class SchoolTestsAPI(ApiTestCasesMixin, APITestCase):
-    fixtures = ['schools.json']
+    fixtures = ['contest/fixtures/schools.json']
 
     def test_getting_info(self):
         response = self.client.get(reverse('api:school-list'))

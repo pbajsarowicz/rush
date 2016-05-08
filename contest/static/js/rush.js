@@ -173,7 +173,7 @@ ContestantValidation.prototype = {
         this.school = document.forms['contestants'][formId + '-school'].value;
 
         if (!this.school) {
-            this.raiseValidation(formId + '-school', 'Pole Rodzaj Szkoły nie może być puste.');
+            this.raiseValidation(formId + '-school', 'Wybierz rodzaj szkoły.');
         } else {
             this.clearValidation(formId + '-school');
         }
