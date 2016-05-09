@@ -207,7 +207,7 @@ class Contest(models.Model):
     place = models.CharField('Miejsce', max_length=255)
     age_min = models.SmallIntegerField('Wiek minimalny')
     age_max = models.SmallIntegerField('Wiek maksymalny')
-    deadline = models.DateTimeField('Czas do końca dodawania zgłoszeń')
+    deadline = models.DateTimeField('Termin zgłaszania zawodników')
     description = models.TextField('Opis', blank=True)
     content_type = models.ForeignKey(
         ContentType, limit_choices_to=UNIT_LIMIT,
