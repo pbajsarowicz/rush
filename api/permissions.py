@@ -10,6 +10,5 @@ class ModeratorOnly(BasePermission):
     """
     def has_object_permission(self, request, view, obj):
         if request.method == 'DELETE':
-            if request.user != obj.moderator and not request.user.is_staff:
-                return False
+            return request.user == obj.moderator or request.user.is_staff
         return True
