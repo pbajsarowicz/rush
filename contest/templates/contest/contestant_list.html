@@ -4,13 +4,24 @@
   <div class="container">
     {{ msg }}
     {% if contestants %}
+      {% csrf_token %}
       {% for contestant in contestants %}
         <ul class="collection">
           <li class="collection-item">
             {{ contestant.first_name }} {{ contestant.last_name }}
-            <a class="secondary-content" href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">
-              <i class="waves-effect waves-light btn">Edytuj</i>
-            </a>
+            <a class="secondary-content waves-effect waves-light btn modal-trigger" href="#delete-user">Usuń</a>
+            <a class="secondary-content waves-effect waves-light btn"
+               href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">Edytuj</a>
+            <div id="delete-user" class="modal">
+              <div class="modal-content">
+                <h4>Usunięcie zawodnika</h4>
+                <p>Czy na pewno chcesz usunąć zawodnika {{ contestant.first_name }} {{ contestant.last_name }} z zawodów {{ contestant.contest }}?</p>
+              </div>
+              <div class="modal-footer">
+                <a class="modal-action modal-close waves-effect waves-green btn-flat">Nie</a>
+                <a onclick="removeContestant({{ contestant.id }})" class="modal-action modal-close waves-effect waves-green btn-flat">Tak</a>
+              </div>
+            </div>
           </li>
         </ul>
       {% endfor %}

@@ -2,8 +2,12 @@
 from __future__ import unicode_literals
 
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated
+)
 
+from api.permissions import ModeratorOnly
 from api.serializers import (
     ContactSerializer,
     ContestSerializer,
@@ -59,6 +63,7 @@ class ContestantViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allow to view Contestants.
     """
+    permission_classes = (IsAuthenticated, ModeratorOnly,)
     queryset = Contestant.objects.all().order_by('contest')
     serializer_class = ContestantSerializer
 
