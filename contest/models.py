@@ -76,10 +76,10 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField('imię', max_length=32)
     last_name = models.CharField('nazwisko', max_length=32)
     organization_name = models.CharField(
-        'nazwa organizacji', blank=True, max_length=255
+        'Nazwa Szkoły/Klubu', max_length=255
     )
     organization_address = models.CharField(
-        'adres organizacji', max_length=255
+        'Adres Szkoły/Klubu', max_length=255
     )
     date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)

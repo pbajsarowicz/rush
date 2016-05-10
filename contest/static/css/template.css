@@ -57,3 +57,11 @@ p {
 footer.page-footer {
   margin: 0;
 }
+
+.collection .collection-item {
+  line-height: 2.5rem;
+}
+
+.secondary-content {
+  margin-left: 20px;
+}
