@@ -518,7 +518,7 @@ function parseContestantData(json) {
         ['Nazwisko', 'last_name'],
         ['Płeć', 'gender'],
         ['Wiek', 'age'],
-        ['Szkoła', 'school']
+        ['Szkoła', 'school'],
         ['styl i dystans', 'styles_distances']
     ]
     var fragment = document.createDocumentFragment();
@@ -541,6 +541,7 @@ function parseContestantData(json) {
  */
 function getContestantInfo(contestant) {
     'use strict';
+    var contestant_data
     if ($('#content' + contestant).css('display') == 'none' || $('#content' + contestant).css('display') == 'block') {
         $.ajax({
             url: '/api/v1/contestants/' + contestant,
