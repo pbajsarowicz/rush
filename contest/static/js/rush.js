@@ -522,12 +522,11 @@ function parseContestantData(json) {
         ['Nazwisko', 'last_name'],
         ['Płeć', 'gender'],
         ['Wiek', 'age'],
-        ['Szkoła', 'school'],
+        ['Rodzaj Szkoły', 'school'],
         ['styl i dystans', 'styles_distances']
     ]
     var fragment = document.createDocumentFragment();
-    var element = document.createElement('ul');
-    var elementUl = element;
+    var elementUl = document.createElement('ul');
     var elementLi;
 
     fieldsNames.forEach(function(field) {
