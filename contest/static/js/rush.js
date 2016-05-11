@@ -12,6 +12,7 @@ function manageUser(user, create) {
     var userData = JSON.parse(user);
     var userName = userData['first_name'] + ' ' + userData['last_name'];
     var userRow = $('#user-' + userData['id']);
+    $('a').prop('onclick',null).off('click').css("cursor","pointer");
 
     $.ajax({
         type: action,
