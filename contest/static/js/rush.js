@@ -513,7 +513,6 @@ function getUserInfo(user) {
 }
 
 /*
-<<<<<<< HEAD
  * Parsing contestant data from js to html.
  */
 function parseContestantData(json) {
