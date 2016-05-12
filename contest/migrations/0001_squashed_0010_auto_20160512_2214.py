@@ -30,9 +30,6 @@ def _0005_auto_20160305_1951_backwards_func(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
-    replaces = [(b'contest', '0001_initial'), (b'contest', '0002_contestant'), (b'contest', '0003_auto_20160214_1700'), (b'contest', '0004_auto_20160223_2144'), (b'contest', '0005_auto_20160305_1951'), (b'contest', '0006_auto_20160404_2121'), (b'contest', '0007_auto_20160414_2144'), (b'contest', '0008_auto_20160508_1853'), (b'contest', '0009_auto_20160508_2022'), (b'contest', '0010_auto_20160512_2214')]
-
     initial = True
 
     dependencies = [
