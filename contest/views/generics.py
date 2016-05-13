@@ -173,9 +173,7 @@ class ContestantListView(View):
         """
         contest = Contest.objects.get(pk=contest_id)
         if request.user.object_id == contest.object_id:
-            contestants = Contestant.objects.filter(
-                contest=contest_id,
-        )
+            contestants = Contestant.objects.filter(contest=contest_id,)
         else:
             contestants = Contestant.objects.filter(
                 contest=contest_id, moderator=request.user,
