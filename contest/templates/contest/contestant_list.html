@@ -8,15 +8,15 @@
       {% for contestant in contestants %}
         <ul class="collection">
           <li class="collection-item" id="contestant-{{ contestant.id }}">
-            {{contestant.first_name }} {{ contestant.last_name }}
-            <button onclick="getContestantInfo({{ contestant.id }})" href="#" class="pull-right btn btn-primary right">Szczegóły</button>
-              {% if contestant.moderator == request.user %}
-                <a class="secondary-content waves-effect waves-light btn" href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">
-                  Edytuj</a>
-                  <a class="secondary-content waves-effect waves-light btn modal-trigger" href="#delete-user">Usuń</a>
-                </a>
-              {% endif %}
-            <p id="content{{contestant.id}}"></p>
+            {{contestant.first_name }} {{ contestant.last_name }} {{ contest.organizer }}
+            <button onclick="getContestantInfo({{ contestant.id }})"
+              class="secondary-content waves-effect waves-light btn">Szczegóły</button>
+            {% if contestant.moderator == request.user %}
+              <a class="secondary-content waves-effect waves-light btn"
+                href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">Edytuj</a>
+              <a class="secondary-content waves-effect waves-light btn modal-trigger" href="#delete-user">Usuń</a>
+            {% endif %}
+            <p id="content{{contestant.id}}" class="invisible"></p>
             <div id="delete-user" class="modal">
               <div class="modal-content">
                 <h4>Usunięcie zawodnika</h4>
