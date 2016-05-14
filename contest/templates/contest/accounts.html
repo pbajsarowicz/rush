@@ -30,8 +30,8 @@
                 </td>
                 <td>{{ user.last_name }}</td>
                 <td>
-                  <a href="#" class="waves-effect waves-light btn" onclick="manageUser('{{ user|to_json }}', true)">Utwórz konto</a>
-                  <a href="#" class="waves-effect waves-light btn" onclick="manageUser('{{ user|to_json }}', false)">Odrzuć zgłoszenie</a>
+                  <a href="#" id="create-user-{{user.id}}" class="waves-effect waves-light btn" onclick="manageUser('{{ user|to_json }}', true)">Utwórz konto</a>
+                  <a href="#" id="discard-user-{{user.id}}" class="waves-effect waves-light btn" onclick="manageUser('{{ user|to_json }}', false)">Odrzuć zgłoszenie</a>
                 </td>
               </tr>
             {% endfor %}
