@@ -204,7 +204,7 @@ class ContestForm(forms.ModelForm):
     """
     Form for creating Contests.
     """
-    organization = forms.CharField(label='organizacja', max_length=255)
+    organization = forms.CharField(label='Organizacja', max_length=255)
 
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
