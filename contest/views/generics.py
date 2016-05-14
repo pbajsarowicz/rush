@@ -175,7 +175,7 @@ class ContestantListView(View):
         is_contest_organizer = request.user.object_id == contest.object_id
         if is_contest_organizer:
             contestants = contest.contestant_set.all()
-            context= {'msg': 'Zawodnicy nie zostali jeszcze dodani.'}
+            context = {'msg': 'Zawodnicy nie zostali jeszcze dodani.'}
         else:
             contestants = contest.contestant_set.filter(moderator=request.user)
             context = {'msg': 'Nie dodałeś zawodników do tych zawodów.'}
@@ -186,9 +186,7 @@ class ContestantListView(View):
                 request, self.template_name,
                 {'contestants': contestants, 'contest': contest}
             )
-        return render(
-                request, self.template_name, context
-        )
+        return render(request, self.template_name, context)
 
 
 class EditContestantView(View):
