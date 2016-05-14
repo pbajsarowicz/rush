@@ -536,7 +536,7 @@ function parseContestantData(json) {
     });
     fragment.appendChild(elementUl);
 
-    return fragment
+    return fragment;
 }
 
 /*
@@ -544,7 +544,7 @@ function parseContestantData(json) {
  */
 function getContestantInfo(contestant) {
     'use strict';
-    var contestant_data
+    var contestant_data;
     if ($('#content' + contestant).css('display') == 'none' || $('#content' + contestant).css('display') == 'block') {
         $.ajax({
             url: '/api/v1/contestants/' + contestant,

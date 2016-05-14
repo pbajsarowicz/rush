@@ -183,10 +183,16 @@ class ContestantListView(View):
             return render(
                 request, self.template_name, {'contestants': contestants}
             )
-        return render(
-            request, self.template_name,
-            {'msg': 'Nie zostali jeszcze dodani zawodnicy.'},
-        )
+        if request.user.object_id == contest.object_id:
+            return render(
+                request, self.template_name,
+                {'msg': 'Nie zostali jeszcze dodani zawodnicy.'},
+            )
+        else:
+            return render(
+                request, self.template_name,
+                {'msg': 'Nie dodałeś zawodników do tych zawodów.'},
+            )
 
 
 class EditContestantView(View):
