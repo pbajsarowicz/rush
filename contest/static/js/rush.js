@@ -12,11 +12,13 @@ function manageUser(user, create) {
     var userData = JSON.parse(user);
     var userName = userData['first_name'] + ' ' + userData['last_name'];
     var userRow = $('#user-' + userData['id']);
-
+    var userId = userData['id'];
     $.ajax({
         type: action,
         beforeSend: function(xhr, settings) {
             xhr.setRequestHeader('X-CSRFToken', csrfToken);
+            document.getElementById('discard-user-' + userId).onclick = function(){ return false; };
+            document.getElementById('create-user-' + userId).onclick = function(){ return false; };
         },
         url: '/administrator/konta/' + userData['id'],
         error: function(){
