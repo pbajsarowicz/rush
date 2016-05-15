@@ -167,25 +167,52 @@ class ContestantListView(View):
     """
     template_name = 'contest/contestant_list.html'
 
+    @staticmethod
+    def _is_contest_organizer(request, contest):
+        """
+        Checks if a logged user calls for a list of contestans which attend to
+        contest created by this user.
+        """
+        return request.user.object_id == contest.object_id
+
+    @staticmethod
+    def _get_contestants(is_contest_organizer, contest, request):
+        """
+        Returns a contestans queryset.
+        """
+        return (
+            contest.contestant_set.all() if is_contest_organizer else
+            contest.contestant_set.filter(moderator=request.user)
+        )
+
+    @staticmethod
+    def _get_msg(is_contest_organizer, contestants=None):
+        """
+        Returns a message.
+        """
+        if not contestants:
+            if is_contest_organizer:
+                return 'Zawodnicy nie zostali jeszcze dodani.'
+            return 'Nie dodałeś zawodników do tych zawodów.'
+        return ''
+
     def get(self, request, contest_id, *args, **kwargs):
         """
         Get contestants data.
         """
         contest = Contest.objects.get(pk=contest_id)
-        is_contest_organizer = request.user.object_id == contest.object_id
-        if is_contest_organizer:
-            contestants = contest.contestant_set.all()
-            context = {'msg': 'Zawodnicy nie zostali jeszcze dodani.'}
-        else:
-            contestants = contest.contestant_set.filter(moderator=request.user)
-            context = {'msg': 'Nie dodałeś zawodników do tych zawodów.'}
-        context['contest'] = contest
+        is_contest_organizer = self._is_contest_organizer(request, contest)
+        contestants = self._get_contestants(
+            is_contest_organizer, contest, request
+        )
+        msg = self._get_msg(is_contest_organizer, contestants)
 
-        if contestants:
-            return render(
-                request, self.template_name,
-                {'contestants': contestants, 'contest': contest}
-            )
+        context = {
+            'contest': contest,
+            'contestants': contestants,
+            'msg': msg,
+        }
+
         return render(request, self.template_name, context)
 
 

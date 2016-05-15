@@ -526,7 +526,7 @@ function parseContestantData(json) {
         ['Wiek', 'age'],
         ['Rodzaj Szkoły', 'school'],
         ['styl i dystans', 'styles_distances']
-    ]
+    ];
     var fragment = document.createDocumentFragment();
     var elementUl = document.createElement('ul');
     var elementLi;
@@ -560,8 +560,7 @@ function getContestantInfo(contestant) {
             });
         }
         $('#content' + contestant).removeClass('invisible').addClass('inline');
-    }
-    else {
+    } else {
         $('#content' + contestant).removeClass('inline').addClass('invisible');
     }
 }
