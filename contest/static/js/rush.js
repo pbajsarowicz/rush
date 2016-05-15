@@ -515,7 +515,57 @@ function getUserInfo(user) {
 }
 
 /*
- * Deletes contestant.
+ * Parsing contestant data from js to html.
+ */
+function parseContestantData(json) {
+    'use strict';
+    var fieldsNames = [
+        ['Imię', 'first_name'],
+        ['Nazwisko', 'last_name'],
+        ['Płeć', 'gender'],
+        ['Wiek', 'age'],
+        ['Rodzaj Szkoły', 'school'],
+        ['styl i dystans', 'styles_distances']
+    ];
+    var fragment = document.createDocumentFragment();
+    var elementUl = document.createElement('ul');
+    var elementLi;
+
+    fieldsNames.forEach(function(field) {
+        elementLi = document.createElement('li');
+        elementLi.appendChild(document.createTextNode(field[0] + ': ' + json[field[1]]));
+        elementUl.appendChild(elementLi);
+    });
+    fragment.appendChild(elementUl);
+
+    return fragment;
+}
+
+/*
+ * Handling contestant info request and inserting data into html container.
+ */
+function getContestantInfo(contestant) {
+    'use strict';
+    var contestant_data;
+
+    if ($('#content' + contestant).attr('class') == 'invisible') {
+        if ($('#content' + contestant).html().length == 0) {
+            $.ajax({
+                url: '/api/v1/contestants/' + contestant,
+                dataType: 'json',
+                success: function(json) {
+                    contestant_data = parseContestantData(json);
+                    $('#content' + contestant).html(contestant_data);
+                }
+            });
+        }
+        $('#content' + contestant).removeClass('invisible').addClass('inline');
+    } else {
+        $('#content' + contestant).removeClass('inline').addClass('invisible');
+    }
+}
+/*
+ Deletes contestant.
  */
 function removeContestant(userId) {
     'use strict';

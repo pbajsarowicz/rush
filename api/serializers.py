@@ -84,6 +84,8 @@ class RushUserSerializer(serializers.HyperlinkedModelSerializer):
 class ContestantSerializer(serializers.HyperlinkedModelSerializer):
     contest = ContestSerializer()
     moderator = RushUserSerializer()
+    gender = serializers.CharField(source='get_gender_display')
+    school = serializers.CharField(source='get_school_display')
 
     class Meta:
         model = Contestant

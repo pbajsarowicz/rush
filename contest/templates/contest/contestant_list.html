@@ -7,11 +7,16 @@
       {% csrf_token %}
       {% for contestant in contestants %}
         <ul class="collection">
-          <li class="collection-item">
-            {{ contestant.first_name }} {{ contestant.last_name }}
-            <a class="secondary-content waves-effect waves-light btn modal-trigger" href="#delete-user">Usuń</a>
-            <a class="secondary-content waves-effect waves-light btn"
-               href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">Edytuj</a>
+          <li class="collection-item" id="contestant-{{ contestant.id }}">
+            {{ contestant.first_name }} {{ contestant.last_name }} {{ contest.organizer }}
+            <button class="secondary-content waves-effect waves-light btn-flat"
+                    onclick="getContestantInfo({{ contestant.id }})" >Szczegóły</button>
+            {% if contestant.moderator == request.user %}
+              <a class="secondary-content waves-effect waves-light btn-flat"
+                 href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">Edytuj</a>
+              <a class="secondary-content waves-effect waves-light btn-flat modal-trigger" href="#delete-user">Usuń</a>
+            {% endif %}
+            <p id="content{{ contestant.id }}" class="invisible"></p>
             <div id="delete-user" class="modal">
               <div class="modal-content">
                 <h4>Usunięcie zawodnika</h4>
@@ -26,5 +31,9 @@
         </ul>
       {% endfor %}
     {% endif %}
+    <div class="section center-align">
+      <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
+      <a class="pull-right btn btn-primary" href="{% url 'contest:contestant-add' contest_id=contest.pk %}">Dodaj</a>
+    </div>
   </div>
 {% endblock container %}
