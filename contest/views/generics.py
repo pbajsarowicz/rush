@@ -172,27 +172,21 @@ class ContestantListView(View):
         Get contestants data.
         """
         contest = Contest.objects.get(pk=contest_id)
-        if request.user.object_id == contest.object_id:
-            contestants = Contestant.objects.filter(contest=contest_id,)
+        is_contest_organizer = request.user.object_id == contest.object_id
+        if is_contest_organizer:
+            contestants = contest.contestant_set.all()
+            context = {'msg': 'Zawodnicy nie zostali jeszcze dodani.'}
         else:
-            contestants = Contestant.objects.filter(
-                contest=contest_id, moderator=request.user,
-            )
+            contestants = contest.contestant_set.filter(moderator=request.user)
+            context = {'msg': 'Nie dodałeś zawodników do tych zawodów.'}
+        context['contest'] = contest
 
         if contestants:
             return render(
-                request, self.template_name, {'contestants': contestants}
-            )
-        if request.user.object_id == contest.object_id:
-            return render(
                 request, self.template_name,
-                {'msg': 'Nie zostali jeszcze dodani zawodnicy.'},
+                {'contestants': contestants, 'contest': contest}
             )
-        else:
-            return render(
-                request, self.template_name,
-                {'msg': 'Nie dodałeś zawodników do tych zawodów.'},
-            )
+        return render(request, self.template_name, context)
 
 
 class EditContestantView(View):

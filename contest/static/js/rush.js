@@ -545,24 +545,24 @@ function parseContestantData(json) {
 function getContestantInfo(contestant) {
     'use strict';
     var contestant_data;
-    if ($('#content' + contestant).css('display') == 'none' || $('#content' + contestant).css('display') == 'block') {
-        $.ajax({
-            url: '/api/v1/contestants/' + contestant,
-            dataType: 'json',
-            success: function(json) {
-                contestant_data = parseContestantData(json);
 
-                $('#content' + contestant).html(contestant_data);
-                $('#content' + contestant).removeClass('invisible').addClass('inline');
-            }
-        });
+    if ($('#content' + contestant).attr('class') == 'invisible') {
+        if ($('#content' + contestant).html().length == 0) {
+            $.ajax({
+                url: '/api/v1/contestants/' + contestant,
+                dataType: 'json',
+                success: function(json) {
+                    contestant_data = parseContestantData(json);
+                    $('#content' + contestant).html(contestant_data);
+                }
+            });
+        }
+        $('#content' + contestant).removeClass('invisible').addClass('inline');
     }
     else {
-        $('#content' + contestant).html('');
         $('#content' + contestant).removeClass('inline').addClass('invisible');
     }
 }
-
 /*
  Deletes contestant.
  */

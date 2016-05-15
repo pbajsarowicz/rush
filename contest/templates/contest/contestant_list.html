@@ -10,10 +10,10 @@
           <li class="collection-item" id="contestant-{{ contestant.id }}">
             {{contestant.first_name }} {{ contestant.last_name }} {{ contest.organizer }}
             <button class="secondary-content waves-effect waves-light btn"
-              onclick="getContestantInfo({{ contestant.id }})" >Szczegóły</button>
+                    onclick="getContestantInfo({{ contestant.id }})" >Szczegóły</button>
             {% if contestant.moderator == request.user %}
               <a class="secondary-content waves-effect waves-light btn"
-                href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">Edytuj</a>
+                 href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">Edytuj</a>
               <a class="secondary-content waves-effect waves-light btn modal-trigger" href="#delete-user">Usuń</a>
             {% endif %}
             <p id="content{{contestant.id}}" class="invisible"></p>
@@ -32,7 +32,8 @@
       {% endfor %}
     {% endif %}
     <div class="section center-align">
-      <a class="waves-effect waves-light btn-large modal-trigger" href="/">Powrót</a>
+      <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
+      <a class="pull-right btn btn-primary" href="{% url 'contest:contestant-add' contest_id=contest.pk %}">Dodaj</a>
     </div>
   </div>
 {% endblock container %}
