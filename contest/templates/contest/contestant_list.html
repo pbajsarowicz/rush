@@ -8,7 +8,7 @@
       {% for contestant in contestants %}
         <ul class="collection">
           <li class="collection-item" id="contestant-{{ contestant.id }}">
-            {{ contestant.first_name }} {{ contestant.last_name }} {{ contest.organizer }}
+            {{ contestant.first_name }} {{ contestant.last_name }}
             <button class="secondary-content waves-effect waves-light btn-flat"
                     onclick="getContestantInfo({{ contestant.id }})" >Szczegóły</button>
             {% if contestant.moderator == request.user %}
