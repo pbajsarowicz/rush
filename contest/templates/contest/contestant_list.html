@@ -33,7 +33,9 @@
     {% endif %}
     <div class="section center-align">
       <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
-      <a class="pull-right btn btn-primary" href="{% url 'contest:contestant-add' contest_id=contest.pk %}">Dodaj</a>
+      {% if user.organization_name %}
+          <a class="pull-right btn btn-primary" href="{% url 'contest:contestant-add' contest_id=contest.pk %}">Dodaj</a>
+      {% endif %}
     </div>
   </div>
 {% endblock container %}
