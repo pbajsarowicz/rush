@@ -51,6 +51,19 @@ function hideClubCode() {
 }
 
 /*
+ *Disables organization input.
+ */
+ function disableOrganization() {
+    if (document.getElementById("freelancer_checkbox").checked) {
+        $('label[for="id_organization_name"').addClass('invisible');
+        $('label[for="id_organization_address"').addClass('invisible');
+    } else {
+        $('label[for="id_organization_name"').addClass('visible');
+        $('label[for="id_organization_address"').addClass('visible');
+    }
+ }
+
+/*
  * Supports initialization of club code in case of validation errors appear.
  */
 function onClubCodeValidation() {
