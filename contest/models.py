@@ -218,7 +218,7 @@ class Contest(models.Model):
 
     def __unicode__(self):
         return '{} {}'.format(
-            self.place, datetime.strftime(self.date, '%d.%m.%Y %X')
+            self.place, datetime.strftime(self.date, '%d.%m.%Y %H:%M')
         )
 
     @property
