@@ -60,11 +60,15 @@ function hideClubCode() {
         $('label[for="id_organization_address"').removeClass('visible').addClass('invisible');
         $('input[id="id_organization_name"').removeClass('visible').addClass('invisible');
         $('input[id="id_organization_address"').removeClass('visible').addClass('invisible');
+        $('input[id="id_club_code"').removeClass('visible').addClass('invisible');
+        $('label[for="id_club_code"').removeClass('visible').addClass('invisible');
     } else {
         $('label[for="id_organization_name"').addClass('visible');
         $('label[for="id_organization_address"').addClass('visible');
         $('input[id="id_organization_name"').addClass('visible');
         $('input[id="id_organization_address"').addClass('visible');
+        $('label[for="id_club_code"').addClass('visible')
+        $('input[id="id_club_code"').addClass('visible')
     }
  }
 
