@@ -54,12 +54,17 @@ function hideClubCode() {
  *Disables organization input.
  */
  function disableOrganization() {
+    'use strict';
     if (document.getElementById("freelancer_checkbox").checked) {
-        $('label[for="id_organization_name"').addClass('invisible');
-        $('label[for="id_organization_address"').addClass('invisible');
+        $('label[for="id_organization_name"').removeClass('visible').addClass('invisible');
+        $('label[for="id_organization_address"').removeClass('visible').addClass('invisible');
+        $('input[id="id_organization_name"').removeClass('visible').addClass('invisible');
+        $('input[id="id_organization_address"').removeClass('visible').addClass('invisible');
     } else {
         $('label[for="id_organization_name"').addClass('visible');
         $('label[for="id_organization_address"').addClass('visible');
+        $('input[id="id_organization_name"').addClass('visible');
+        $('input[id="id_organization_address"').addClass('visible');
     }
  }
 
