@@ -222,10 +222,6 @@ class Contest(models.Model):
         )
 
     @property
-    def change_date_of_deadline(self):
-        return datetime.strftime(self.deadline, '%d.%m.%Y')
-
-    @property
     def is_submitting_open(self):
         """
         Return whether a contestant can submit to contest or not.

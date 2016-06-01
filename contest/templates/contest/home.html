@@ -25,11 +25,11 @@
               {% if contest.is_submitting_open and contest.is_future %}
                 <a class="text" href="{% url 'contest:contestant-list' contest_id=contest.pk %}">{{ contest }}</a>
               {% else %}
-                <span class="btn tooltipped" data-position="bottom" data-delay="50" data-tooltip="Termin dodawania zawodników minął (data {{ contest.change_date_of_deadline }})">{{ contest }}</span>
+                <span class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Termin dodawania zawodników minął {{ contest.deadline|date:'d.m.Y' }}">{{ contest }}</span>
               {% endif %}
               <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}"
                  onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
-              <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}" 
+              <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}"
                  onclick="getContestInfo({{ contest.pk }})">Dodaj zawodników</a>
               <div id="modal{{contest.pk}}" class="modal">
                 <div class="modal-content">
