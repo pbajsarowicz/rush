@@ -1,0 +1,39 @@
+{% extends "contest/base.html" %}
+
+{% block container %}
+  <div class="container">
+    {{ msg }}
+    {% if contestants %}
+      {% csrf_token %}
+      {% for contestant in contestants %}
+        <ul class="collection">
+          <li class="collection-item" id="contestant-{{ contestant.id }}">
+            {{ contestant.first_name }} {{ contestant.last_name }}
+            <button class="secondary-content waves-effect waves-light btn-flat"
+                    onclick="getContestantInfo({{ contestant.id }})" >Szczegóły</button>
+            {% if contestant.moderator == request.user %}
+              <a class="secondary-content waves-effect waves-light btn-flat"
+                 href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">Edytuj</a>
+              <a class="secondary-content waves-effect waves-light btn-flat modal-trigger" href="#delete-user">Usuń</a>
+            {% endif %}
+            <p id="content{{ contestant.id }}" class="invisible"></p>
+            <div id="delete-user" class="modal">
+              <div class="modal-content">
+                <h4>Usunięcie zawodnika</h4>
+                <p>Czy na pewno chcesz usunąć zawodnika {{ contestant.first_name }} {{ contestant.last_name }} z zawodów {{ contestant.contest }}?</p>
+              </div>
+              <div class="modal-footer">
+                <a class="modal-action modal-close waves-effect waves-green btn-flat">Nie</a>
+                <a onclick="removeContestant({{ contestant.id }})" class="modal-action modal-close waves-effect waves-green btn-flat">Tak</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      {% endfor %}
+    {% endif %}
+    <div class="section center-align">
+      <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
+      <a class="pull-right btn btn-primary" href="{% url 'contest:contestant-add' contest_id=contest.pk %}">Dodaj</a>
+    </div>
+  </div>
+{% endblock container %}

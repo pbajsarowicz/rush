@@ -3,7 +3,14 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 
-from contest.models import RushUser
+from contest.models import (
+    Contestant,
+    RushUser,
+    Contest,
+    Club,
+    School,
+    Contact,
+)
 
 
 class RushUserAdmin(admin.ModelAdmin):
@@ -15,9 +22,11 @@ class RushUserAdmin(admin.ModelAdmin):
         Creating an account (set login, temporary password, active status).
         """
         for user in queryset:
-            user.is_active = True
-            user.set_password('password123')
-            user.save()
+            if user.is_active:
+                continue
+            user.activate()
+            user.send_reset_password_email(request, True)
+
     create.short_description = 'Stwórz konto'
 
     def cancel(self, request, queryset):
@@ -28,14 +37,30 @@ class RushUserAdmin(admin.ModelAdmin):
             queryset.delete()
     cancel.short_description = 'Usuń'
 
-    exclude = (
-        'password', 'date_joined', 'last_login', 'status', 'is_superuser',
-        'is_staff', 'is_active', 'is_admin',
-    )
+    fields = [
+        'username', 'email', 'first_name', 'last_name', 'organization_name',
+        'organization_address', 'unit_name', 'date_joined',
+        'last_login', 'groups', 'user_permissions',
+    ]
     list_display = ('first_name', 'last_name', 'is_active')
-    readonly_fields = ('last_login', 'date_joined')
+    readonly_fields = ('last_login', 'date_joined', 'unit_name')
     actions = [create, cancel]
     list_filter = ('is_active',)
+    filter_horizontal = ['user_permissions']
+
+
+class ContestantInline(admin.StackedInline):
+    model = Contestant
+    extra = 0
+
+
+class ContestAdmin(admin.ModelAdmin):
+    inlines = [ContestantInline]
 
 
 admin.site.register(RushUser, RushUserAdmin)
+admin.site.register(Contestant)
+admin.site.register(Contest, ContestAdmin)
+admin.site.register(Club)
+admin.site.register(School)
+admin.site.register(Contact)

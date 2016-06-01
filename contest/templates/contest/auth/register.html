@@ -1,0 +1,25 @@
+{% extends "contest/base.html" %}
+
+{% block container %}
+  <div class="container">
+    <div class="row center">
+      {% if success_message %}
+        {{ success_message }}
+      {% else %}
+        <form class="col s6" action="?next={{next}}" role="form" method="post" name="register_form">
+          <div class="row center">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="row">
+              <div class="col s12">
+                <input type="checkbox" name="club_checkbox" class="filled-in" id="filled-in-box" onclick="hideClubCode();"/>
+                <label for="filled-in-box">Klub</label>
+              </div>
+            </div>
+            <button type="submit" class="pull-right btn btn-primary">Wyślij zapytanie o konto</button>
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% endblock container %}

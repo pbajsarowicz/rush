@@ -1,3 +1,5 @@
+
+
 """
 Django settings for rush project.
 
@@ -38,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'contest',
+    'rest_framework',
+    'api',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -60,11 +64,16 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.template.context_processors.request',
+                'django.template.context_processors.csrf'
             ],
+            'builtins': ['contest.templatetags.to_json'],
         },
     },
 ]
@@ -113,6 +122,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Framework settings
+# http://www.django-rest-framework.org/
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'PAGE_SIZE': 10
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -134,9 +152,7 @@ AUTH_USER_MODEL = 'contest.RushUser'
 
 STATIC_URL = '/static/'
 
-
-LOGIN_URL = '/login/'
+LOGIN_URL = '/zaloguj/'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_URL = '/logout/'
-AUTH_USER_MODEL = 'contest.RushUser'
+LOGOUT_URL = '/wyloguj/'
 SUPPORT_EMAIL = 'Sample@email.com'

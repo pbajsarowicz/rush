@@ -1,7 +1,11 @@
-Django==1.9
+coverage==4.0.3
+Django==1.9.6
+djangorestframework==3.3.2
+Fabric==1.10.2
 fancycompleter==0.4
 flake8==2.5.0
 mccabe==0.3.1
+mock==2.0.0
 MySQL-python==1.2.5
 ordereddict==1.1
 pdbpp==0.8.3

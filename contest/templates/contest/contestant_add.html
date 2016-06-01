@@ -1,0 +1,69 @@
+{% extends "contest/base.html" %}
+
+{% block container %}
+  <div class="container">
+    {% if organization %}
+      <h4 class="blue-text text-darken-2">{{ organization }}</h4>
+    {% endif %}
+    <div class="center">
+      {% if message %}
+        {{ message }}
+        <div class="row center">
+          <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">ok</a>
+        </div>
+      {% else %}
+        <p class="blue-text text-darken-2">Konkurs: {{ name }}</p>
+        <form class="col s6" action="?next={{next}}" role="form" method="post" name="contestants" onsubmit="return contestant.validateForm()">
+          <div id="formset" class="row center">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            {% for form in formset %}
+              <div id="id_{{ form.prefix}}" class="contestant-form animation">
+                {{ form.as_p }}
+              </div>
+            {% endfor %}
+          </div>
+          <a class="waves-effect waves-light btn modal-trigger" href="#cancel-modal">Anuluj</a>
+          <div id="cancel-modal" class="modal">
+            <div class="modal-content">
+              <h4>Na pewno chcesz powrócić do głównego ekranu? Wszystkie dane wprowadzone przed chwilą zostaną utracone.</h4>
+            </div>
+            <div class="modal-footer">
+              <a class=" modal-action modal-close waves-effect waves-green btn-flat">Nie</a>
+              <a href="{% url 'contest:home' %}" class="modal-action modal-close waves-effect waves-green btn-flat">Tak</a>
+            </div>
+          </div>
+          <a class="waves-effect waves-light btn modal-trigger" href="#confirmation-modal">Zakończ</a>
+          <div id="confirmation-modal" class="modal">
+            <div class="modal-content">
+              <h4>Czy na pewno chcesz zakończyć dodawanie zawodników?</h4>
+            </div>
+            <div class="modal-footer">
+              <a class="modal-action modal-close waves-effect waves-green btn-flat">Powrót</a>
+              <input type="submit" class="modal-action modal-close waves-effect waves-green btn-flat" value="Tak">
+            </div>
+          </div>
+          <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+  <div id="empty_form" style="display: none;">
+    <div id="id_{{ formset.empty_form.prefix}}" class="contestant-form animation">
+      {{ formset.empty_form.as_p }}
+    </div>
+  </div>
+  <div id="contestants-preview" class="z-depth-2 invisible">
+    <ul class="collection with-header">
+      <li class="collection-header"><h6><strong>Dodani zawodnicy</strong></h6></li>
+    </ul>
+  </div>
+{% endblock container %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    var minAge = parseInt('{{ name.age_min }}');
+    var maxAge = parseInt('{{ name.age_max }}');
+  </script>
+{% endblock scripts %}
