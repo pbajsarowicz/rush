@@ -71,7 +71,7 @@ class ContestTestCase(TestCase):
     def test_contest_methods(self):
         self.assertEqual(
             self.contest.__unicode__(),
-            'Szkoła {}'.format(datetime.strftime(self.now, '%d.%m.%Y %X'))
+            'Szkoła {}'.format(datetime.strftime(self.now, '%d.%m.%Y %H:%M'))
         )
 
 
