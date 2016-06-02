@@ -431,7 +431,7 @@ class AccountsViewTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 500)
 
-    def test_delete(self):
+    def test_delete_and_rejection_email(self):
         user = RushUser(
             email='test@user.pl', first_name='Test', last_name='Anonymous',
             is_active=False
@@ -444,6 +444,7 @@ class AccountsViewTestCase(TestCase):
         )
         self.assertFalse(RushUser.objects.filter(pk=user.id).exists())
         self.assertEqual(response.status_code, 204)
+        self.assertEqual(mail.outbox[0].to, [user.email])
 
         response = self.client.delete(
             reverse('contest:accounts', kwargs={'user_id': user.id})
