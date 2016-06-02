@@ -269,6 +269,6 @@ class ContestForm(forms.ModelForm):
     class Meta:
         model = Contest
         fields = [
-            'date', 'place', 'deadline', 'age_min',
+            'name_of_contest', 'date', 'place', 'deadline', 'age_min',
             'age_max', 'description',
         ]
