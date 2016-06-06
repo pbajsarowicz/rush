@@ -338,6 +338,8 @@ Contestant.prototype = {
         var span = document.createElement('span');
         var contestantsPreviewUl = this.contestantsPreview.getElementsByClassName('collection')[0];
         var contestant = this;
+        var nameOfContestant = firstName + ' ' + lastName;
+        nameOfContestant = nameOfContestant.substr(0, 15) + '...';
 
         if (this.contestantsPreview.className.indexOf('invisible') > -1) {
             this.contestantsPreview.className = this.contestantsPreview.className.replace('invisible', '');
@@ -349,7 +351,7 @@ Contestant.prototype = {
         span.addEventListener('click', function() {
             contestant.loadCachedContestant(formId);
         }, false);
-        span.appendChild(document.createTextNode(firstName + ' ' + lastName));
+        span.appendChild(document.createTextNode(nameOfContestant));
 
         elementLi.className = 'collection-item';
         elementLi.appendChild(span);
