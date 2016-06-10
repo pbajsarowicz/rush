@@ -5,8 +5,8 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.generic import View
 from django.template import loader
+from django.views.generic import View
 
 from contest.models import RushUser
 
@@ -44,25 +44,22 @@ class AccountsView(View):
         """
         try:
             user = RushUser.objects.get(pk=user_id)
-            self.send_email_with_notification_about_removal(user.email)
-            RushUser.objects.get(pk=user_id).delete()
+            self.send_rejection_email(user.email)
+            user.delete()
         except RushUser.DoesNotExist:
             return HttpResponse(status=500)
         return HttpResponse(status=204)
 
     @staticmethod
-    def send_email_with_notification_about_removal(email):
+    def send_rejection_email(email):
         """
         Send a email notification about removal user.
         """
         support = settings.SUPPORT_EMAIL
         template = ('email/rejection_account.html',)
-        text = loader.render_to_string(
-            template,
-            {'email': support}
-        )
+        text = loader.render_to_string(template, {'email': support})
         msg = EmailMessage(
-            'Podanie o konto odrzucone', text, settings.SUPPORT_EMAIL, [email]
+            'Podanie o konto odrzucone', text, support, [email]
         )
         msg.content_subtype = 'html'
         msg.send()
