@@ -787,7 +787,7 @@ class ContestAddTestCase(TestCase):
             Permission.objects.get(name='Can add contest')
         )
         self.form_data = {
-            'name_of_contest': 'Wodnik',
+            'name': 'Wodnik',
             'date': '31.12.2100 16:00',
             'place': 'Majorka',
             'deadline': '29.12.2100 23:59',

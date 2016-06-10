@@ -203,7 +203,7 @@ class Contest(models.Model):
     """
     Model for Contest.
     """
-    name_of_contest = models.CharField('Nazwa zawodów', max_length=255)
+    name = models.CharField('Nazwa zawodów', max_length=255)
     date = models.DateTimeField('Data')
     place = models.CharField('Miejsce', max_length=255)
     age_min = models.SmallIntegerField('Wiek minimalny')

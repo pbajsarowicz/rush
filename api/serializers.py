@@ -64,7 +64,7 @@ class ContestSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Contest
         fields = (
-            'pk', 'name_of_contest', 'date', 'place', 'age_min', 'age_max',
+            'pk', 'name', 'date', 'place', 'age_min', 'age_max',
             'deadline', 'description', 'organizer',
         )
 

@@ -23,9 +23,9 @@
           <li class="collection-item contest-item">
             <div class="contest-item">
               {% if contest.is_submitting_open and contest.is_future %}
-                <a class="text" href="{% url 'contest:contestant-list' contest_id=contest.pk %}">{{ contest.name_of_contest }}</a>
+                <a class="text" href="{% url 'contest:contestant-list' contest_id=contest.pk %}">{{ contest.name }}</a>
               {% else %}
-                <span class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Termin dodawania zawodników minął {{ contest.deadline|date:'d.m.Y' }}">{{ contest.name_of_contest }}</span>
+                <span class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Termin dodawania zawodników minął {{ contest.deadline|date:'d.m.Y' }}">{{ contest.name }}</span>
               {% endif %}
               <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}"
                  onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
