@@ -179,7 +179,7 @@ class ContestantForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         super(ContestantForm, self).__init__(*args, **kwargs)
 
-        if self.user.unit:
+        if not self.user.is_freelancer:
             self.fields['organization'].initial = self.user.unit
             self.fields['organization'].widget.attrs['readonly'] = True
         else:

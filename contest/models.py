@@ -131,6 +131,13 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         self.password = make_password(raw_password)
 
     @property
+    def is_freelancer(self):
+        """
+        Returns whether this is a freelancer or not.
+        """
+        return self.groups.filter(name="Individual contestants").exists()
+
+    @property
     def is_staff(self):
         """
         Return True if user has admin privileges.

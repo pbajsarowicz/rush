@@ -33,7 +33,7 @@
               <a href="{% url 'contest:home' %}" class="modal-action modal-close waves-effect waves-green btn-flat">Tak</a>
             </div>
           </div>
-          {% if request.user|has_group:"Individual contestants" %}
+          {% if request.user.is_freelancer %}
             <button type="submit" class="pull-right btn btn-primary">Dołącz</button>
           {% else %}
             <button type="submit" class="pull-right btn btn-primary">Zakończ</button>

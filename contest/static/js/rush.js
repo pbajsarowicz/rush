@@ -38,7 +38,7 @@ function manageUser(user, create) {
  */
 function hideClubCode() {
     'use strict';
-    if (document.register_form.club_checkbox.checked) {
+    if (document.register_form.club_checkbox.checked && document.getElementById("freelancer_checkbox").checked == false) {
         $('label[for="id_club_code"').addClass('visible');
         clubCodeInput.className = 'visible';
         clubCodeInput.required = true;
