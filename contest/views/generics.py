@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django import template
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
@@ -47,6 +48,12 @@ class ContestantAddView(View):
     View for contestant assigning.
     """
     template_name = 'contest/contestant_add.html'
+    register = template.Library()
+    
+    @register.filter(name='has_group')
+    def has_group(user, group_name):
+        group = Group.objects.get(name=group_name)
+        return True if group in user.groups.all() else False
 
     @staticmethod
     def _get_message(contest=None):

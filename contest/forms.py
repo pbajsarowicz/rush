@@ -182,6 +182,11 @@ class ContestantForm(forms.ModelForm):
         if self.user.unit:
             self.fields['organization'].initial = self.user.unit
             self.fields['organization'].widget.attrs['readonly'] = True
+        else:
+            self.fields['first_name'].initial = self.user.first_name
+            self.fields['first_name'].widget.attrs['readonly'] = True
+            self.fields['last_name'].initial = self.user.last_name
+            self.fields['last_name'].widget.attrs['readonly'] = True
 
     def clean_age(self):
         age = self.cleaned_data.get('age')

@@ -33,8 +33,12 @@
               <a href="{% url 'contest:home' %}" class="modal-action modal-close waves-effect waves-green btn-flat">Tak</a>
             </div>
           </div>
-          <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
-          <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
+          {% if request.user|has_group:"Individual contestants" %}
+            <button type="submit" class="pull-right btn btn-primary">Dołącz</button>
+          {% else %}
+            <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
+            <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
+          {% endif %}
         </form>
       {% endif %}
     </div>
