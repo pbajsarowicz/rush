@@ -26,11 +26,10 @@
               <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}"
                  onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
               {% if user.organization_name %}
-                <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}" 
-                   onclick="getContestInfo({{ contest.pk }})">Dodaj zawodników</a>
+                <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}"
+                onclick="getContestInfo({{ contest.pk }})">Dodaj zawodników</a>
               {% else %}
-                  <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}" 
-                   onclick="getContestInfo({{ contest.pk }})">Dołącz</a>
+                <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}"onclick="getContestInfo({{ contest.pk }})">Dołącz</a>
               {% endif %}
               <div id="modal{{contest.pk}}" class="modal">
                 <div class="modal-content">

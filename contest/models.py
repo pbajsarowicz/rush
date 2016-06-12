@@ -133,9 +133,9 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
     @property
     def is_freelancer(self):
         """
-        Returns whether this is a freelancer or not.
+        Returns whether user is a freelancer or not.
         """
-        return self.groups.filter(name="Individual contestants").exists()
+        return self.groups.filter(name='Individual contestants').exists()
 
     @property
     def is_staff(self):

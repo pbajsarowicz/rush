@@ -69,7 +69,8 @@ class RegisterView(View):
             {'first_name': name, 'last_name': last_name, 'page': page}
         )
         msg = EmailMessage(
-            'Utworzyłeś konto, ustaw hasło', text, settings.SUPPORT_EMAIL, email
+            'Utworzyłeś konto, ustaw hasło',
+            text, settings.SUPPORT_EMAIL, email
         )
         msg.content_subtype = 'html'
         msg.send()
@@ -95,7 +96,7 @@ class RegisterView(View):
                     name='Individual contestants'
                 )
                 user.groups.add(individual_contestants_group)
-                email = [user.email,]
+                email = [user.email]
                 page = urljoin(
                     'http://{}'.format(request.get_host()),
                     reverse('contest:accounts')

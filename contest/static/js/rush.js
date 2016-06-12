@@ -38,7 +38,8 @@ function manageUser(user, create) {
  */
 function hideClubCode() {
     'use strict';
-    if (document.register_form.club_checkbox.checked && document.getElementById("freelancer_checkbox").checked == false) {
+    if (document.register_form.club_checkbox.checked &&
+        document.getElementById("freelancer_checkbox").checked == false) {
         $('label[for="id_club_code"').addClass('visible');
         clubCodeInput.className = 'visible';
         clubCodeInput.required = true;
@@ -55,20 +56,18 @@ function hideClubCode() {
  */
  function disableOrganization() {
     'use strict';
-    if (document.getElementById("freelancer_checkbox").checked) {
-        $('label[for="id_organization_name"').removeClass('visible').addClass('invisible');
-        $('label[for="id_organization_address"').removeClass('visible').addClass('invisible');
-        $('input[id="id_organization_name"').removeClass('visible').addClass('invisible');
-        $('input[id="id_organization_address"').removeClass('visible').addClass('invisible');
-        $('input[id="id_club_code"').removeClass('visible').addClass('invisible');
-        $('label[for="id_club_code"').removeClass('visible').addClass('invisible');
+    if (document.register_form.freelancer_checkbox.checked) {
+        $('label[for="id_organization_name"]').removeClass('visible').addClass('invisible');
+        $('label[for="id_organization_address"]').removeClass('visible').addClass('invisible');
+        $('input[id="id_organization_name"]').removeClass('visible').addClass('invisible');
+        $('input[id="id_organization_address"]').removeClass('visible').addClass('invisible');
+        $('input[id="id_club_code"]').removeClass('visible').addClass('invisible');
+        $('label[for="id_club_code"]').removeClass('visible').addClass('invisible');
     } else {
-        $('label[for="id_organization_name"').addClass('visible');
-        $('label[for="id_organization_address"').addClass('visible');
-        $('input[id="id_organization_name"').addClass('visible');
-        $('input[id="id_organization_address"').addClass('visible');
-        $('label[for="id_club_code"').addClass('visible')
-        $('input[id="id_club_code"').addClass('visible')
+        $('label[for="id_organization_name"]').addClass('visible');
+        $('label[for="id_organization_address"]').addClass('visible');
+        $('input[id="id_organization_name"]').addClass('visible');
+        $('input[id="id_organization_address"]').addClass('visible');
     }
  }
 
