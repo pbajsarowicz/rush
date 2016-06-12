@@ -316,6 +316,7 @@ Contestant.prototype = {
         var preview = document.getElementById('preview-' + formId);
         var firstName = document.forms['contestants']['id_form-' + formId + '-first_name'].value;
         var lastName = document.forms['contestants']['id_form-' + formId + '-last_name'].value;
+        var contestantName = firstName + ' ' + lastName;
 
         if contestantName.length <= 15:
             contestantName = contestantName.substr(0, 15) + '...';
