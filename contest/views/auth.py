@@ -59,6 +59,21 @@ class RegisterView(View):
         msg.content_subtype = 'html'
         msg.send()
 
+    @staticmethod
+    def send_email_with_freelancer(name, last_name, email, page):
+        """
+        Sends an email with new user to admins.
+        """
+        text = loader.render_to_string(
+            'email/password_set_email.html',
+            {'first_name': name, 'last_name': last_name, 'page': page}
+        )
+        msg = EmailMessage(
+            'Utworzyłeś konto, ustaw hasło', text, settings.SUPPORT_EMAIL, email
+        )
+        msg.content_subtype = 'html'
+        msg.send()
+
     def get(self, request, *args, **kwargs):
         """
         Return registration form on site.
@@ -74,27 +89,41 @@ class RegisterView(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            emails = []
-            for admin in self.the_list_of_admins():
-                emails.append(admin.email)
             user = RushUser.objects.get(email=form.cleaned_data['email'])
             if not user.organization_name:
                 individual_contestants_group = Group.objects.get(
                     name='Individual contestants'
                 )
                 user.groups.add(individual_contestants_group)
-            page = urljoin(
-                'http://{}'.format(request.get_host()),
-                reverse('contest:accounts')
-            )
-            self.send_email_with_new_user(
-                user.first_name, user.last_name, emails, page
-            )
+                email = [user.email,]
+                page = urljoin(
+                    'http://{}'.format(request.get_host()),
+                    reverse('contest:accounts')
+                )
+                self.send_email_with_freelancer(
+                    user.first_name, user.last_name, email, page
+                )
+                return render(
+                    request, 'contest/auth/register_confirmation.html',
+                    {'email': settings.SUPPORT_EMAIL}
+                )
 
-            return render(
-                request, 'contest/auth/register_confirmation.html',
-                {'email': settings.SUPPORT_EMAIL}
-            )
+            else:
+                emails = []
+                for admin in self.the_list_of_admins():
+                    emails.append(admin.email)
+                page = urljoin(
+                    'http://{}'.format(request.get_host()),
+                    reverse('contest:accounts')
+                )
+                self.send_email_with_new_user(
+                    user.first_name, user.last_name, emails, page
+                )
+
+                return render(
+                    request, 'contest/auth/register_confirmation.html',
+                    {'email': settings.SUPPORT_EMAIL}
+                )
         return render(request, self.template_name, {'form': form})
 
 
