@@ -68,10 +68,7 @@ class ContestTestCase(TestCase):
         )
 
     def test_contest_methods(self):
-        self.assertEqual(
-            self.contest.__unicode__(),
-            'Wodnik'
-        )
+        self.assertEqual(self.contest.__unicode__(), 'Wodnik')
 
 
 class ContestantTestCase(TestCase):
