@@ -217,7 +217,9 @@ class Contest(models.Model):
     organizer = GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
-        return self.name
+        return self.name or (
+            '{} - {}'.format(self.place, self.date.strftime('%d-%m-%Y'))
+        )
 
     @property
     def is_submitting_open(self):
