@@ -59,7 +59,7 @@
         {% for contest in completed %}
           <li class="collection-item contest-item">
             <div class="contest-item">
-              <span class="text">{{ contest }}</span>
+              <span class="text">{{ contest.name }}</span>
               <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}"
                  onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
               <div id="modal{{contest.pk}}" class="modal">
