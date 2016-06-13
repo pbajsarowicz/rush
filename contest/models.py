@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from urlparse import urljoin
-from datetime import datetime
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import make_password
@@ -203,6 +202,7 @@ class Contest(models.Model):
     """
     Model for Contest.
     """
+    name = models.CharField('Nazwa zawodów', max_length=255)
     date = models.DateTimeField('Data')
     place = models.CharField('Miejsce', max_length=255)
     age_min = models.SmallIntegerField('Wiek minimalny')
@@ -217,9 +217,7 @@ class Contest(models.Model):
     organizer = GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
-        return '{} {}'.format(
-            self.place, datetime.strftime(self.date, '%d.%m.%Y %H:%M')
-        )
+        return self.name
 
     @property
     def is_submitting_open(self):
