@@ -59,22 +59,6 @@ class RegisterView(View):
         msg.content_subtype = 'html'
         msg.send()
 
-    @staticmethod
-    def send_email_with_freelancer(name, last_name, email, page):
-        """
-        Sends an email with new user to admins.
-        """
-        text = loader.render_to_string(
-            'email/password_set_email.html',
-            {'first_name': name, 'last_name': last_name, 'page': page}
-        )
-        msg = EmailMessage(
-            'Utworzyłeś konto, ustaw hasło',
-            text, settings.SUPPORT_EMAIL, email
-        )
-        msg.content_subtype = 'html'
-        msg.send()
-
     def get(self, request, *args, **kwargs):
         """
         Return registration form on site.
@@ -96,13 +80,9 @@ class RegisterView(View):
                     name='Individual contestants'
                 )
                 user.groups.add(individual_contestants_group)
-                email = [user.email]
-                page = urljoin(
-                    'http://{}'.format(request.get_host()),
-                    reverse('contest:accounts')
-                )
-                self.send_email_with_freelancer(
-                    user.first_name, user.last_name, email, page
+                user.activate()
+                user.send_reset_password_email(
+                    request, True
                 )
                 return render(
                     request, 'contest/auth/register_confirmation.html',
