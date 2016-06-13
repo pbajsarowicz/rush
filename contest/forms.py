@@ -172,7 +172,9 @@ class ContestantForm(forms.ModelForm):
     """
     Form for contestant creation.
     """
-    organization = forms.CharField(label='Klub/Szkoła', max_length=100)
+    organization = forms.CharField(
+        label='Klub/Szkoła', max_length=255, required=False
+    )
 
     def __init__(self, *args, **kwargs):
         self.contest = kwargs.pop('contest_id')
