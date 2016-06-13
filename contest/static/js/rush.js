@@ -318,7 +318,7 @@ Contestant.prototype = {
         var lastName = document.forms['contestants']['id_form-' + formId + '-last_name'].value;
         var contestantName = firstName + ' ' + lastName;
 
-        if contestantName.length <= 15:
+        if (contestantName.length >= 15)
             contestantName = contestantName.substr(0, 15) + '...';
 
         if (this.contestantsPreview.className.indexOf('invisible') > -1) {
@@ -348,7 +348,7 @@ Contestant.prototype = {
         var contestant = this;
         var contestantName = firstName + ' ' + lastName;
 
-        if contestantName.length <= 15:
+        if (contestantName.length >= 15)
             contestantName = contestantName.substr(0, 15) + '...';
 
         if (this.contestantsPreview.className.indexOf('invisible') > -1) {
