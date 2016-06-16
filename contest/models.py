@@ -145,23 +145,6 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         """
         return self.has_perm('contest.add_contest')
 
-    @staticmethod
-    def _get_options(model, prefix, active_object_id):
-        from django.utils.html import format_html
-        options = []
-        content_type = ContentType.objects.get_for_model(model)
-
-        for organization in model.objects.all().order_by('name'):
-            selected = organization.id == active_object_id
-            options.append(format_html(
-                '<option value="{}_{}" {}>[{}] {}</option>',
-                organization.id, content_type,
-                'selected' if selected else '',
-                prefix, organization.name
-            ))
-
-        return options
-
     def unit_name_select(self):
         """
         Returns organizations' names for purposes of admin panel.
