@@ -14,10 +14,12 @@ from django.db import models
 from django.db.models import Q
 from django.template import loader
 from django.utils.encoding import force_bytes
+from django.utils.html import format_html
 from django.utils.http import urlsafe_base64_encode
 from django.utils import timezone
 
 from contest.manager import RushUserManager
+from contest.utils import admin_utils
 
 UNIT_LIMIT = (
     Q(app_label='contest', model='club') |
@@ -143,13 +145,45 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         """
         return self.has_perm('contest.add_contest')
 
-    def get_unit_name(self):
+    @staticmethod
+    def _get_options(model, prefix, active_object_id):
+        from django.utils.html import format_html
+        options = []
+        content_type = ContentType.objects.get_for_model(model)
+
+        for organization in model.objects.all().order_by('name'):
+            selected = organization.id == active_object_id
+            options.append(format_html(
+                '<option value="{}_{}" {}>[{}] {}</option>',
+                organization.id, content_type,
+                'selected' if selected else '',
+                prefix, organization.name
+            ))
+
+        return options
+
+    def unit_name_select(self):
+        """
+        Returns organizations' names for purposes of admin panel.
+        """
+        school_options = admin_utils.get_options(School, 'Szkoła', self.object_id)
+        club_options = admin_utils.get_options(Club, 'Klub', self.object_id)
+
+        return format_html(
+            '<select id="id_unit" name="unit">{}{}</select>'.format(
+                '<br>'.join(school_options),
+                '<br>'.join(club_options)
+            )
+        )
+    unit_name_select.short_description = 'Szkoła/Klub'
+    unit_name_select = property(unit_name_select)
+
+    @property
+    def unit_name(self):
         """
         Return name of user's unit.
         """
         return self.unit.name
-    get_unit_name.short_description = 'Szkoła/Klub'
-    unit_name = property(get_unit_name)
 
     def activate(self):
         """

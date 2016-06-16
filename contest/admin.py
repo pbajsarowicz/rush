@@ -11,6 +11,7 @@ from contest.models import (
     School,
     Contact,
 )
+from contest.utils import admin_utils
 
 
 class RushUserAdmin(admin.ModelAdmin):
@@ -37,13 +38,22 @@ class RushUserAdmin(admin.ModelAdmin):
             queryset.delete()
     cancel.short_description = 'Usuń'
 
+    def save_model(self, request, obj, form, change):
+        object_id, content_type = admin_utils.get_unit_id_and_type(
+            request.POST['unit']
+        )
+        obj.object_id = object_id
+        obj.content_type = content_type
+
+        obj.save()
+
     fields = [
         'username', 'email', 'first_name', 'last_name', 'organization_name',
-        'organization_address', 'unit_name', 'date_joined',
+        'organization_address', 'unit_name_select', 'date_joined',
         'last_login', 'groups', 'user_permissions',
     ]
     list_display = ('first_name', 'last_name', 'is_active')
-    readonly_fields = ('last_login', 'date_joined', 'unit_name')
+    readonly_fields = ('last_login', 'date_joined', 'unit_name_select')
     actions = [create, cancel]
     list_filter = ('is_active',)
     filter_horizontal = ['user_permissions']
