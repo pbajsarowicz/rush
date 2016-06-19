@@ -443,6 +443,9 @@ $('#add_more').click(function() {
     contestant.addNextContestant();
 });
 
+function displayFiles() {
+    return 'Pracuje nad tym :)'
+}
 /*
  * Populates modal with contest info.
  */
@@ -459,7 +462,7 @@ function getContestInfo(pk) {
         success: function(json){
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od ' + json['age_min'] + ' do ' + json['age_max'] + ' lat' +
-            '<br> Termin zgłaszania zawodników: ' +  json['deadline'];
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<a> Pliki: ' + displayFiles();
 
             organizer = json['organizer'];
             if (organizer) {

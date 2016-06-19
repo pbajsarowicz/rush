@@ -296,7 +296,7 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         Create new Contest.
         """
-        form = self.form_class(request.POST, user=request.user)
+        form = self.form_class(request.POST, request.FILES, user=request.user,)
         if form.is_valid():
             form.save()
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'

@@ -21,6 +21,7 @@ from contest.models import (
     School,
     RushUser,
 )
+import magic
 
 
 class RegistrationForm(forms.ModelForm):
@@ -255,6 +256,18 @@ class ContestForm(forms.ModelForm):
             )
         return age_max
 
+    def clean_docfile(self):
+        docfile = self.cleaned_data.get('docfile', False)
+        if docfile:
+            docfiletype = magic.from_buffer(docfile.read())
+            if docfile._size > 10 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "Plik jest za duży (Więcej niż 10 mb)"
+                )
+            elif not 'pdf' or 'docx' or 'doc' or 'xls' or 'ods' in docfiletype:
+                raise forms.ValidationError("Zły format")
+        return docfile
+
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)
 
@@ -270,5 +283,5 @@ class ContestForm(forms.ModelForm):
         model = Contest
         fields = [
             'name', 'date', 'place', 'deadline', 'age_min',
-            'age_max', 'description',
+            'age_max', 'description', 'docfile',
         ]

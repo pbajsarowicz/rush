@@ -198,6 +198,10 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         msg.send()
 
 
+def contest_directory_path(instance, filename):
+    return 'documents/contest_{0}/{1}'.format(instance.name, filename)
+
+
 class Contest(models.Model):
     """
     Model for Contest.
@@ -215,6 +219,9 @@ class Contest(models.Model):
     )
     object_id = models.PositiveIntegerField(blank=True, null=True)
     organizer = GenericForeignKey('content_type', 'object_id')
+    docfile = models.FileField(
+        'Pliki', upload_to=contest_directory_path, default='brak'
+    )
 
     def __unicode__(self):
         return self.name or (
