@@ -21,7 +21,6 @@ from contest.models import (
     School,
     RushUser,
 )
-import magic
 
 
 class RegistrationForm(forms.ModelForm):
@@ -221,6 +220,7 @@ class ContestForm(forms.ModelForm):
         self.fields['organization'].initial = self.user.unit
         if self.user.unit:
             self.fields['organization'].widget.attrs['readonly'] = True
+        self.fields['docfile'].widget.attrs['multiple'] = True
 
     def clean_date(self):
         date = self.cleaned_data.get('date')
@@ -258,13 +258,15 @@ class ContestForm(forms.ModelForm):
 
     def clean_docfile(self):
         docfile = self.cleaned_data.get('docfile', False)
-        if docfile:
-            docfiletype = magic.from_buffer(docfile.read())
+        ext = str(docfile)
+        print ext
+        ext = ext[-3:]
+        if docfile != 'brak':
             if docfile._size > 10 * 1024 * 1024:
                 raise forms.ValidationError(
                     "Plik jest za duży (Więcej niż 10 mb)"
                 )
-            elif not 'pdf' or 'docx' or 'doc' or 'xls' or 'ods' in docfiletype:
+            elif not 'doc' or 'pdf' or 'docx' or '' in ext:
                 raise forms.ValidationError("Zły format")
         return docfile
 
