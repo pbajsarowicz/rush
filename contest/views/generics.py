@@ -38,6 +38,13 @@ class HomeView(TemplateView):
         context = super(HomeView, self).get_context_data(**kwargs)
         context['upcoming'] = Contest.objects.filter(date__gte=timezone.now())
         context['completed'] = Contest.objects.filter(date__lt=timezone.now())
+        context['joined'] = self.request.user.contestant_set.values_list('contest__id', flat=True).distinct()
+        context['upcoming'] = Contest.objects.filter(
+            date__gte=timezone.now()
+        ).order_by('date')
+        context['completed'] = Contest.objects.filter(
+            date__lt=timezone.now()
+        ).order_by('-date')
 
         return context
 

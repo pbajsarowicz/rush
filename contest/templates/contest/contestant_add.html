@@ -23,8 +23,8 @@
               </div>
             {% endfor %}
           </div>
-          <a class="waves-effect waves-light btn modal-trigger" href="#confirmation-modal">Anuluj</a>
-          <div id="confirmation-modal" class="modal">
+          <a class="waves-effect waves-light btn modal-trigger" href="#cancel-modal">Anuluj</a>
+          <div id="cancel-modal" class="modal">
             <div class="modal-content">
               <h4>Na pewno chcesz powrócić do głównego ekranu? Wszystkie dane wprowadzone przed chwilą zostaną utracone.</h4>
             </div>
@@ -33,7 +33,22 @@
               <a href="{% url 'contest:home' %}" class="modal-action modal-close waves-effect waves-green btn-flat">Tak</a>
             </div>
           </div>
-          <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
+          {% if request.user.is_freelancer %}
+            <button type="submit" class="pull-right btn btn-primary">Dołącz</button>
+          {% else %}
+            <button type="submit" class="pull-right btn btn-primary">Zakończ</button>
+            <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
+          {% endif %}
+          <a class="waves-effect waves-light btn modal-trigger" href="#confirmation-modal">Zakończ</a>
+          <div id="confirmation-modal" class="modal">
+            <div class="modal-content">
+              <h4>Czy na pewno chcesz zakończyć dodawanie zawodników?</h4>
+            </div>
+            <div class="modal-footer">
+              <a class="modal-action modal-close waves-effect waves-green btn-flat">Powrót</a>
+              <input type="submit" class="modal-action modal-close waves-effect waves-green btn-flat" value="Tak">
+            </div>
+          </div>
           <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
         </form>
       {% endif %}

@@ -38,12 +38,13 @@ function manageUser(user, create) {
  */
 function hideClubCode() {
     'use strict';
-    if (document.register_form.club_checkbox.checked) {
-        $('label[for="id_club_code"').addClass('visible');
+    if (document.register_form.club_checkbox.checked &&
+        document.getElementById("freelancer_checkbox").checked == false) {
+        $('label[for="id_club_code"]').addClass('visible');
         clubCodeInput.className = 'visible';
         clubCodeInput.required = true;
     } else {
-        $('label[for="id_club_code"').removeClass('visible').addClass('invisible');
+        $('label[for="id_club_code"]').removeClass('visible').addClass('invisible');
         clubCodeInput.className = 'invisible';
         clubCodeInput.required = false;
         clubCodeInput.value = '';
@@ -55,20 +56,18 @@ function hideClubCode() {
  */
  function disableOrganization() {
     'use strict';
-    if (document.getElementById("freelancer_checkbox").checked) {
-        $('label[for="id_organization_name"').removeClass('visible').addClass('invisible');
-        $('label[for="id_organization_address"').removeClass('visible').addClass('invisible');
-        $('input[id="id_organization_name"').removeClass('visible').addClass('invisible');
-        $('input[id="id_organization_address"').removeClass('visible').addClass('invisible');
-        $('input[id="id_club_code"').removeClass('visible').addClass('invisible');
-        $('label[for="id_club_code"').removeClass('visible').addClass('invisible');
+    if (document.register_form.freelancer_checkbox.checked) {
+        $('label[for="id_organization_name"]').removeClass('visible').addClass('invisible');
+        $('label[for="id_organization_address"]').removeClass('visible').addClass('invisible');
+        $('input[id="id_organization_name"]').removeClass('visible').addClass('invisible');
+        $('input[id="id_organization_address"]').removeClass('visible').addClass('invisible');
+        $('input[id="id_club_code"]').removeClass('visible').addClass('invisible');
+        $('label[for="id_club_code"]').removeClass('visible').addClass('invisible');
     } else {
-        $('label[for="id_organization_name"').addClass('visible');
-        $('label[for="id_organization_address"').addClass('visible');
-        $('input[id="id_organization_name"').addClass('visible');
-        $('input[id="id_organization_address"').addClass('visible');
-        $('label[for="id_club_code"').addClass('visible')
-        $('input[id="id_club_code"').addClass('visible')
+        $('label[for="id_organization_name"]').addClass('visible');
+        $('label[for="id_organization_address"]').addClass('visible');
+        $('input[id="id_organization_name"]').addClass('visible');
+        $('input[id="id_organization_address"]').addClass('visible');
     }
  }
 
@@ -219,6 +218,19 @@ ContestantValidation.prototype = {
         }
     },
     /*
+     * Validates school/club name.
+     */
+    validateOrganization: function(formId) {
+        'use strict';
+        this.stylesDistances = document.forms['contestants'][formId + '-organization'].value;
+
+        if (!this.stylesDistances) {
+            this.raiseValidation(formId + '-organization', 'Pole Klub/Szkoła nie może być puste.');
+        } else {
+            this.clearValidation(formId + '-organization');
+        }
+    },
+    /*
      * Checking whether add_contestant form has validation errors.
      */
     validateForm: function(formId) {
@@ -230,7 +242,8 @@ ContestantValidation.prototype = {
 
         var validators = [
             'validateFirstName', 'validateLastName', 'validateGender',
-            'validateAge', 'validateSchool', 'validateStylesDistances'
+            'validateAge', 'validateSchool', 'validateStylesDistances',
+            'validateOrganization'
         ]
 
         for (var i = 0, len = validators.length ; i < len; i++) {
@@ -288,6 +301,27 @@ Contestant.prototype = {
         return parseInt(document.getElementById('id_form-TOTAL_FORMS').value);
     },
     /*
+     * Prepares a previewed value of contestant name (if too long - truncates the original one).
+     */
+    getPreviewContestantName: function(firstName, lastName) {
+        'use strict';
+        var contestantName = firstName + ' ' + lastName;
+
+        if (contestantName.length >= 15) {
+            return contestantName.substr(0, 15) + '...';
+        }
+        return contestantName;
+    },
+    /*
+     * Shows a bar which represents a preview of already added contestants.
+     */
+    showPreviewBar: function() {
+        'use strict';
+        if (this.contestantsPreview.className.indexOf('invisible') > -1) {
+            this.contestantsPreview.className = this.contestantsPreview.className.replace('invisible', '');
+        }
+    },
+    /*
      * Removes last form from the set.
      */
     removeLastForm: function() {
@@ -338,9 +372,10 @@ Contestant.prototype = {
         var preview = document.getElementById('preview-' + formId);
         var firstName = document.forms['contestants']['id_form-' + formId + '-first_name'].value;
         var lastName = document.forms['contestants']['id_form-' + formId + '-last_name'].value;
+        var contestantName = this.getPreviewContestantName(firstName, lastName);
 
         if (preview) {
-            preview.textContent = firstName + ' ' + lastName;
+            preview.textContent = contestantName;
         }
     },
     /*
@@ -360,10 +395,9 @@ Contestant.prototype = {
         var span = document.createElement('span');
         var contestantsPreviewUl = this.contestantsPreview.getElementsByClassName('collection')[0];
         var contestant = this;
+        var contestantName = this.getPreviewContestantName(firstName, lastName);
 
-        if (this.contestantsPreview.className.indexOf('invisible') > -1) {
-            this.contestantsPreview.className = this.contestantsPreview.className.replace('invisible', '');
-        }
+        this.showPreviewBar();
 
         span.className = 'chip';
         span.id = 'preview-' + formId;
@@ -371,7 +405,7 @@ Contestant.prototype = {
         span.addEventListener('click', function() {
             contestant.loadCachedContestant(formId);
         }, false);
-        span.appendChild(document.createTextNode(firstName + ' ' + lastName));
+        span.appendChild(document.createTextNode(contestantName));
 
         elementLi.className = 'collection-item';
         elementLi.appendChild(span);
@@ -444,7 +478,7 @@ function getContestInfo(pk) {
         url: '/api/v1/contests/' + pk + '/?format=json',
         dataType: 'json',
         success: function(json){
-            result = 'Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
+            result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od ' + json['age_min'] + ' do ' + json['age_max'] + ' lat' +
             '<br> Termin zgłaszania zawodników: ' +  json['deadline'];
 

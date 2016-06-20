@@ -9,6 +9,7 @@ from django.contrib.auth import (
     logout,
     REDIRECT_FIELD_NAME,
 )
+from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
@@ -73,18 +74,28 @@ class RegisterView(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            emails = []
-            for admin in self.the_list_of_admins():
-                emails.append(admin.email)
             user = RushUser.objects.get(email=form.cleaned_data['email'])
-            page = urljoin(
-                'http://{}'.format(request.get_host()),
-                reverse('contest:accounts')
-            )
-            self.send_email_with_new_user(
-                user.first_name, user.last_name, emails, page
-            )
+            if not user.organization_name:
+                individual_contestants_group = Group.objects.get(
+                    name='Individual contestants'
+                )
+                user.groups.add(individual_contestants_group)
+                user.activate()
+                user.send_reset_password_email(
+                    request, True
+                )
 
+            else:
+                emails = []
+                for admin in self.the_list_of_admins():
+                    emails.append(admin.email)
+                page = urljoin(
+                    'http://{}'.format(request.get_host()),
+                    reverse('contest:accounts')
+                )
+                self.send_email_with_new_user(
+                    user.first_name, user.last_name, emails, page
+                )
             return render(
                 request, 'contest/auth/register_confirmation.html',
                 {'email': settings.SUPPORT_EMAIL}

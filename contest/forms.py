@@ -172,16 +172,23 @@ class ContestantForm(forms.ModelForm):
     """
     Form for contestant creation.
     """
-    organization = forms.CharField(label='Klub/Szkoła', max_length=100)
+    organization = forms.CharField(
+        label='Klub/Szkoła', max_length=255, required=False
+    )
 
     def __init__(self, *args, **kwargs):
         self.contest = kwargs.pop('contest_id')
         self.user = kwargs.pop('user')
         super(ContestantForm, self).__init__(*args, **kwargs)
 
-        if self.user.unit:
+        if not self.user.is_freelancer:
             self.fields['organization'].initial = self.user.unit
             self.fields['organization'].widget.attrs['readonly'] = True
+        else:
+            self.fields['first_name'].initial = self.user.first_name
+            self.fields['first_name'].widget.attrs['readonly'] = True
+            self.fields['last_name'].initial = self.user.last_name
+            self.fields['last_name'].widget.attrs['readonly'] = True
 
     def clean_age(self):
         age = self.cleaned_data.get('age')
@@ -269,6 +276,6 @@ class ContestForm(forms.ModelForm):
     class Meta:
         model = Contest
         fields = [
-            'date', 'place', 'deadline', 'age_min',
+            'name', 'date', 'place', 'deadline', 'age_min',
             'age_max', 'description',
         ]

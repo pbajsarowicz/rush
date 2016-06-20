@@ -431,7 +431,7 @@ class AccountsViewTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 500)
 
-    def test_delete(self):
+    def test_delete_and_rejection_email(self):
         user = RushUser(
             email='test@user.pl', first_name='Test', last_name='Anonymous',
             is_active=False
@@ -444,6 +444,7 @@ class AccountsViewTestCase(TestCase):
         )
         self.assertFalse(RushUser.objects.filter(pk=user.id).exists())
         self.assertEqual(response.status_code, 204)
+        self.assertEqual(mail.outbox[0].to, [user.email])
 
         response = self.client.delete(
             reverse('contest:accounts', kwargs={'user_id': user.id})
@@ -465,8 +466,6 @@ class RegisterViewTests(TestCase):
             {
                 'first_name': ['To pole jest wymagane.'],
                 'last_name': ['To pole jest wymagane.'],
-                'organization_name': ['To pole jest wymagane.'],
-                'organization_address': ['To pole jest wymagane.'],
                 'email': ['To pole jest wymagane.']
             }
         )
@@ -787,6 +786,7 @@ class ContestAddTestCase(TestCase):
             Permission.objects.get(name='Can add contest')
         )
         self.form_data = {
+            'name': 'Wodnik',
             'date': '31.12.2100 16:00',
             'place': 'Majorka',
             'deadline': '29.12.2100 23:59',
