@@ -81,10 +81,7 @@ class RegisterView(View):
                 )
                 user.groups.add(individual_contestants_group)
                 user.activate()
-                user.send_reset_password_email(
-                    request, True
-                )
-
+                user.send_reset_password_email(request, True)
             else:
                 emails = []
                 for admin in self.the_list_of_admins():
