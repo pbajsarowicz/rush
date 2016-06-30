@@ -204,7 +204,7 @@ class Contest(models.Model):
     Model for Contest.
     """
     year_dropdown = []
-    for x in range(datetime.now().year - 40, (datetime.now().year + 1)):
+    for x in range(datetime.now().year, (datetime.now().year - 41), - 1):
         year_dropdown.append((x, x))
 
     name = models.CharField('Nazwa zawodów', max_length=255)
@@ -258,7 +258,7 @@ class Contestant(models.Model):
         ('S', 'Szkoła średnia'),
     )
     year_dropdown = []
-    for x in range(datetime.now().year - 40, (datetime.now().year + 1)):
+    for x in range(datetime.now().year, (datetime.now().year - 41), - 1):
         year_dropdown.append((x, x))
 
     moderator = models.ForeignKey(RushUser)
