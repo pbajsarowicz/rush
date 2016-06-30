@@ -47,12 +47,12 @@ class HomeViewTests(TestCase):
     def setUp(self):
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            place='Szkoła', age_min=11, age_max=2000, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            place='Szkoła', age_min=11, age_max=2000, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
         self.user = RushUser.objects.create_superuser(
@@ -513,14 +513,14 @@ class ContestantAddViewTestCase(TestCase):
 
         self.form_data = {
             'csrfmiddlewaretoken': 'A33GMETyB7NE1CknWDg2jVuS1Jsm5A9y',
-            'form-0-age': '11',
+            'form-0-age': '2005',
             'form-0-first_name': 'Jan',
             'form-0-gender': 'M',
             'form-0-last_name': 'Kowalski',
             'form-0-school': 'P',
             'form-0-styles_distances': '1000m',
             'form-0-organization': self.user.unit,
-            'form-1-age': '16',
+            'form-1-age': '2000',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
@@ -535,17 +535,17 @@ class ContestantAddViewTestCase(TestCase):
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            place='Szkoła', age_min=2005, age_max=2000, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            place='Szkoła', age_min=2005, age_max=2000, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
         self.contest_deadline = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            place='Szkoła', age_min=2005, age_max=2000, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
 
@@ -621,7 +621,7 @@ class ContestantAddViewTestCase(TestCase):
             'Takie zawody nie istnieją.'
         )
 
-        self.form_data['form-0-age'] = 99
+        self.form_data['form-0-age'] = 1978
         response = self.client.post(
             reverse(
                 'contest:contestant-add',
@@ -637,7 +637,7 @@ class ContestantAddViewTestCase(TestCase):
             response.context['formset'].errors, [expected_error, {}]
         )
 
-        self.form_data['form-0-age'] = 15
+        self.form_data['form-0-age'] = 2001
         self.form_data['form-0-gender'] = 'WRONG'
         response = self.client.post(
             reverse(
@@ -679,7 +679,7 @@ class ContestantListViewTestCase(TestCase):
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            place='Szkoła', age_min=11, age_max=2000, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20)),
             content_type=ContentType.objects.get_for_model(club),
             object_id=club.pk
