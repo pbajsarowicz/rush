@@ -5,8 +5,8 @@
       "fields": {
           "date": "2016-02-03T11:00:00Z",
           "place": "Basen Wodnik we Wrocławiu",
-          "lowest_year": 10,
-          "highest_year": 20,
+          "lowest_year": 2006,
+          "highest_year": 1996,
           "deadline": "2016-03-10T05:00:00Z",
           "description": "Lorem ipsum dolor sit amet.",
           "object_id": 3
@@ -18,8 +18,8 @@
       "fields": {
           "date": "2016-02-28T17:00:00Z",
           "place": "Basen Wodnik w Poznaniu",
-          "lowest_year": 10,
-          "highest_year": 20,
+          "lowest_year": 2006,
+          "highest_year": 1996,
           "deadline": "2016-02-25T11:00:00Z",
           "description": "Lorem ipsum dolor sit amet.",
           "object_id": 2
@@ -31,8 +31,8 @@
       "fields": {
           "date": "2016-03-17T13:09:11Z",
           "place": "Basen Wodnik w Pile",
-          "lowest_year": 10,
-          "highest_year": 20,
+          "lowest_year": 2006,
+          "highest_year": 1996,
           "deadline": "2016-03-10T22:59:59Z",
           "description": "Zapraszamy!",
           "object_id": 1
