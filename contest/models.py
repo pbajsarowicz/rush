@@ -210,8 +210,8 @@ class Contest(models.Model):
     name = models.CharField('Nazwa zawodów', max_length=255)
     date = models.DateTimeField('Data')
     place = models.CharField('Miejsce', max_length=255)
-    age_min = models.IntegerField('Rocznik minimalny', choices=year_dropdown)
-    age_max = models.IntegerField('Rocznik maksymalny', choices=year_dropdown)
+    lowest_year = models.IntegerField('Rocznik minimalny', choices=year_dropdown)
+    highest_year = models.IntegerField('Rocznik maksymalny', choices=year_dropdown)
     deadline = models.DateTimeField('Termin zgłaszania zawodników')
     description = models.TextField('Opis', blank=True)
     content_type = models.ForeignKey(

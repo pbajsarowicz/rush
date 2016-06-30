@@ -186,7 +186,7 @@ class ContestantForm(forms.ModelForm):
     def clean_age(self):
         age = self.cleaned_data.get('age')
         contest = Contest.objects.get(pk=self.contest)
-        if contest.age_min >= age >= contest.age_max:
+        if contest.lowest_year >= age >= contest.highest_year:
             return age
         raise forms.ValidationError(
             'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
@@ -244,16 +244,16 @@ class ContestForm(forms.ModelForm):
             )
         return deadline
 
-    def clean_age_max(self):
-        age_min = self.cleaned_data.get('age_min')
-        age_max = self.cleaned_data.get('age_max')
+    def clean_highest_year(self):
+        lowest_year = self.cleaned_data.get('lowest_year')
+        highest_year = self.cleaned_data.get('highest_year')
 
-        if age_min > age_max:
+        if lowest_year < highest_year:
             raise forms.ValidationError(
                 'Przedział wiekowy jest niepoprawny. '
                 'Popraw wartości i spróbuj ponownie.'
             )
-        return age_max
+        return highest_year
 
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)
@@ -269,6 +269,6 @@ class ContestForm(forms.ModelForm):
     class Meta:
         model = Contest
         fields = [
-            'name', 'date', 'place', 'deadline', 'age_min',
-            'age_max', 'description',
+            'name', 'date', 'place', 'deadline', 'lowest_year',
+            'highest_year', 'description',
         ]
