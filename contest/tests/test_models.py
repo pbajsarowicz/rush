@@ -63,7 +63,7 @@ class ContestTestCase(TestCase):
     def setUp(self):
         self.now = timezone.now()
         self.contest = Contest.objects.create(
-            date=self.now, place='Szkoła', age_min=11, age_max=16,
+            date=self.now, place='Szkoła', age_min=2005, age_max=2000,
             deadline=self.now
         )
 
@@ -85,7 +85,7 @@ class ContestantTestCase(TestCase):
     def setUp(self):
         self.contestant = Contestant.objects.create(
             moderator=RushUser.objects.first(), first_name='Adam',
-            last_name='Kowalski', gender='M', age=15, school='S',
+            last_name='Kowalski', gender='M', age=2001, school='S',
             styles_distances='10m żabka', contest=Contest.objects.first()
         )
 

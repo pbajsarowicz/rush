@@ -186,7 +186,7 @@ class ContestantForm(forms.ModelForm):
     def clean_age(self):
         age = self.cleaned_data.get('age')
         contest = Contest.objects.get(pk=self.contest)
-        if contest.age_min <= age <= contest.age_max:
+        if contest.age_min >= age >= contest.age_max:
             return age
         raise forms.ValidationError(
             'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'

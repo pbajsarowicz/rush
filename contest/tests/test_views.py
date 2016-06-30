@@ -47,12 +47,12 @@ class HomeViewTests(TestCase):
     def setUp(self):
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=2000, description='Opis',
+            place='Szkoła', age_min=2005, age_max=2000, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=2000, description='Opis',
+            place='Szkoła', age_min=2005, age_max=2000, description='Opis',
             deadline=make_aware(datetime(2008, 11, 20))
         )
         self.user = RushUser.objects.create_superuser(
@@ -679,14 +679,14 @@ class ContestantListViewTestCase(TestCase):
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=2000, description='Opis',
+            place='Szkoła', age_min=2005, age_max=2000, description='Opis',
             deadline=make_aware(datetime(2048, 11, 20)),
             content_type=ContentType.objects.get_for_model(club),
             object_id=club.pk
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
-            gender='M', age=14, school='S', styles_distances='100m motyl',
+            gender='M', age=2002, school='S', styles_distances='100m motyl',
             contest=self.contest
         )
 
@@ -717,7 +717,7 @@ class EditContestantViewTestCase(TestCase):
             first_name='Adam',
             last_name='Nowak',
             gender='M',
-            age=14,
+            age=2002,
             school='P',
             styles_distances='100m motyl',
             contest=Contest.objects.first(),
@@ -745,7 +745,7 @@ class EditContestantViewTestCase(TestCase):
         self.assertEqual(
             response.context['form'].initial['styles_distances'], '100m motyl'
         )
-        self.assertEqual(response.context['form'].initial['age'], 14)
+        self.assertEqual(response.context['form'].initial['age'], 2002)
 
     def test_post(self):
         response = self.client.post(
@@ -755,7 +755,7 @@ class EditContestantViewTestCase(TestCase):
             ),
             data={
                 'first_name': 'Karol', 'last_name': 'Kowalski',
-                'school': 'P', 'gender': 'F', 'age': 11,
+                'school': 'P', 'gender': 'F', 'age': 2005,
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -769,7 +769,7 @@ class EditContestantViewTestCase(TestCase):
             response.context['form'].cleaned_data['school'], 'P'
         )
         self.assertEqual(response.context['form'].cleaned_data['gender'], 'F')
-        self.assertEqual(response.context['form'].cleaned_data['age'], 11)
+        self.assertEqual(response.context['form'].cleaned_data['age'], 2005)
 
 
 class ContestAddTestCase(TestCase):
@@ -792,8 +792,8 @@ class ContestAddTestCase(TestCase):
             'date': '31.12.2100 16:00',
             'place': 'Majorka',
             'deadline': '29.12.2100 23:59',
-            'age_min': 14,
-            'age_max': 17,
+            'age_min': 2002,
+            'age_max': 1999,
             'description': 'Zapraszamy na zawody!',
             'organization': self.user_1.unit,
         }
@@ -838,7 +838,7 @@ class ContestAddTestCase(TestCase):
             ]
         )
 
-        self.form_data['age_min'] = 80
+        self.form_data['age_min'] = 1978
         self.form_data['date'] = '02.04.2016 16:00'
         self.form_data['deadline'] = '01.04.2016 16:00'
         response = self.client.post(
