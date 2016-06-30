@@ -47,13 +47,14 @@ class HomeViewTests(TestCase):
     def setUp(self):
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', lowest_year=2005, highest_year=2000, description='Opis',
+            place='Szkoła', lowest_year=2005, highest_year=2000,
+            description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', lowest_year=2005, highest_year=2000, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20))
+            place='Szkoła', lowest_year=2005, highest_year=2000,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
         )
         self.user = RushUser.objects.create_superuser(
             email='xyz@xyz.pl', username='login', password='Password'
@@ -535,18 +536,18 @@ class ContestantAddViewTestCase(TestCase):
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', lowest_year=2005, highest_year=2000, description='Opis',
-            deadline=make_aware(datetime(2048, 11, 20))
+            place='Szkoła', lowest_year=2005, highest_year=2000,
+            description='Opis', deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', lowest_year=2005, highest_year=2000, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20))
+            place='Szkoła', lowest_year=2005, highest_year=2000,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
         )
         self.contest_deadline = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', lowest_year=2005, highest_year=2000, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20))
+            place='Szkoła', lowest_year=2005, highest_year=2000,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
         )
 
     def test_get(self):
@@ -679,8 +680,8 @@ class ContestantListViewTestCase(TestCase):
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', lowest_year=2005, highest_year=2000, description='Opis',
-            deadline=make_aware(datetime(2048, 11, 20)),
+            place='Szkoła', lowest_year=2005, highest_year=2000,
+            description='Opis', deadline=make_aware(datetime(2048, 11, 20)),
             content_type=ContentType.objects.get_for_model(club),
             object_id=club.pk
         )
