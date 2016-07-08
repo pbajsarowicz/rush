@@ -4,6 +4,7 @@ import uuid
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordResetForm,
@@ -71,6 +72,7 @@ class LoginForm(AuthenticationForm):
     Build-in form to log user in. Overwriting error_messages
     to make them more clear for user.
     """
+
     error_messages = {
         'invalid_login': _(
             'Wprowadź poprawny login oraz hasło. '
@@ -78,6 +80,27 @@ class LoginForm(AuthenticationForm):
         ),
         'inactive': _('Konto nie zostało aktywowane'),
     }
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if username and password:
+            if '@' in username:
+                username = RushUser.objects.get(email=username).username
+            self.user_cache = authenticate(
+                username=username, password=password
+            )
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': self.username_field.verbose_name},
+                )
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 
 class RushResetPasswordForm(SetPasswordForm):

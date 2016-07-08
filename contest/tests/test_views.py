@@ -134,6 +134,17 @@ class LoginViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/redirect/page/')
+        self.client.logout()
+
+        data = {
+            'username': 'xyz@xyz.pl',
+            'password': 'Password',
+            'next': '/redirect/page/',
+        }
+        response = self.client.post(reverse('contest:login'), data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/redirect/page/')
 
 
 class SetResetPasswordViewTestCase(TestCase):
