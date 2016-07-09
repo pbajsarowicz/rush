@@ -94,7 +94,8 @@ class RegisterView(View):
                     user.first_name, user.last_name, emails, page
                 )
             return render(
-                request, 'contest/auth/register_confirmation.html',
+                request,
+                'contest/auth/register_confirmation.html',
                 {'email': settings.SUPPORT_EMAIL}
             )
         return render(request, self.template_name, {'form': form})
