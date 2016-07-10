@@ -11,7 +11,6 @@ from contest.models import (
     Contestant,
     RushUser,
     School,
-    UnitModelsMixin,
 )
 
 
@@ -122,6 +121,7 @@ class ContactTestCase(TestCase):
             self.contact.__unicode__(),
             'email@wp.pl www.example.com 123456789'
         )
+
 
 class UnitModelsMixinTestCase(TestCase):
     fixtures = [
