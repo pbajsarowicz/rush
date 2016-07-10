@@ -27,6 +27,29 @@ UNIT_LIMIT = (
 )
 
 
+class UnitModelsMixin(object):
+
+    def unit_name_select(self):
+        """
+        Returns organizations' names for purposes of admin panel.
+        """
+        school_options = admin_utils.get_options(
+            School, 'Szkoła', self.object_id, self.content_type
+        )
+        club_options = admin_utils.get_options(
+            Club, 'Klub', self.object_id, self.content_type
+        )
+
+        return format_html(
+            '<select id="id_unit" name="unit">{}{}</select>'.format(
+                '<br>'.join(school_options),
+                '<br>'.join(club_options)
+            )
+        )
+    unit_name_select.short_description = 'Szkoła/Klub'
+    unit_name_select = property(unit_name_select)
+
+
 class Contact(models.Model):
     """
     Model with contact details.
@@ -36,7 +59,7 @@ class Contact(models.Model):
     phone_number = models.CharField('numer telefonu', max_length=9, blank=True)
 
     def __unicode__(self):
-        return self.website
+        return '{} {} {}'.format(self.email, self.website, self.phone_number)
 
 
 class School(models.Model):
@@ -66,7 +89,7 @@ class Club(models.Model):
         return self.name
 
 
-class RushUser(AbstractBaseUser, PermissionsMixin):
+class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
     """
     User model for Rush users.
     """
@@ -145,22 +168,6 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         """
         return self.has_perm('contest.add_contest')
 
-    def unit_name_select(self):
-        """
-        Returns organizations' names for purposes of admin panel.
-        """
-        school_options = admin_utils.get_options(School, 'Szkoła', self.object_id)
-        club_options = admin_utils.get_options(Club, 'Klub', self.object_id)
-
-        return format_html(
-            '<select id="id_unit" name="unit">{}{}</select>'.format(
-                '<br>'.join(school_options),
-                '<br>'.join(club_options)
-            )
-        )
-    unit_name_select.short_description = 'Szkoła/Klub'
-    unit_name_select = property(unit_name_select)
-
     @property
     def unit_name(self):
         """
@@ -215,7 +222,7 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         msg.send()
 
 
-class Contest(models.Model):
+class Contest(UnitModelsMixin, models.Model):
     """
     Model for Contest.
     """

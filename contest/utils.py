@@ -8,12 +8,15 @@ from django.utils.html import format_html
 class AdminUtils(object):
 
     @staticmethod
-    def get_options(model, prefix, active_object_id):
+    def get_options(model, prefix, active_object_id, active_content_type):
         options = []
         content_type = ContentType.objects.get_for_model(model)
 
         for organization in model.objects.all().order_by('name'):
-            selected = organization.id == active_object_id
+            selected = (
+                organization.id == active_object_id and
+                content_type == active_content_type
+            )
             options.append(format_html(
                 '<option value="{}_{}" {}>[{}] {}</option>',
                 organization.id, content_type,
