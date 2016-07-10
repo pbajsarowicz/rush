@@ -14,15 +14,40 @@ from django.db import models
 from django.db.models import Q
 from django.template import loader
 from django.utils.encoding import force_bytes
+from django.utils.html import format_html
 from django.utils.http import urlsafe_base64_encode
 from django.utils import timezone
 
 from contest.manager import RushUserManager
+from contest.utils import admin_utils
 
 UNIT_LIMIT = (
     Q(app_label='contest', model='club') |
     Q(app_label='contest', model='school')
 )
+
+
+class UnitModelsMixin(object):
+
+    def unit_name_select(self):
+        """
+        Returns organizations' names for purposes of admin panel.
+        """
+        school_options = admin_utils.get_options(
+            School, 'Szkoła', self.object_id, self.content_type
+        )
+        club_options = admin_utils.get_options(
+            Club, 'Klub', self.object_id, self.content_type
+        )
+
+        return format_html(
+            '<select id="id_unit" name="unit">{}{}</select>'.format(
+                '<br>'.join(school_options),
+                '<br>'.join(club_options)
+            )
+        )
+    unit_name_select.short_description = 'Szkoła/Klub'
+    unit_name_select = property(unit_name_select)
 
 
 class Contact(models.Model):
@@ -34,7 +59,7 @@ class Contact(models.Model):
     phone_number = models.CharField('numer telefonu', max_length=9, blank=True)
 
     def __unicode__(self):
-        return self.website
+        return '{} {} {}'.format(self.email, self.website, self.phone_number)
 
 
 class School(models.Model):
@@ -64,7 +89,7 @@ class Club(models.Model):
         return self.name
 
 
-class RushUser(AbstractBaseUser, PermissionsMixin):
+class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
     """
     User model for Rush users.
     """
@@ -143,13 +168,12 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         """
         return self.has_perm('contest.add_contest')
 
-    def get_unit_name(self):
+    @property
+    def unit_name(self):
         """
         Return name of user's unit.
         """
         return self.unit.name
-    get_unit_name.short_description = 'Szkoła/Klub'
-    unit_name = property(get_unit_name)
 
     def activate(self):
         """
@@ -198,7 +222,7 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         msg.send()
 
 
-class Contest(models.Model):
+class Contest(UnitModelsMixin, models.Model):
     """
     Model for Contest.
     """

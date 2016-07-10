@@ -11,9 +11,26 @@ from contest.models import (
     School,
     Contact,
 )
+from contest.utils import admin_utils
 
 
-class RushUserAdmin(admin.ModelAdmin):
+class UnitAdminMixin(object):
+
+    def save_model(self, request, obj, form, change):
+        """
+        Handles saving an expected school/club based on chosen option
+        in pre-filled select.
+        """
+        object_id, content_type = admin_utils.get_unit_id_and_type(
+            request.POST['unit']
+        )
+        obj.object_id = object_id
+        obj.content_type = content_type
+
+        obj.save()
+
+
+class RushUserAdmin(UnitAdminMixin, admin.ModelAdmin):
     """
     What RushUserAdmin can do and how RushUser is displayed.
     """
@@ -39,11 +56,11 @@ class RushUserAdmin(admin.ModelAdmin):
 
     fields = [
         'username', 'email', 'first_name', 'last_name', 'organization_name',
-        'organization_address', 'unit_name', 'date_joined',
+        'organization_address', 'unit_name_select', 'date_joined',
         'last_login', 'groups', 'user_permissions',
     ]
     list_display = ('first_name', 'last_name', 'is_active')
-    readonly_fields = ('last_login', 'date_joined', 'unit_name')
+    readonly_fields = ('last_login', 'date_joined', 'unit_name_select')
     actions = [create, cancel]
     list_filter = ('is_active',)
     filter_horizontal = ['user_permissions']
@@ -54,8 +71,14 @@ class ContestantInline(admin.StackedInline):
     extra = 0
 
 
-class ContestAdmin(admin.ModelAdmin):
+class ContestAdmin(UnitAdminMixin, admin.ModelAdmin):
     inlines = [ContestantInline]
+
+    fields = (
+        'name', 'date', 'place', 'age_min', 'age_max', 'deadline',
+        'description', 'unit_name_select',
+    )
+    readonly_fields = ('unit_name_select',)
 
 
 admin.site.register(RushUser, RushUserAdmin)
