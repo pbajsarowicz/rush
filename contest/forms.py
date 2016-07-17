@@ -272,3 +272,12 @@ class ContestForm(forms.ModelForm):
             'name', 'date', 'place', 'deadline', 'age_min',
             'age_max', 'description',
         ]
+
+
+class ContestResultsForm(forms.ModelForm):
+    """
+    Form for add results.
+    """
+    class Meta:
+        model = Contest
+        fields = ['results',]

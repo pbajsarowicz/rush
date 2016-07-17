@@ -169,6 +169,13 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         return self.has_perm('contest.add_contest')
 
     @property
+    def is_moderator(self):
+        """
+        Returns whether this is a freelancer or not.
+        """
+        return self.groups.filter(name="moderator").exists()
+
+    @property
     def unit_name(self):
         """
         Return name of user's unit.
@@ -233,6 +240,7 @@ class Contest(UnitModelsMixin, models.Model):
     age_max = models.SmallIntegerField('Wiek maksymalny')
     deadline = models.DateTimeField('Termin zgłaszania zawodników')
     description = models.TextField('Opis', blank=True)
+    results = models.CharField('Wyniki', blank=True, max_length=3000)
     content_type = models.ForeignKey(
         ContentType, limit_choices_to=UNIT_LIMIT,
         blank=True, null=True

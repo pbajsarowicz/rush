@@ -83,4 +83,14 @@ urlpatterns = [
         login_required(views.ContestAddView.as_view()),
         name='contest-add'
     ),
+    url(
+        r'^zawody/dodaj/wyniki/?$',
+        login_required(views.ContestResultsAddView.as_view()),
+        name='contest-add-results'
+    ),
+    url(
+        r'^zawody/wyniki/?$',
+        login_required(views.ContestResultsView.as_view()),
+        name='contest-results'
+    ),
 ]

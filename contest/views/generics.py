@@ -25,6 +25,7 @@ from contest.models import (
 from contest.forms import (
     ContestantForm,
     ContestForm,
+    ContestResultsForm,
 )
 
 
@@ -302,3 +303,52 @@ class ContestAddView(PermissionRequiredMixin, View):
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
+
+
+class ContestResultsAddView(View):
+    template_name = 'contest/add_results.html'
+    form_class = ContestResultsForm
+
+    def get(self, request):
+        """
+        Return clear form.
+        """
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save(commit=False)
+            return redirect('contest:contest-results')
+        return render(request, self.template_name, {'form': form})
+
+
+class ContestResultsView(View):
+    """
+    Displays results
+    """
+    template_name = 'contest/contest_results.html'
+
+    @staticmethod
+    def _get_results(contest, request):
+        """
+        Returns a results queryset.
+        """
+        results = list(Contest.objects.all())
+        return results
+
+    def get(self, request, contest_id, *args, **kwargs):
+        """
+        Get contest data.
+        """
+        contest = Contest.objects.get(id=contest_id)
+        results = self._get_results(
+            contest, request
+        )
+
+        context = {
+            'contest': contest,
+            'results': results,
+        }
+        return render(request, self.template_name, context)
