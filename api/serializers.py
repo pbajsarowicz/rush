@@ -57,8 +57,8 @@ class SchoolClubRelatedField(serializers.RelatedField):
 
 
 class ContestSerializer(serializers.HyperlinkedModelSerializer):
-    deadline = serializers.DateTimeField(format='%d.%m.%Y %X')
-    date = serializers.DateTimeField(format='%d.%m.%Y %X')
+    deadline = serializers.DateTimeField(format='%d.%m.%Y %H:%M')
+    date = serializers.DateTimeField(format='%d.%m.%Y %H:%M')
     organizer = SchoolClubRelatedField(read_only=True)
 
     class Meta:
