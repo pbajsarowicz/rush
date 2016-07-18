@@ -620,3 +620,35 @@ function removeContestant(userId) {
         }
     });
 }
+
+/*
+ * Show distances input.
+ */
+function showDistances() {
+    'use strict';
+    if (document.contest_add.dowolny.checked) {
+        $('#dowolny-distances').removeClass('invisible');
+    } else {
+        $('#dowolny-distances').addClass('invisible');
+    }
+    if (document.contest_add.grzbietowy.checked) {
+        $('#grzbietowy-distances').removeClass('invisible');
+    } else {
+        $('#grzbietowy-distances').addClass('invisible');
+    }
+    if (document.contest_add.klasyczny.checked) {
+        $('#klasyczny-distances').removeClass('invisible');
+    } else {
+        $('#klasyczny-distances').addClass('invisible');
+    }
+    if (document.contest_add.motylkowy.checked) {
+        $('#motylkowy-distances').removeClass('invisible');
+    } else {
+        $('#motylkowy-distances').addClass('invisible');
+    }
+    if (document.contest_add.zmienny.checked) {
+        $('#zmienny-distances').removeClass('invisible');
+    } else {
+        $('#zmienny-distances').addClass('invisible');
+    }
+}

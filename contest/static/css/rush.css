@@ -111,3 +111,29 @@ Base elements
   margin-top: 45px;
   position: absolute;
 }
+
+/* adding contest */
+.distance-choices [type="checkbox"] + label {
+  position: relative;
+  padding-left: 22px;
+  margin-right: 12px;
+  cursor: pointer;
+  display: inline-block;
+  height: 25px;
+  line-height: 25px;
+  font-size: 1rem;
+  -webkit-user-select: none;
+  /* webkit (safari, chrome) browsers */
+  -moz-user-select: none;
+  /* mozilla browsers */
+  -khtml-user-select: none;
+  /* webkit (konqueror) browsers */
+  -ms-user-select: none;
+  /* IE10+ */
+}
+
+.distance-choices {
+  position: relative;
+  left: 15px;
+  top: 8px;
+}
