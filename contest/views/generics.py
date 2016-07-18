@@ -309,7 +309,7 @@ class ContestResultsAddView(View):
     template_name = 'contest/add_results.html'
     form_class = ContestResultsForm
 
-    def get(self, contest_id, request):
+    def get(self, request, contest_id, *args, **kwargs):
         """
         Return clear form.
         """
@@ -317,12 +317,13 @@ class ContestResultsAddView(View):
         form = self.form_class(instance=contest)
         return render(request, self.template_name, {'form': form})
 
-    def post(self, request):
-        form = self.form_class(request.POST)
+    def post(self, request, contest_id, *args, **kwargs):
+        contest = Contest.objects.get(pk=contest_id)
+        form = self.form_class(request.POST, instance=contest)
         if form.is_valid():
             form.save(commit=False)
             return redirect('contest:contest-results',
-            contest_id=self.contest_id
+            contest_id=contest_id
             )
         return render(request, self.template_name, {'form': form})
 
@@ -334,12 +335,13 @@ class ContestResultsView(View):
     template_name = 'contest/contest_results.html'
 
     @staticmethod
-    def _get_results(contest, request):
+    def _get_results(contest_id, request):
         """
         Returns a results queryset.
         """
-        results = list(Contest.objects.all())
-        return results
+        contest = Contest.objects.get(pk=contest_id)
+        print contest.__dict__
+        return contest.results
 
     @staticmethod
     def _get_msg(results=None):
@@ -350,13 +352,13 @@ class ContestResultsView(View):
             return 'Nie dodano jeszcze wyników.'
         return ''
 
-    def get(self, contest_id, request):
+    def get(self, request, contest_id, *args, **kwargs):
         """
         Get contest data.
         """
         contest = Contest.objects.get(pk=contest_id)
         results = self._get_results(
-            contest, request
+            contest_id, request
         )
         msg = self._get_msg(results)
 
