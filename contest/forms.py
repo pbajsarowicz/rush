@@ -259,14 +259,13 @@ class ContestForm(forms.ModelForm):
     def clean_docfile(self):
         docfile = self.cleaned_data.get('docfile', False)
         ext = str(docfile)
-        print ext
-        ext = ext[-3:]
+        ext = ext[-4:]
         if docfile != 'brak':
             if docfile._size > 10 * 1024 * 1024:
                 raise forms.ValidationError(
                     "Plik jest za duży (Więcej niż 10 mb)"
                 )
-            elif not 'doc' or 'pdf' or 'docx' or '' in ext:
+            elif not '.doc' or not '.pdf' or not 'docx' in ext:
                 raise forms.ValidationError("Zły format")
         return docfile
 

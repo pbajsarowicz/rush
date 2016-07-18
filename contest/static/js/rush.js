@@ -623,7 +623,3 @@ function removeContestant(userId) {
         }
     });
 }
-
-function lol() {
-    document.write('lol');
-}
