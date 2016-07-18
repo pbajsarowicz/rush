@@ -278,16 +278,6 @@ class ContestResultsForm(forms.ModelForm):
     """
     Form for add results.
     """
-    def save(self, commit=True):
-        self.contest = super(ContestResultsForm, self).save(commit=False)
-
-        results = self.cleaned_data['results']
-        self.contest.results = results
-
-        if commit:
-            self.contest.save()
-
-        return self.contest
 
     class Meta:
         model = Contest

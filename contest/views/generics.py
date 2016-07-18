@@ -201,7 +201,7 @@ class ContestantListView(View):
             return 'Nie dodałeś zawodników do tych zawodów.'
         return ''
 
-    def get(self, contest_id, *args, **kwargs):
+    def get(self, request, contest_id, *args, **kwargs):
         """
         Get contestants data.
         """
@@ -306,6 +306,9 @@ class ContestAddView(PermissionRequiredMixin, View):
 
 
 class ContestResultsAddView(View):
+    """
+    View for adding contest results.
+    """
     template_name = 'contest/add_results.html'
     form_class = ContestResultsForm
 
@@ -318,19 +321,20 @@ class ContestResultsAddView(View):
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, contest_id, *args, **kwargs):
+        """
+        Save results.
+        """
         contest = Contest.objects.get(pk=contest_id)
         form = self.form_class(request.POST, instance=contest)
         if form.is_valid():
-            form.save(commit=False)
-            return redirect('contest:contest-results',
-            contest_id=contest_id
-            )
+            form.save(commit=True)
+            return redirect('contest:contest-results', contest_id=contest_id)
         return render(request, self.template_name, {'form': form})
 
 
 class ContestResultsView(View):
     """
-    Displays results
+    Displays results.
     """
     template_name = 'contest/contest_results.html'
 
@@ -353,7 +357,7 @@ class ContestResultsView(View):
 
     def get(self, request, contest_id, *args, **kwargs):
         """
-        Get contest data.
+        Get results data.
         """
         contest = Contest.objects.get(pk=contest_id)
         results = self._get_results(
