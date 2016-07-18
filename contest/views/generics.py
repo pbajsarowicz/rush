@@ -340,7 +340,6 @@ class ContestResultsView(View):
         Returns a results queryset.
         """
         contest = Contest.objects.get(pk=contest_id)
-        print contest.__dict__
         return contest.results
 
     @staticmethod
