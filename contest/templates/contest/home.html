@@ -60,8 +60,8 @@
           <li class="collection-item contest-item">
             <div class="contest-item">
               <span class="text">{{ contest }}</span>
-              <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-add-results' %}">Dodaj wyniki</a>
-              <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-results' %}">Wyniki</a>
+              <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-add-results' contest_id=contest.pk %}">Dodaj wyniki</a>
+              <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-results' contest_id=contest.pk %}">Wyniki</a>
               <div id="modal{{contest.pk}}" class="modal">
                 <div class="modal-content">
                   <h4>Szczegóły konkursu</h4>

@@ -201,7 +201,7 @@ class ContestantListView(View):
             return 'Nie dodałeś zawodników do tych zawodów.'
         return ''
 
-    def get(self, request, contest_id, *args, **kwargs):
+    def get(self, contest_id, *args, **kwargs):
         """
         Get contestants data.
         """
@@ -309,18 +309,21 @@ class ContestResultsAddView(View):
     template_name = 'contest/add_results.html'
     form_class = ContestResultsForm
 
-    def get(self, request):
+    def get(self, contest_id, request):
         """
         Return clear form.
         """
-        form = self.form_class()
+        contest = Contest.objects.get(pk=contest_id)
+        form = self.form_class(instance=contest)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save(commit=False)
-            return redirect('contest:contest-results')
+            return redirect('contest:contest-results',
+            contest_id=self.contest_id
+            )
         return render(request, self.template_name, {'form': form})
 
 
@@ -338,17 +341,28 @@ class ContestResultsView(View):
         results = list(Contest.objects.all())
         return results
 
-    def get(self, request, contest_id, *args, **kwargs):
+    @staticmethod
+    def _get_msg(results=None):
+        """
+        Returns a message.
+        """
+        if not results:
+            return 'Nie dodano jeszcze wyników.'
+        return ''
+
+    def get(self, contest_id, request):
         """
         Get contest data.
         """
-        contest = Contest.objects.get(id=contest_id)
+        contest = Contest.objects.get(pk=contest_id)
         results = self._get_results(
             contest, request
         )
+        msg = self._get_msg(results)
 
         context = {
             'contest': contest,
             'results': results,
+            'msg': msg,
         }
         return render(request, self.template_name, context)
