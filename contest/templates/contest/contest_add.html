@@ -2,7 +2,7 @@
 
 {% block container %}
   <div class="container">
-    <span class="row center">
+    <div class="row center">
       {% if message %}
         {{ message }}
         <div class="row center">
@@ -10,12 +10,12 @@
         </div>
       {% else %}
         <form class="col s6" action="?next={{next}}" role="form" method="post" name="contest_add">
-          <span class="row center">
+          <div class="row center">
             {% csrf_token %}
             {{ form.as_p }}
-            <label>Style:</label>
+            <label id="style">Style:</label>
             <p>
-              <input type="checkbox" class="filled-in" id="dowolny" onclick="showDistances();" name="dowolny">
+              <input type="checkbox" class="filled-in" id="dowolny" onclick="showDistances(1);" name="dowolny">
               <label for="dowolny">Dowolny</label><br>
               <span id="dowolny-distances" class="distance-choices invisible">
                 <input type="checkbox" id="d25">
@@ -35,7 +35,7 @@
               </span>
             </p>
             <p>
-              <input type="checkbox" class="filled-in" id="grzbietowy" onclick="showDistances();" name="grzbietowy">
+              <input type="checkbox" class="filled-in" id="grzbietowy" onclick="showDistances(2);" name="grzbietowy">
               <label for="grzbietowy">Grzbietowy</label><br>
               <span id="grzbietowy-distances" class="distance-choices invisible">
                 <input type="checkbox" id="g25">
@@ -49,7 +49,7 @@
               </span>
             </p>
             <p>
-              <input type="checkbox" class="filled-in" id="klasyczny" onclick="showDistances();" name="klasyczny">
+              <input type="checkbox" class="filled-in" id="klasyczny" onclick="showDistances(3);" name="klasyczny">
               <label for="klasyczny">Klasyczny</label><br>
               <span id="klasyczny-distances" class="distance-choices invisible">
                 <input type="checkbox" id="k25">
@@ -63,7 +63,7 @@
               </span>
             </p>
             <p>
-              <input type="checkbox" class="filled-in" id="motylkowy" onclick="showDistances();" name="motylkowy">
+              <input type="checkbox" class="filled-in" id="motylkowy" onclick="showDistances(4);" name="motylkowy">
               <label for="motylkowy">Motylkowy</label><br>
               <span id="motylkowy-distances" class="distance-choices invisible">
                 <input type="checkbox" id="m25">
@@ -77,7 +77,7 @@
               </span>
             </p>
             <p>
-              <input type="checkbox" class="filled-in" id="zmienny" onclick="showDistances();" name="zmienny">
+              <input type="checkbox" class="filled-in" id="zmienny" onclick="showDistances(5);" name="zmienny">
               <label for="zmienny">Zmienny</label><br>
               <span id="zmienny-distances" class="distance-choices invisible">
                 <input type="checkbox" id="z100">
@@ -87,8 +87,8 @@
               </span>
             </p>
             <a class="waves-effect waves-light btn modal-trigger" href="{% url 'contest:home' %}" >Anuluj</a>
-            <button type="submit" class="pull-right btn btn-primary">Gotowe</button>
-          </span>
+            <button type="submit" class="pull-right btn btn-primary" onclick="return validateDistances();">Gotowe</button>
+          </div>
         </form>
       {% endif %}
     </div>
