@@ -116,7 +116,7 @@ Base elements
 .distance-choices [type="checkbox"] + label {
   position: relative;
   padding-left: 25px;
-  margin-right: 14px;
+  margin-right: 30px;
   cursor: pointer;
   display: inline-block;
   height: 25px;

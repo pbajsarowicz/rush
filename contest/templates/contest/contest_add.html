@@ -18,75 +18,75 @@
               <input type="checkbox" class="filled-in" id="dowolny" onclick="showDistances(1);" name="dowolny">
               <label for="dowolny">Dowolny</label><br>
               <span id="dowolny-distances" class="distance-choices invisible">
-                <input type="checkbox" id="d25">
-                <label for="d25">25m</label>
-                <input type="checkbox" id="d50">
-                <label for="d50">50m</label>
-                <input type="checkbox" id="d100">
-                <label for="d100">100m</label>
-                <input type="checkbox" id="d200">
-                <label for="d200">200m</label><br>
-                <input type="checkbox" id="d400">
-                <label for="d400">400m</label>
-                <input type="checkbox" id="d800">
-                <label for="d800">800m</label>
-                <input type="checkbox" id="d1500">
-                <label for="d1500">1500m</label>
+                <input type="checkbox" id="D25">
+                <label for="D25">25m</label>
+                <input type="checkbox" id="D50">
+                <label for="D50">50m</label>
+                <input type="checkbox" id="D100">
+                <label for="D100">100m</label>
+                <input type="checkbox" id="D200">
+                <label for="D200">200m</label><br>
+                <input type="checkbox" id="D400">
+                <label for="D400">400m</label>
+                <input type="checkbox" id="D800">
+                <label for="D800">800m</label>
+                <input type="checkbox" id="D1500">
+                <label for="D1500">1500m</label>
               </span>
             </p>
             <p>
               <input type="checkbox" class="filled-in" id="grzbietowy" onclick="showDistances(2);" name="grzbietowy">
               <label for="grzbietowy">Grzbietowy</label><br>
               <span id="grzbietowy-distances" class="distance-choices invisible">
-                <input type="checkbox" id="g25">
-                <label for="g25">25m</label>
-                <input type="checkbox" id="g50">
-                <label for="g50">50m</label>
-                <input type="checkbox" id="g100">
-                <label for="g100">100m</label>
-                <input type="checkbox" id="g200">
-                <label for="g200">200m</label>
+                <input type="checkbox" id="G25">
+                <label for="G25">25m</label>
+                <input type="checkbox" id="G50">
+                <label for="G50">50m</label>
+                <input type="checkbox" id="G100">
+                <label for="G100">100m</label>
+                <input type="checkbox" id="G200">
+                <label for="G200">200m</label>
               </span>
             </p>
             <p>
               <input type="checkbox" class="filled-in" id="klasyczny" onclick="showDistances(3);" name="klasyczny">
               <label for="klasyczny">Klasyczny</label><br>
               <span id="klasyczny-distances" class="distance-choices invisible">
-                <input type="checkbox" id="k25">
-                <label for="k25">25m</label>
-                <input type="checkbox" id="k50">
-                <label for="k50">50m</label>
-                <input type="checkbox" id="k100">
-                <label for="k100">100m</label>
-                <input type="checkbox" id="k200">
-                <label for="k200">200m</label>
+                <input type="checkbox" id="K25">
+                <label for="K25">25m</label>
+                <input type="checkbox" id="K50">
+                <label for="K50">50m</label>
+                <input type="checkbox" id="K100">
+                <label for="K100">100m</label>
+                <input type="checkbox" id="K200">
+                <label for="K200">200m</label>
               </span>
             </p>
             <p>
               <input type="checkbox" class="filled-in" id="motylkowy" onclick="showDistances(4);" name="motylkowy">
               <label for="motylkowy">Motylkowy</label><br>
               <span id="motylkowy-distances" class="distance-choices invisible">
-                <input type="checkbox" id="m25">
-                <label for="m25">25m</label>
-                <input type="checkbox" id="m50">
-                <label for="m50">50m</label>
-                <input type="checkbox" id="m100">
-                <label for="m100">100m</label>
-                <input type="checkbox" id="m200">
-                <label for="m200">200m</label>
+                <input type="checkbox" id="M25">
+                <label for="M25">25m</label>
+                <input type="checkbox" id="M50">
+                <label for="M50">50m</label>
+                <input type="checkbox" id="M100">
+                <label for="M100">100m</label>
+                <input type="checkbox" id="M200">
+                <label for="M200">200m</label>
               </span>
             </p>
             <p>
               <input type="checkbox" class="filled-in" id="zmienny" onclick="showDistances(5);" name="zmienny">
               <label for="zmienny">Zmienny</label><br>
               <span id="zmienny-distances" class="distance-choices invisible">
-                <input type="checkbox" id="z100">
-                <label for="z100">100m</label>
-                <input type="checkbox" id="z200">
-                <label for="z200">200m</label>
+                <input type="checkbox" id="Z100">
+                <label for="Z100">100m</label>
+                <input type="checkbox" id="Z200">
+                <label for="Z200">200m</label>
               </span>
             </p>
-            <a class="waves-effect waves-light btn modal-trigger" href="{% url 'contest:home' %}" >Anuluj</a>
+            <a class="waves-effect waves-light btn modal-trigger" href="{% url 'contest:home' %}">Anuluj</a>
             <button type="submit" class="pull-right btn btn-primary" onclick="return validateDistances();">Gotowe</button>
           </div>
         </form>

@@ -118,6 +118,7 @@ class ContestantAddView(View):
             request, self.template_name, {
                 'formset': formset,
                 'name': contest,
+                'distances': contest.get_style_display().split(','),
                 'organization': organization,
             }
         )

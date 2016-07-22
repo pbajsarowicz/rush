@@ -188,12 +188,12 @@ ContestantValidation.prototype = {
      */
     validateStylesDistances: function(formId) {
         'use strict';
-        this.stylesDistances = document.forms['contestants'][formId + '-styles_distances'].value;
+        this.stylesDistances = document.forms['contestants'][formId + '-style'].value;
 
         if (!this.stylesDistances) {
-            this.raiseValidation(formId + '-styles_distances', 'Pole Style i dystanse nie może być puste.');
+            this.raiseValidation(formId + '-style', 'Pole Style i dystanse nie może być puste.');
         } else {
-            this.clearValidation(formId + '-styles_distances');
+            this.clearValidation(formId + '-style');
         }
     },
     /*
@@ -560,7 +560,7 @@ function parseContestantData(json) {
         ['Płeć', 'gender'],
         ['Wiek', 'age'],
         ['Rodzaj Szkoły', 'school'],
-        ['styl i dystans', 'styles_distances']
+        ['styl i dystans', 'style']
     ];
     var fragment = document.createDocumentFragment();
     var elementUl = document.createElement('ul');
@@ -632,7 +632,7 @@ function showDistances(checkboxNumber) {
                 $('#dowolny-distances').removeClass('invisible');
             } else {
                 $('#dowolny-distances').addClass('invisible');
-                ['d25', 'd50', 'd100', 'd200', 'd400', 'd800', 'd1500'].forEach(function(item) {
+                ['D25', 'D50', 'D100', 'D200', 'D400', 'D800', 'D1500'].forEach(function(item) {
                     $('#' + item).attr('checked', false);
                 });
             }
@@ -642,7 +642,7 @@ function showDistances(checkboxNumber) {
                 $('#grzbietowy-distances').removeClass('invisible');
             } else {
                 $('#grzbietowy-distances').addClass('invisible');
-                ['g25', 'g50', 'g100', 'g200'].forEach(function(item) {
+                ['G25', 'G50', 'G100', 'G200'].forEach(function(item) {
                     $('#' + item).attr('checked', false);
                 });
             }
@@ -652,7 +652,7 @@ function showDistances(checkboxNumber) {
                 $('#klasyczny-distances').removeClass('invisible');
             } else {
                 $('#klasyczny-distances').addClass('invisible');
-                ['k25', 'k50', 'k100', 'k200'].forEach(function(item) {
+                ['K25', 'K50', 'K100', 'K200'].forEach(function(item) {
                     $('#' + item).attr('checked', false);
                 });
             }
@@ -662,7 +662,7 @@ function showDistances(checkboxNumber) {
                 $('#motylkowy-distances').removeClass('invisible');
             } else {
                 $('#motylkowy-distances').addClass('invisible');
-                ['m25', 'm50', 'm100', 'm200'].forEach(function(item) {
+                ['M25', 'M50', 'M100', 'M200'].forEach(function(item) {
                     $('#' + item).attr('checked', false);
                 });
             }
@@ -672,7 +672,7 @@ function showDistances(checkboxNumber) {
                 $('#zmienny-distances').removeClass('invisible');
             } else {
                 $('#zmienny-distances').addClass('invisible');
-                ['z100', 'z200'].forEach(function(item) {
+                ['Z100', 'Z200'].forEach(function(item) {
                     $('#' + item).attr('checked', false);
                 });
             }
@@ -694,10 +694,10 @@ function validateDistances() {
     }
 
     if ($('#dowolny').is(':checked')) {
-        if (!($('#d25').is(':checked') || $('#d50').is(':checked') ||
-            $('#d100').is(':checked') || $('#d200').is(':checked') ||
-            $('#d400').is(':checked') || $('#d800').is(':checked') ||
-            $('#d1500').is(':checked'))) {
+        if (!($('#D25').is(':checked') || $('#D50').is(':checked') ||
+            $('#D100').is(':checked') || $('#D200').is(':checked') ||
+            $('#D400').is(':checked') || $('#D800').is(':checked') ||
+            $('#D1500').is(':checked'))) {
             errorMessage = 'Nie wybrano dystansu.';
             $('label[for="dowolny"]').html(
                 'Dowolny <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
@@ -706,8 +706,8 @@ function validateDistances() {
         }
     }
     if ($('#grzbietowy').is(':checked')) {
-        if (!($('#g25').is(':checked') || $('#g50').is(':checked') ||
-            $('#g100').is(':checked') || $('#g200').is(':checked'))) {
+        if (!($('#G25').is(':checked') || $('#G50').is(':checked') ||
+            $('#G100').is(':checked') || $('#G200').is(':checked'))) {
             errorMessage = 'Nie wybrano dystansu.';
             $('label[for="grzbietowy"]').html(
                 'Grzbietowy <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
@@ -716,8 +716,8 @@ function validateDistances() {
         }
     }
     if ($('#klasyczny').is(':checked')) {
-        if (!($('#k25').is(':checked') || $('#k50').is(':checked') ||
-            $('#k100').is(':checked') || $('#k200').is(':checked'))) {
+        if (!($('#K25').is(':checked') || $('#K50').is(':checked') ||
+            $('#K100').is(':checked') || $('#K200').is(':checked'))) {
             errorMessage = 'Nie wybrano dystansu.';
             $('label[for="klasyczny"]').html(
                 'Klasyczny <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
@@ -726,8 +726,8 @@ function validateDistances() {
         }
     }
     if ($('#motylkowy').is(':checked')) {
-        if (!($('#m25').is(':checked') || $('#m50').is(':checked') ||
-            $('#m100').is(':checked') || $('#m200').is(':checked'))) {
+        if (!($('#M25').is(':checked') || $('#M50').is(':checked') ||
+            $('#M100').is(':checked') || $('#M200').is(':checked'))) {
             errorMessage = 'Nie wybrano dystansu.';
             $('label[for="motylkowy"]').html(
                 'Motylkowy <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
@@ -736,7 +736,7 @@ function validateDistances() {
         }
     }
     if ($('#zmienny').is(':checked')) {
-        if (!($('#k100').is(':checked') || $('#k200').is(':checked'))) {
+        if (!($('#Z100').is(':checked') || $('#Z200').is(':checked'))) {
             errorMessage = 'Nie wybrano dystansu.';
             $('label[for="zmienny"]').html(
                 'Zmienny <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
@@ -744,5 +744,21 @@ function validateDistances() {
             isValidated = false;
         }
     }
-    return isValidated;
+
+    if (isValidated) {
+        var distances = [
+            'D25', 'D50', 'D100', 'D200', 'D400', 'D800', 'D1500', 'G25', 'G50', 'G100', 'G200',
+            'K25', 'K50', 'K100', 'K200', 'M25', 'M50', 'M100', 'M200', 'Z100', 'Z200'
+        ];
+        var result = '';
+        distances.forEach(function(item) {
+            if ($('#' + item).is(':checked')) {
+                result += ',' + item;
+            }
+        });
+        $('#distances-summary').val('');
+        $('#distances-summary').val(result);
+        return true;
+    }
+    return false;
 }

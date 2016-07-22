@@ -518,14 +518,14 @@ class ContestantAddViewTestCase(TestCase):
             'form-0-gender': 'M',
             'form-0-last_name': 'Kowalski',
             'form-0-school': 'P',
-            'form-0-styles_distances': '1000m',
+            'form-0-style': '1000m',
             'form-0-organization': self.user.unit,
             'form-1-age': '16',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
             'form-1-school': 'P',
-            'form-1-styles_distances': '500m',
+            'form-1-style': '500m',
             'form-1-organization': self.user.unit,
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
@@ -686,7 +686,7 @@ class ContestantListViewTestCase(TestCase):
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
-            gender='M', age=14, school='S', styles_distances='100m motyl',
+            gender='M', age=14, school='S', style='100m motyl',
             contest=self.contest
         )
 
@@ -719,7 +719,7 @@ class EditContestantViewTestCase(TestCase):
             gender='M',
             age=14,
             school='P',
-            styles_distances='100m motyl',
+            style='100m motyl',
             contest=Contest.objects.first(),
             moderator=self.user
         )
@@ -743,7 +743,7 @@ class EditContestantViewTestCase(TestCase):
         self.assertEqual(response.context['form'].initial['gender'], 'M')
         self.assertEqual(response.context['form'].initial['school'], 'P')
         self.assertEqual(
-            response.context['form'].initial['styles_distances'], '100m motyl'
+            response.context['form'].initial['style'], '100m motyl'
         )
         self.assertEqual(response.context['form'].initial['age'], 14)
 

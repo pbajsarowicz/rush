@@ -91,5 +91,5 @@ class ContestantSerializer(serializers.HyperlinkedModelSerializer):
         model = Contestant
         fields = (
             'first_name', 'last_name', 'gender', 'age', 'school',
-            'styles_distances', 'moderator', 'contest'
+            'style', 'moderator', 'contest'
         )

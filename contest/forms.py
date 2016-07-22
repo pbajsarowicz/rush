@@ -196,7 +196,7 @@ class ContestantForm(forms.ModelForm):
         model = Contestant
         fields = (
             'first_name', 'last_name', 'gender',
-            'age', 'school', 'styles_distances',
+            'age', 'school'
         )
 
 
@@ -205,6 +205,7 @@ class ContestForm(forms.ModelForm):
     Form for creating Contests.
     """
     organization = forms.CharField(label='Organizacja', max_length=255)
+    distances = forms.CharField(label='', max_length=128)
 
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
@@ -212,6 +213,9 @@ class ContestForm(forms.ModelForm):
 
         super(ContestForm, self).__init__(*args, **kwargs)
 
+        self.fields['distances'].widget.attrs = {
+            'class': 'invisible', 'id': 'distances-summary'
+        }
         self.fields['date'].widget.attrs = {'class': 'datetime'}
         self.fields['deadline'].widget.attrs = {'class': 'datetime'}
         self.fields['description'].widget.attrs = {
@@ -244,10 +248,13 @@ class ContestForm(forms.ModelForm):
             )
         return deadline
 
+    def clean_distances(self):
+        distances = self.cleaned_data.get('distances')
+        return distances.split(',')[1:]
+
     def clean_age_max(self):
         age_min = self.cleaned_data.get('age_min')
         age_max = self.cleaned_data.get('age_max')
-
         if age_min > age_max:
             raise forms.ValidationError(
                 'Przedział wiekowy jest niepoprawny. '
@@ -260,10 +267,12 @@ class ContestForm(forms.ModelForm):
 
         contest.content_type = self.user.content_type
         contest.object_id = self.user.object_id
+        styles = self.cleaned_data['distances']
+        print styles
+        contest.style = styles
 
         if commit:
             contest.save()
-
         return contest
 
     class Meta:

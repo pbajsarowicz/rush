@@ -27,6 +27,20 @@ UNIT_LIMIT = (
     Q(app_label='contest', model='school')
 )
 
+STYLES_DISTANCES = (
+    ('D25', 'Dowolny 25m'), ('D50', 'Dowolny 50m'),
+    ('D100', 'Dowolny 100m'), ('D200', 'Dowolny 200m'),
+    ('D400', 'Dowolny 400m'), ('D800', 'Dowolny 800m'),
+    ('D1500', 'Dowolny 1500m'), ('G25', 'Grzbietowy 25m'),
+    ('G50', 'Grzbietowy 50m'), ('G100', 'Grzbietowy 100m'),
+    ('G200', 'Grzbietowy 200m'), ('K25', 'Klasyczny 25m'),
+    ('K50', 'Klasyczny 50m'), ('K100', 'Klasyczny 100m'),
+    ('K200', 'Klasyczny 200m'), ('M25', 'Motylkowy 25m'),
+    ('M50', 'Motylkowy 50m'), ('M100', 'Motylkowy 100m'),
+    ('M200', 'Motylkowy 200m'), ('Z100', 'Zmienny 100m'),
+    ('Z200', 'Zmienny 200m')
+)
+
 
 class UnitModelsMixin(object):
 
@@ -227,21 +241,6 @@ class Contest(UnitModelsMixin, models.Model):
     """
     Model for Contest.
     """
-
-    STYLES_DISTANCES = (
-        ('D25', 'Dowolny 25m'), ('D50', 'Dowolny 50m'),
-        ('D100', 'Dowolny 100m'), ('D200', 'Dowolny 200m'),
-        ('D400', 'Dowolny 400m'), ('D800', 'Dowolny 800m'),
-        ('D1500', 'Dowolny 1500m'), ('G25', 'Grzbietowy 25m'),
-        ('G50', 'Grzbietowy 50m'), ('G100', 'Grzbietowy 100m'),
-        ('G200', 'Grzbietowy 200m'), ('K25', 'Klasyczny 25m'),
-        ('K50', 'Klasyczny 50m'), ('K100', 'Klasyczny 100m'),
-        ('K200', 'Klasyczny 200m'), ('M25', 'Motylkowy 25m'),
-        ('M50', 'Motylkowy 50m'), ('M100', 'Motylkowy 100m'),
-        ('M200', 'Motylkowy 200m'), ('Z100', 'Zmienny 100m'),
-        ('Z200', 'Zmienny 200m')
-    )
-
     name = models.CharField('Nazwa zawodów', max_length=255)
     date = models.DateTimeField('Data')
     place = models.CharField('Miejsce', max_length=255)
@@ -295,7 +294,7 @@ class Contestant(models.Model):
     gender = models.CharField('płeć', max_length=1, choices=GENDERS)
     age = models.IntegerField('wiek')
     school = models.CharField('rodzaj szkoły', max_length=1, choices=SCHOOLS)
-    styles_distances = models.CharField('style i dystanse', max_length=255)
+    style = MultiSelectField(choices=STYLES_DISTANCES)
     contest = models.ForeignKey(Contest)
 
     def __unicode__(self):
