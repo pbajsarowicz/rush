@@ -9,7 +9,8 @@
           "age_max": 20,
           "deadline": "2016-03-10T05:00:00Z",
           "description": "Lorem ipsum dolor sit amet.",
-          "object_id": 3
+          "object_id": 3,
+          "style": ["D25", "D50", "G25", "K50", "K200", "Z200"]
       }
   },
   {
@@ -22,7 +23,8 @@
           "age_max": 20,
           "deadline": "2016-02-25T11:00:00Z",
           "description": "Lorem ipsum dolor sit amet.",
-          "object_id": 2
+          "object_id": 2,
+          "style": ["D25", "D50", "G25", "K50", "K200", "Z200"]
       }
   },
   {
@@ -35,7 +37,8 @@
           "age_max": 20,
           "deadline": "2016-03-10T22:59:59Z",
           "description": "Zapraszamy!",
-          "object_id": 1
+          "object_id": 1,
+          "style": ["D25", "D50", "G25", "K50", "K200", "Z200"]
       }
   }
 ]

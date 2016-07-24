@@ -173,11 +173,14 @@ class ContestantForm(forms.ModelForm):
     Form for contestant creation.
     """
     organization = forms.CharField(label='Klub/Szkoła', max_length=100)
+    distances = forms.CharField(label='', max_length=128)
 
     def __init__(self, *args, **kwargs):
         self.contest = kwargs.pop('contest_id')
         self.user = kwargs.pop('user')
         super(ContestantForm, self).__init__(*args, **kwargs)
+
+        self.fields['distances'].widget.attrs = {'class': 'invisible'}
 
         if self.user.unit:
             self.fields['organization'].initial = self.user.unit
@@ -191,6 +194,19 @@ class ContestantForm(forms.ModelForm):
         raise forms.ValidationError(
             'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
         )
+
+    def clean_distances(self):
+        distances = self.cleaned_data.get('distances')
+        return distances.split(',')[1:]
+
+    def save(self, commit=True):
+        contestant = super(ContestantForm, self).save(commit=False)
+
+        contestant.style = self.cleaned_data['distances']
+
+        if commit:
+            contestant.save()
+        return contestant
 
     class Meta:
         model = Contestant
@@ -267,9 +283,7 @@ class ContestForm(forms.ModelForm):
 
         contest.content_type = self.user.content_type
         contest.object_id = self.user.object_id
-        styles = self.cleaned_data['distances']
-        print styles
-        contest.style = styles
+        contest.style = self.cleaned_data['distances']
 
         if commit:
             contest.save()

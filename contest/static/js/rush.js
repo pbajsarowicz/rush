@@ -184,19 +184,6 @@ ContestantValidation.prototype = {
         }
     },
     /*
-     * Validates styles and distances.
-     */
-    validateStylesDistances: function(formId) {
-        'use strict';
-        this.stylesDistances = document.forms['contestants'][formId + '-style'].value;
-
-        if (!this.stylesDistances) {
-            this.raiseValidation(formId + '-style', 'Pole Style i dystanse nie może być puste.');
-        } else {
-            this.clearValidation(formId + '-style');
-        }
-    },
-    /*
      * Validates school/club name.
      */
     validateOrganization: function(formId) {
@@ -221,8 +208,7 @@ ContestantValidation.prototype = {
 
         var validators = [
             'validateFirstName', 'validateLastName', 'validateGender',
-            'validateAge', 'validateSchool', 'validateStylesDistances',
-            'validateOrganization'
+            'validateAge', 'validateSchool', 'validateOrganization'
         ]
 
         for (var i = 0, len = validators.length ; i < len; i++) {
@@ -438,10 +424,30 @@ Contestant.prototype = {
 /*
  * Calls a method that handles adding a new form.
  */
+function nextContestant(prefix) {
+    'use strict';
+    if (checkDistances(prefix)) {
+        contestant.addNextContestant();
+    }
+}
+
+/*
+ * Calls a method that handles validating given distances.
+ */
 $('#add_more').click(function() {
     'use strict';
-    contestant.addNextContestant();
+    $("a[id^='validation-start']").get(-2).click();
 });
+
+/*
+ * Checks last contestant on submitting form.
+ */
+$('#submit_form').click(function() {
+    'use strict';
+    $('#confirmation-modal').closeModal();
+    return checkDistances('form-' + ($("div[id^='id_form']").length - 2));
+});
+
 
 /*
  * Populates modal with contest info.
@@ -560,7 +566,7 @@ function parseContestantData(json) {
         ['Płeć', 'gender'],
         ['Wiek', 'age'],
         ['Rodzaj Szkoły', 'school'],
-        ['styl i dystans', 'style']
+        ['Styl i dystans', 'style']
     ];
     var fragment = document.createDocumentFragment();
     var elementUl = document.createElement('ul');
@@ -680,9 +686,10 @@ function showDistances(checkboxNumber) {
 }
 
 /*
- * Validate given distances.
+ * Validate given distances when adding contest.
  */
 function validateDistances() {
+    'use strict';
     var errorMessage;
     var isValidated = true;
     if (!($('#dowolny').is(':checked') || $('#grzbietowy').is(':checked') ||
@@ -761,4 +768,54 @@ function validateDistances() {
         return true;
     }
     return false;
+}
+
+/*
+ * Check if user took at least 1 distance (add_contestant form).
+ */
+function checkDistances(prefix) {
+    'use strict';
+    var result = '';
+    $('.distance_' + prefix).each(function() {
+        if ($(this).is(':checked')) {
+            result += ',' + (this.id).split('_', 1);
+        }
+    });
+    if (result) {
+        $('#id_' + prefix + '-distances').val('');
+        $('#id_' + prefix + '-distances').val(result);
+        $('#distance-error').remove();
+        return true;
+    }
+    else {
+        if ($('#distance-error').length === 0) {
+            $('#validation-start_' + prefix).before('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.</span>');
+        }
+        return false;
+    }
+}
+
+/*
+ * Check if user took at least 1 distance (edit_contestant form).
+ */
+function checkEditedDistances() {
+    'use strict';
+    var result = '';
+    $('.distance').each(function() {
+        if ($(this).is(':checked')) {
+            result += ',' + this.id
+        }
+    });
+    if (result) {
+        $('#id_distances').val('');
+        $('#id_distances').val(result);
+        $('#distance-error').remove();
+        return true;
+    }
+    else {
+        if ($('#distance-error').length === 0) {
+            $('#style').after('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.</span>');
+        }
+        return false;
+    }
 }

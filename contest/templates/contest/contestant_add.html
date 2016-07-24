@@ -20,13 +20,14 @@
             {% for form in formset %}
               <div id="id_{{ form.prefix}}" class="contestant-form animation">
                 {{ form.as_p }}
-                <label id="style">Style:</label>
+                <p id="style">Style:</p>
                 <p class="distance-choices">
-                {% for distance in distances %}
-                  <input type="checkbox" id="{{ distance }}">
-                  <label for="{{ distance }}">{{ distance }}</label>
+                {% for code, distance in distances %}
+                  <input type="checkbox" id="{{ code }}_{{ form.prefix }}" class="distance_{{ form.prefix }}">
+                  <label for="{{ code }}_{{ form.prefix }}">{{ distance }}</label>
                 {% endfor %}
                 </p>
+                <a class="invisible" id="validation-start_{{ form.prefix }}" onclick="nextContestant('{{ form.prefix }}')"></a>
               </div>
             {% endfor %}
           </div>
@@ -47,7 +48,7 @@
             </div>
             <div class="modal-footer">
               <a class="modal-action modal-close waves-effect waves-green btn-flat">Powrót</a>
-              <input type="submit" class="modal-action modal-close waves-effect waves-green btn-flat" value="Tak">
+              <input type="submit" id="submit_form" class="modal-action modal-close waves-effect waves-green btn-flat" value="Tak">
             </div>
           </div>
           <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
@@ -56,8 +57,16 @@
     </div>
   </div>
   <div id="empty_form" style="display: none;">
-    <div id="id_{{ formset.empty_form.prefix}}" class="contestant-form animation">
+    <div id="id_{{ formset.empty_form.prefix }}" class="contestant-form animation">
       {{ formset.empty_form.as_p }}
+      <p class="style">Style:</p>
+      <p class="distance-choices">
+      {% for code, distance in distances %}
+        <input type="checkbox" id="{{ code }}_{{ formset.empty_form.prefix }}" class="distance_{{ formset.empty_form.prefix }}">
+        <label for="{{ code }}_{{ formset.empty_form.prefix }}">{{ distance }}</label>
+      {% endfor %}
+      </p>
+      <a class="invisible" id="validation-start_{{ formset.empty_form.prefix }}" onclick="nextContestant('{{ formset.empty_form.prefix }}')"></a>
     </div>
   </div>
   <div id="contestants-preview" class="z-depth-2 invisible">

@@ -118,7 +118,9 @@ class ContestantAddView(View):
             request, self.template_name, {
                 'formset': formset,
                 'name': contest,
-                'distances': contest.get_style_display().split(','),
+                'distances': zip(
+                    contest.style, contest.get_style_display().split(',')
+                ),
                 'organization': organization,
             }
         )
@@ -234,10 +236,11 @@ class EditContestantView(View):
         """
         contestant = Contestant.objects.get(id=contestant_id)
         user = request.user
+        contest = contestant.contest
 
         form = self.form_class(
             instance=contestant,
-            contest_id=contestant.contest.id,
+            contest_id=contest.id,
             user=user
         )
 
@@ -247,8 +250,16 @@ class EditContestantView(View):
                 {'msg': 'Nie możesz edytować tego zawodnika.'},
             )
         return render(
-            request, self.template_name,
-            {'contestant': contestant, 'form': form, 'user': user},
+            request,
+            self.template_name,
+            {
+                'contestant': contestant,
+                'form': form,
+                'user': user,
+                'distances': zip(
+                    contest.style, contest.get_style_display().split(',')
+                ),
+            },
         )
 
     def post(self, request, contestant_id, *args, **kwargs):
@@ -256,21 +267,29 @@ class EditContestantView(View):
         Submit contestant data.
         """
         contestant = Contestant.objects.get(id=contestant_id)
+        contest = contestant.contest
         form = self.form_class(
             request.POST,
             user=request.user,
             instance=contestant,
-            contest_id=contestant.contest.id
+            contest_id=contest.id
         )
         if form.has_changed():
             if form.is_valid():
                 form.save()
                 return redirect(
-                    'contest:contestant-list', contest_id=contestant.contest.id
+                    'contest:contestant-list', contest_id=contest.id
                 )
             return render(
-                request, self.template_name,
-                {'contestant': contestant, 'form': form},
+                request,
+                self.template_name,
+                {
+                    'contestant': contestant,
+                    'form': form,
+                    'distances': zip(
+                        contest.style, contest.get_style_display().split(',')
+                    ),
+                },
             )
         return redirect(
             'contest:contestant-list',
