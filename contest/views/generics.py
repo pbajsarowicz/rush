@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.forms import formset_factory
-from django.shortcuts import(
+from django.shortcuts import (
     render,
     redirect,
 )

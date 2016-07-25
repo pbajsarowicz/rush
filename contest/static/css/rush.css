@@ -70,6 +70,23 @@ p#style {
   color: #9e9e9e;
 }
 
+/* Error page */
+
+div#error-text {
+  width: 900px;
+  height: 300px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+div#error-text p {
+  text-align: center;
+  font-size: 18px;
+
 /************
 Base elements
 *************/

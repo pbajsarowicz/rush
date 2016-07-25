@@ -25,3 +25,8 @@ urlpatterns = [
     url(r'^api/v1/', include('api.urls', namespace='api')),
     url(r'^admin/', admin.site.urls),
 ]
+
+handler400 = 'contest.views.bad_request'
+handler403 = 'contest.views.permission_denied'
+handler404 = 'contest.views.page_not_found'
+handler500 = 'contest.views.server_error'
