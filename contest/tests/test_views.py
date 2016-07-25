@@ -518,14 +518,14 @@ class ContestantAddViewTestCase(TestCase):
             'form-0-gender': 'M',
             'form-0-last_name': 'Kowalski',
             'form-0-school': 'P',
-            'form-0-distances': ',D25,G25',
+            'form-0-styles': ',D25,G25',
             'form-0-organization': self.user.unit,
             'form-1-age': '16',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
             'form-1-school': 'P',
-            'form-1-distances': ',K50,Z200',
+            'form-1-styles': ',K50,Z200',
             'form-1-organization': self.user.unit,
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
@@ -533,22 +533,22 @@ class ContestantAddViewTestCase(TestCase):
             'form-TOTAL_FORMS': '2'
         }
 
-        DISTANCES = ['D25', 'D50', 'G25', 'K50', 'K200', 'Z200']
+        styles = ['D25', 'D50', 'G25', 'K50', 'K200', 'Z200']
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
             place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2048, 11, 20)), style=DISTANCES
+            deadline=make_aware(datetime(2048, 11, 20)), styles=styles
         )
         self.contest_done = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
             place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20)), style=DISTANCES
+            deadline=make_aware(datetime(2008, 11, 20)), styles=styles
         )
         self.contest_deadline = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
             place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20)), style=DISTANCES
+            deadline=make_aware(datetime(2008, 11, 20)), styles=styles
         )
 
     def test_get(self):
@@ -688,7 +688,7 @@ class ContestantListViewTestCase(TestCase):
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
-            gender='M', age=14, school='S', style=['M50', 'Z100'],
+            gender='M', age=14, school='S', styles=['M50', 'Z100'],
             contest=self.contest
         )
 
@@ -721,7 +721,7 @@ class EditContestantViewTestCase(TestCase):
             gender='M',
             age=14,
             school='P',
-            style=',K200,D25',
+            styles=',K200,D25',
             contest=Contest.objects.first(),
             moderator=self.user
         )
@@ -795,7 +795,7 @@ class ContestAddTestCase(TestCase):
             'age_max': 17,
             'description': 'Zapraszamy na zawody!',
             'organization': self.user_1.unit,
-            'distances': ',D25,G50,K200,Z100'
+            'styles': ',D25,G50,K200,Z100'
         }
 
     def test_has_access(self):

@@ -254,7 +254,7 @@ class Contest(UnitModelsMixin, models.Model):
     )
     object_id = models.PositiveIntegerField(blank=True, null=True)
     organizer = GenericForeignKey('content_type', 'object_id')
-    style = MultiSelectField(choices=STYLES_DISTANCES)
+    styles = MultiSelectField(choices=STYLES_DISTANCES)
 
     def __unicode__(self):
         return self.name or (
@@ -294,7 +294,7 @@ class Contestant(models.Model):
     gender = models.CharField('płeć', max_length=1, choices=GENDERS)
     age = models.IntegerField('wiek')
     school = models.CharField('rodzaj szkoły', max_length=1, choices=SCHOOLS)
-    style = MultiSelectField(choices=STYLES_DISTANCES)
+    styles = MultiSelectField(choices=STYLES_DISTANCES)
     contest = models.ForeignKey(Contest)
 
     def __unicode__(self):

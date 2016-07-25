@@ -11,13 +11,13 @@
             {{ form.as_p }}
             <p id="style">Style:</p>
             <p class="distance-choices">
-              {% for code, distance in distances %}
+              {% for code, distance in styles %}
                 <input type="checkbox" id="{{ code }}" class="distance">
                 <label for="{{ code }}">{{ distance }}</label>
               {% endfor %}
             </p>
             <a  href="{% url 'contest:contestant-list' contest_id=contestant.contest.id %}" class="pull-left btn btn-primary">Anuluj</a>
-            <button type="submit" class="pull-right btn btn-primary" onclick="return checkEditedDistances()">Zapisz</button>
+            <button type="submit" class="pull-right btn btn-primary" onclick="return checkEditedStyles()">Zapisz</button>
           </form>
         </div>
       {% endif %}

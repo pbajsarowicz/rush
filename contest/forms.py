@@ -173,14 +173,12 @@ class ContestantForm(forms.ModelForm):
     Form for contestant creation.
     """
     organization = forms.CharField(label='Klub/Szkoła', max_length=100)
-    distances = forms.CharField(label='', max_length=128)
+    styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         self.contest = kwargs.pop('contest_id')
         self.user = kwargs.pop('user')
         super(ContestantForm, self).__init__(*args, **kwargs)
-
-        self.fields['distances'].widget.attrs = {'class': 'invisible'}
 
         if self.user.unit:
             self.fields['organization'].initial = self.user.unit
@@ -195,14 +193,14 @@ class ContestantForm(forms.ModelForm):
             'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
         )
 
-    def clean_distances(self):
-        distances = self.cleaned_data.get('distances')
-        return distances.split(',')[1:]
+    def clean_styles(self):
+        styles = self.cleaned_data.get('styles')
+        return styles.split(',')[1:]
 
     def save(self, commit=True):
         contestant = super(ContestantForm, self).save(commit=False)
 
-        contestant.style = self.cleaned_data['distances']
+        contestant.styles = self.cleaned_data['styles']
 
         if commit:
             contestant.save()
@@ -221,7 +219,7 @@ class ContestForm(forms.ModelForm):
     Form for creating Contests.
     """
     organization = forms.CharField(label='Organizacja', max_length=255)
-    distances = forms.CharField(label='', max_length=128)
+    styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
@@ -229,9 +227,7 @@ class ContestForm(forms.ModelForm):
 
         super(ContestForm, self).__init__(*args, **kwargs)
 
-        self.fields['distances'].widget.attrs = {
-            'class': 'invisible', 'id': 'distances-summary'
-        }
+        self.fields['styles'].widget.attrs = {'id': 'styles-summary'}
         self.fields['date'].widget.attrs = {'class': 'datetime'}
         self.fields['deadline'].widget.attrs = {'class': 'datetime'}
         self.fields['description'].widget.attrs = {
@@ -264,9 +260,9 @@ class ContestForm(forms.ModelForm):
             )
         return deadline
 
-    def clean_distances(self):
-        distances = self.cleaned_data.get('distances')
-        return distances.split(',')[1:]
+    def clean_styles(self):
+        styles = self.cleaned_data.get('styles')
+        return styles.split(',')[1:]
 
     def clean_age_max(self):
         age_min = self.cleaned_data.get('age_min')
@@ -283,7 +279,7 @@ class ContestForm(forms.ModelForm):
 
         contest.content_type = self.user.content_type
         contest.object_id = self.user.object_id
-        contest.style = self.cleaned_data['distances']
+        contest.styles = self.cleaned_data['styles']
 
         if commit:
             contest.save()

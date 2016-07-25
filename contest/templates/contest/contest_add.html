@@ -15,9 +15,9 @@
             {{ form.as_p }}
             <label id="style">Style:</label>
             <p>
-              <input type="checkbox" class="filled-in" id="dowolny" onclick="showDistances(1);" name="dowolny">
+              <input type="checkbox" class="filled-in" id="dowolny" onclick="showStyles(1);" name="dowolny">
               <label for="dowolny">Dowolny</label><br>
-              <span id="dowolny-distances" class="distance-choices invisible">
+              <span id="dowolny-styles" class="distance-choices invisible">
                 <input type="checkbox" id="D25" name="D25">
                 <label for="D25">25m</label>
                 <input type="checkbox" id="D50" name="D50">
@@ -35,9 +35,9 @@
               </span>
             </p>
             <p>
-              <input type="checkbox" class="filled-in" id="grzbietowy" onclick="showDistances(2);" name="grzbietowy">
+              <input type="checkbox" class="filled-in" id="grzbietowy" onclick="showStyles(2);" name="grzbietowy">
               <label for="grzbietowy">Grzbietowy</label><br>
-              <span id="grzbietowy-distances" class="distance-choices invisible">
+              <span id="grzbietowy-styles" class="distance-choices invisible">
                 <input type="checkbox" id="G25" name="G25">
                 <label for="G25">25m</label>
                 <input type="checkbox" id="G50" name="G50">
@@ -49,9 +49,9 @@
               </span>
             </p>
             <p>
-              <input type="checkbox" class="filled-in" id="klasyczny" onclick="showDistances(3);" name="klasyczny">
+              <input type="checkbox" class="filled-in" id="klasyczny" onclick="showStyles(3);" name="klasyczny">
               <label for="klasyczny">Klasyczny</label><br>
-              <span id="klasyczny-distances" class="distance-choices invisible">
+              <span id="klasyczny-styles" class="distance-choices invisible">
                 <input type="checkbox" id="K25" name="K25">
                 <label for="K25">25m</label>
                 <input type="checkbox" id="K50" name="K50">
@@ -63,9 +63,9 @@
               </span>
             </p>
             <p>
-              <input type="checkbox" class="filled-in" id="motylkowy" onclick="showDistances(4);" name="motylkowy">
+              <input type="checkbox" class="filled-in" id="motylkowy" onclick="showStyles(4);" name="motylkowy">
               <label for="motylkowy">Motylkowy</label><br>
-              <span id="motylkowy-distances" class="distance-choices invisible">
+              <span id="motylkowy-styles" class="distance-choices invisible">
                 <input type="checkbox" id="M25" name="M25">
                 <label for="M25">25m</label>
                 <input type="checkbox" id="M50" name="M50">
@@ -77,9 +77,9 @@
               </span>
             </p>
             <p>
-              <input type="checkbox" class="filled-in" id="zmienny" onclick="showDistances(5);" name="zmienny">
+              <input type="checkbox" class="filled-in" id="zmienny" onclick="showStyles(5);" name="zmienny">
               <label for="zmienny">Zmienny</label><br>
-              <span id="zmienny-distances" class="distance-choices invisible">
+              <span id="zmienny-styles" class="distance-choices invisible">
                 <input type="checkbox" id="Z100" name="Z100">
                 <label for="Z100">100m</label>
                 <input type="checkbox" id="Z200" name="Z200">
@@ -87,7 +87,7 @@
               </span>
             </p>
             <a class="waves-effect waves-light btn modal-trigger" href="{% url 'contest:home' %}">Anuluj</a>
-            <button type="submit" class="pull-right btn btn-primary" onclick="return validateDistances();">Gotowe</button>
+            <button type="submit" class="pull-right btn btn-primary" onclick="return validateStyles();">Gotowe</button>
           </div>
         </form>
       {% endif %}

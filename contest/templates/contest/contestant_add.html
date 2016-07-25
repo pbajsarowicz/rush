@@ -22,7 +22,7 @@
                 {{ form.as_p }}
                 <p id="style">Style:</p>
                 <p class="distance-choices">
-                {% for code, distance in distances %}
+                {% for code, distance in styles %}
                   <input type="checkbox" id="{{ code }}_{{ form.prefix }}" class="distance_{{ form.prefix }}">
                   <label for="{{ code }}_{{ form.prefix }}">{{ distance }}</label>
                 {% endfor %}
@@ -61,7 +61,7 @@
       {{ formset.empty_form.as_p }}
       <p class="style">Style:</p>
       <p class="distance-choices">
-      {% for code, distance in distances %}
+      {% for code, distance in styles %}
         <input type="checkbox" id="{{ code }}_{{ formset.empty_form.prefix }}" class="distance_{{ formset.empty_form.prefix }}">
         <label for="{{ code }}_{{ formset.empty_form.prefix }}">{{ distance }}</label>
       {% endfor %}

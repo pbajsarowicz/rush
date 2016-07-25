@@ -118,8 +118,8 @@ class ContestantAddView(View):
             request, self.template_name, {
                 'formset': formset,
                 'name': contest,
-                'distances': zip(
-                    contest.style, contest.get_style_display().split(',')
+                'styles': zip(
+                    contest.styles, contest.get_styles_display().split(',')
                 ),
                 'organization': organization,
             }
@@ -256,8 +256,8 @@ class EditContestantView(View):
                 'contestant': contestant,
                 'form': form,
                 'user': user,
-                'distances': zip(
-                    contest.style, contest.get_style_display().split(',')
+                'styles': zip(
+                    contest.styles, contest.get_styles_display().split(',')
                 ),
             },
         )
@@ -286,8 +286,8 @@ class EditContestantView(View):
                 {
                     'contestant': contestant,
                     'form': form,
-                    'distances': zip(
-                        contest.style, contest.get_style_display().split(',')
+                    'styles': zip(
+                        contest.styles, contest.get_styles_display().split(',')
                     ),
                 },
             )

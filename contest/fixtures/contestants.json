@@ -8,7 +8,7 @@
             "gender": "M",
             "age": 17,
             "school": "P",
-            "style": ["D25", "K50"],
+            "styles": ["D25", "K50"],
             "moderator": 1,
             "contest": 1
         }
@@ -22,7 +22,7 @@
           "gender": "F",
           "age": 16,
           "school": "P",
-          "style": ["D25", "K50"],
+          "styles": ["D25", "K50"],
           "moderator": 1,
           "contest": 1
       }
@@ -36,7 +36,7 @@
           "gender": "M",
           "age": 18,
           "school": "P",
-          "style": ["D25", "K50"],
+          "styles": ["D25", "K50"],
           "moderator": 1,
           "contest": 1
       }
@@ -50,7 +50,7 @@
           "gender": "F",
           "age": 14,
           "school": "P",
-          "style": ["D25", "K50"],
+          "styles": ["D25", "K50"],
           "moderator": 1,
           "contest": 1
       }
