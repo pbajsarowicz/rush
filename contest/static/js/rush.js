@@ -444,7 +444,6 @@ $('#add_more').click(function() {
  */
 $('#submit_form').click(function() {
     'use strict';
-    $('#confirmation-modal').closeModal();
     return checkStyles('form-' + ($("div[id^='id_form']").length - 2));
 });
 
@@ -630,10 +629,10 @@ function removeContestant(userId) {
 /*
  * Show styles input.
  */
-function showStyles(checkboxNumber) {
+function showStyles(styleName) {
     'use strict';
-    switch (checkboxNumber) {
-        case 1:
+    switch (styleName) {
+        case 'dowolny':
             if ($('#dowolny').is(':checked')) {
                 $('#dowolny-styles').removeClass('invisible');
             } else {
@@ -643,7 +642,7 @@ function showStyles(checkboxNumber) {
                 });
             }
             break;
-        case 2:
+        case 'grzbietowy':
             if ($('#grzbietowy').is(':checked')) {
                 $('#grzbietowy-styles').removeClass('invisible');
             } else {
@@ -653,7 +652,7 @@ function showStyles(checkboxNumber) {
                 });
             }
             break;
-        case 3:
+        case 'klasyczny':
             if ($('#klasyczny').is(':checked')) {
                 $('#klasyczny-styles').removeClass('invisible');
             } else {
@@ -663,7 +662,7 @@ function showStyles(checkboxNumber) {
                 });
             }
             break;
-        case 4:
+        case 'motylkowy':
             if ($('#motylkowy').is(':checked')) {
                 $('#motylkowy-styles').removeClass('invisible');
             } else {
@@ -673,7 +672,7 @@ function showStyles(checkboxNumber) {
                 });
             }
             break;
-        case 5:
+        case 'zmienny':
             if ($('#zmienny').is(':checked')) {
                 $('#zmienny-styles').removeClass('invisible');
             } else {
@@ -836,7 +835,7 @@ function checkEditedStyles() {
     });
     if (result) {
         $('#id_styles').val('');
-        $('#id_styles').val(result);
+        $('#id_styles').val(result.substr(1));
         $('#distance-error').remove();
         return true;
     }

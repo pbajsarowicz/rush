@@ -195,7 +195,7 @@ class ContestantForm(forms.ModelForm):
 
     def clean_styles(self):
         styles = self.cleaned_data.get('styles')
-        return styles.split(',')[1:]
+        return styles.split(',')
 
     def save(self, commit=True):
         contestant = super(ContestantForm, self).save(commit=False)
@@ -262,7 +262,7 @@ class ContestForm(forms.ModelForm):
 
     def clean_styles(self):
         styles = self.cleaned_data.get('styles')
-        return styles.split(',')[1:]
+        return styles.split(',')
 
     def clean_age_max(self):
         age_min = self.cleaned_data.get('age_min')
