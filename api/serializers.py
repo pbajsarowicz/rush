@@ -71,6 +71,7 @@ class ContestSerializer(serializers.HyperlinkedModelSerializer):
 
 class RushUserSerializer(serializers.HyperlinkedModelSerializer):
     unit = SchoolClubRelatedField(read_only=True)
+    date_joined = serializers.DateTimeField(format='%d.%m.%Y %H:%M')
 
     class Meta:
         model = RushUser
