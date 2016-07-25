@@ -6,7 +6,13 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.forms import formset_factory
-from django.shortcuts import(
+from django.http import (
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseServerError
+)
+from django.shortcuts import (
     render,
     redirect,
 )
@@ -302,3 +308,27 @@ class ContestAddView(PermissionRequiredMixin, View):
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
+
+
+def bad_request(request):
+    template = loader.get_template('error.html')
+    body = template.render({'email': settings.SUPPORT_EMAIL}, request)
+    return HttpResponseBadRequest(body)
+
+
+def permission_denied(request):
+    template = loader.get_template('error.html')
+    body = template.render({'email': settings.SUPPORT_EMAIL}, request)
+    return HttpResponseForbidden(body)
+
+
+def page_not_found(request):
+    template = loader.get_template('error.html')
+    body = template.render({'email': settings.SUPPORT_EMAIL}, request)
+    return HttpResponseNotFound(body)
+
+
+def server_error(request):
+    template = loader.get_template('error.html')
+    body = template.render({'email': settings.SUPPORT_EMAIL}, request)
+    return HttpResponseServerError(body)
