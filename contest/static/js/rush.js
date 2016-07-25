@@ -455,6 +455,7 @@ function getContestInfo(pk) {
     var contact = '';
     var organizer_contact = '';
     var result = '';
+    var URLS = 'static/documents/contest_pliki/fdsopfja.docx'
 
     $.ajax({
         url: '/api/v1/contests/' + pk + '/?format=json',
@@ -462,7 +463,7 @@ function getContestInfo(pk) {
         success: function(json){
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od ' + json['age_min'] + ' do ' + json['age_max'] + ' lat' +
-            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<a> Pliki: ' + displayFiles();
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<a href=' + URLS + '>'+ file_list + '</a>'
 
             organizer = json['organizer'];
             if (organizer) {

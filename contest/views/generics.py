@@ -26,7 +26,7 @@ from contest.forms import (
     ContestantForm,
     ContestForm,
 )
-
+import os
 
 class HomeView(TemplateView):
     """
@@ -35,6 +35,8 @@ class HomeView(TemplateView):
     template_name = 'contest/home.html'
 
     def get_context_data(self, **kwargs):
+        path="contest/static/documents/contest_pliki/"
+        file_list = os.listdir(path)
         context = super(HomeView, self).get_context_data(**kwargs)
         context['upcoming'] = Contest.objects.filter(
             date__gte=timezone.now()
@@ -42,6 +44,7 @@ class HomeView(TemplateView):
         context['completed'] = Contest.objects.filter(
             date__lt=timezone.now()
         ).order_by('-date')
+        context['file_list'] = file_list
 
         return context
 
@@ -302,3 +305,20 @@ class ContestAddView(PermissionRequiredMixin, View):
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
+
+
+class ContestFileView(View):
+    """
+    View for download file.
+    """
+    template_name = 'contest/file_download.html'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Return file.
+        """
+        path="contest/static/documents/contest_pliki/"
+        img_list =os.listdir(path)
+        return render(request, self.template_name, {'images': img_list})
+
+

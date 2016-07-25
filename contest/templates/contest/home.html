@@ -1,8 +1,10 @@
 {% extends "contest/base.html" %}
 {% load staticfiles %}
 
+
 {% block container %}
   <div class="container">
+        <a href='{{ MEDIA_URL }}{{ file.relative_path }}'>{{contest.docfile}}</a>
     <h1 class="header center">Witaj {{ user.first_name }} {{ user.last_name }}</h1>
     <div class="row center">
       <h5 class="header col s12 light">Poniżej znajdziesz informacje o nadchodzących i zakończonych zawodach.</h5>
@@ -82,3 +84,6 @@
     </ul>
   </div>
 {% endblock container %}
+<script type="text/javascript">
+var file_list = {{ files }}
+</script>

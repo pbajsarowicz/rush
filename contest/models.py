@@ -199,7 +199,7 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
 
 
 def contest_directory_path(instance, filename):
-    return 'documents/contest_{0}/{1}'.format(instance.name, filename)
+    return 'contest/static/documents/contest_{0}/{1}'.format(instance.name, filename)
 
 
 class Contest(models.Model):
@@ -227,6 +227,11 @@ class Contest(models.Model):
         return self.name or (
             '{} - {}'.format(self.place, self.date.strftime('%d-%m-%Y'))
         )
+
+    @property
+    def relative_path(self):
+        return os.path.relpath(self.path, settings.MEDIA_ROOT)
+
 
     @property
     def is_submitting_open(self):
