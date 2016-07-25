@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'contest',
     'rest_framework',
     'api',
+    'multiselectfield',
 ]
 
 MIDDLEWARE_CLASSES = [
