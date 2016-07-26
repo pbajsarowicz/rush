@@ -281,4 +281,4 @@ class ContestResultsForm(forms.ModelForm):
 
     class Meta:
         model = Contest
-        fields = ['results',]
+        fields = ['results']
