@@ -399,19 +399,30 @@ class AccountsViewTestCase(TestCase):
     def setUp(self):
         user = RushUser(
             email='auth@user.pl', first_name='auth', last_name='auth',
-            is_active=True, username='auth'
+            is_active=True, username='auth', is_admin=True
         )
         user.set_password('password123')
         user.save()
 
+        normal_user = RushUser.objects.create(
+            email='cc@aa.bbb', first_name='Adam', last_name='NieAdmin',
+            is_active=True, username='normal_user', is_admin=False
+        )
+        normal_user.set_password('password123')
+        normal_user.save()
+
         self.client.login(username='auth', password='password123')
 
     def test_get(self):
+        self.client.login(username='normal_user', password='password123')
+        response = self.client.get(reverse('contest:accounts'))
+        self.assertRedirects(response, reverse('contest:home'))
+
         inactive_user = RushUser.objects.create(
             email='inactive_user@user.pl', first_name='Test',
             last_name='Anonymous', is_active=False, username='inactive_user'
         )
-
+        self.client.login(username='auth', password='password123')
         response = self.client.get(reverse('contest:accounts'))
 
         self.assertEqual(response.status_code, 200)

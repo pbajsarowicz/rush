@@ -4,7 +4,10 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import (
+    render,
+    redirect
+)
 from django.template import loader
 from django.views.generic import View
 
@@ -22,6 +25,8 @@ class AccountsView(View):
         """
         Transfer RushUser model and render pages 'administratorzy/konta'.
         """
+        if not request.user.is_staff:
+            return redirect('contest:home')
         users = RushUser.objects.filter(is_active=False)
 
         return render(request, self.template_name, {'users': users})
