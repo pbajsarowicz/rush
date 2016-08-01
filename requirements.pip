@@ -16,3 +16,4 @@ pyrepl==0.8.4
 Unidecode==0.04.18
 wmctrl==0.3
 wsgiref==0.1.2
+django-multiselectfield==0.1.3

@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.forms import formset_factory
-from django.shortcuts import(
+from django.shortcuts import (
     render,
     redirect,
 )
@@ -120,6 +120,9 @@ class ContestantAddView(View):
             request, self.template_name, {
                 'formset': formset,
                 'name': contest,
+                'styles': zip(
+                    contest.styles, contest.get_styles_display().split(',')
+                ),
                 'organization': organization,
             }
         )
@@ -235,10 +238,11 @@ class EditContestantView(View):
         """
         contestant = Contestant.objects.get(id=contestant_id)
         user = request.user
+        contest = contestant.contest
 
         form = self.form_class(
             instance=contestant,
-            contest_id=contestant.contest.id,
+            contest_id=contest.id,
             user=user
         )
 
@@ -248,8 +252,16 @@ class EditContestantView(View):
                 {'msg': 'Nie możesz edytować tego zawodnika.'},
             )
         return render(
-            request, self.template_name,
-            {'contestant': contestant, 'form': form, 'user': user},
+            request,
+            self.template_name,
+            {
+                'contestant': contestant,
+                'form': form,
+                'user': user,
+                'styles': zip(
+                    contest.styles, contest.get_styles_display().split(',')
+                ),
+            },
         )
 
     def post(self, request, contestant_id, *args, **kwargs):
@@ -257,21 +269,29 @@ class EditContestantView(View):
         Submit contestant data.
         """
         contestant = Contestant.objects.get(id=contestant_id)
+        contest = contestant.contest
         form = self.form_class(
             request.POST,
             user=request.user,
             instance=contestant,
-            contest_id=contestant.contest.id
+            contest_id=contest.id
         )
         if form.has_changed():
             if form.is_valid():
                 form.save()
                 return redirect(
-                    'contest:contestant-list', contest_id=contestant.contest.id
+                    'contest:contestant-list', contest_id=contest.id
                 )
             return render(
-                request, self.template_name,
-                {'contestant': contestant, 'form': form},
+                request,
+                self.template_name,
+                {
+                    'contestant': contestant,
+                    'form': form,
+                    'styles': zip(
+                        contest.styles, contest.get_styles_display().split(',')
+                    ),
+                },
             )
         return redirect(
             'contest:contestant-list',

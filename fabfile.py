@@ -2,7 +2,10 @@ import os
 import urlparse
 import webbrowser
 
-from fabric.api import local
+from fabric.api import local, env, run, cd
+
+env.hosts = ['rush']
+env.use_ssh_config = True
 
 
 def pep8():
@@ -72,3 +75,23 @@ def pip(reinstall='N'):
     """
     extra = '-I' if reinstall.upper() == 'Y' else ''
     local('pip install {} -r requirements.pip'.format(extra))
+
+
+def deploy(branch='develop'):
+    """
+    Remote deployment command
+    """
+    with cd('/home/app/rush/'):
+        try:
+            run('pkill gunicorn')
+        except SystemExit:
+            pass
+
+        run('git pull origin {}'.format(branch))
+        run('python manage.py migrate')
+        run('pip install -r requirements.pip')
+        run('service nginx restart')
+        run(
+            'gunicorn --bind 127.0.0.1:8001 rush.wsgi:application '
+            '--settings=rush.local_settings'
+        )
