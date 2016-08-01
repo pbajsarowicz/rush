@@ -14,10 +14,10 @@
             {% if contestant.moderator == request.user %}
               <a class="secondary-content waves-effect waves-light btn-flat"
                  href="{% url 'contest:contestant-edit' contestant_id=contestant.id %}">Edytuj</a>
-              <a class="secondary-content waves-effect waves-light btn-flat modal-trigger" href="#delete-user">Usuń</a>
+              <a class="secondary-content waves-effect waves-light btn-flat modal-trigger" href="#delete-{{ contestant.id }}">Usuń</a>
             {% endif %}
             <p id="content{{ contestant.id }}" class="invisible"></p>
-            <div id="delete-user" class="modal">
+            <div id="delete-{{ contestant.id }}" class="modal">
               <div class="modal-content">
                 <h4>Usunięcie zawodnika</h4>
                 <p>Czy na pewno chcesz usunąć zawodnika {{ contestant.first_name }} {{ contestant.last_name }} z zawodów {{ contestant.contest }}?</p>
