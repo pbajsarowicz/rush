@@ -533,14 +533,14 @@ class ContestantAddViewTestCase(TestCase):
 
         self.form_data = {
             'csrfmiddlewaretoken': 'A33GMETyB7NE1CknWDg2jVuS1Jsm5A9y',
-            'form-0-age': '2005',
+            'form-0-year_of_birth': '2005',
             'form-0-first_name': 'Jan',
             'form-0-gender': 'M',
             'form-0-last_name': 'Kowalski',
             'form-0-school': 'P',
             'form-0-styles': ',D25,G25',
             'form-0-organization': self.user.unit,
-            'form-1-age': '2000',
+            'form-1-year_of_birth': '2000',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
@@ -656,7 +656,7 @@ class ContestantAddViewTestCase(TestCase):
             'Takie zawody nie istnieją.'
         )
 
-        self.form_data['form-0-age'] = 1978
+        self.form_data['form-0-year_of_birth'] = 1978
         response = self.client.post(
             reverse(
                 'contest:contestant-add',
@@ -666,13 +666,15 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         expected_error = {
-            'age': ['Zawodnik nie mieści się w wymaganym przedziale wiekowym.']
+            'year_of_birth': [
+                'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
+            ]
         }
         self.assertEqual(
             response.context['formset'].errors, [expected_error, {}]
         )
 
-        self.form_data['form-0-age'] = 2001
+        self.form_data['form-0-year_of_birth'] = 2001
         self.form_data['form-0-gender'] = 'WRONG'
         response = self.client.post(
             reverse(
@@ -721,7 +723,7 @@ class ContestantListViewTestCase(TestCase):
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
-            gender='M', age=2002, school='S', styles=['M50', 'Z100'],
+            gender='M', year_of_birth=2002, school='S', styles=['M50', 'Z100'],
             contest=self.contest
         )
 
@@ -752,7 +754,7 @@ class EditContestantViewTestCase(TestCase):
             first_name='Adam',
             last_name='Nowak',
             gender='M',
-            age=2002,
+            year_of_birth=2002,
             school='P',
             styles=',K200,D25',
             contest=Contest.objects.first(),
@@ -778,10 +780,11 @@ class EditContestantViewTestCase(TestCase):
         self.assertEqual(response.context['form'].initial['gender'], 'M')
         self.assertEqual(response.context['form'].initial['school'], 'P')
         self.assertEqual(
-            response.context['form'].initial['styles_distances'], '100m motyl'
+            response.context['form'].initial['year_of_birth'], 2002
         )
-        self.assertEqual(response.context['form'].initial['age'], 2002)
-        self.assertEqual(response.context['form'].initial['age'], 2002)
+        self.assertEqual(
+            response.context['form'].initial['year_of_birth'], 2002
+        )
 
     def test_post(self):
         response = self.client.post(
@@ -791,7 +794,7 @@ class EditContestantViewTestCase(TestCase):
             ),
             data={
                 'first_name': 'Karol', 'last_name': 'Kowalski',
-                'school': 'P', 'gender': 'F', 'age': 2005,
+                'school': 'P', 'gender': 'F', 'year_of_birth': 2005,
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -805,7 +808,9 @@ class EditContestantViewTestCase(TestCase):
             response.context['form'].cleaned_data['school'], 'P'
         )
         self.assertEqual(response.context['form'].cleaned_data['gender'], 'F')
-        self.assertEqual(response.context['form'].cleaned_data['age'], 2005)
+        self.assertEqual(
+            response.context['form'].cleaned_data['year_of_birth'], 2005
+        )
 
 
 class ContestAddTestCase(TestCase):

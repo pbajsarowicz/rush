@@ -79,7 +79,7 @@
 {% block scripts %}
   {{ block.super }}
   <script>
-    var minAge = parseInt('{{ name.lowest_year }}');
-    var maxAge = parseInt('{{ name.highest_year }}');
+    var lowestYear = parseInt('{{ name.lowest_year }}');
+    var highestYear = parseInt('{{ name.highest_year }}');
   </script>
 {% endblock scripts %}

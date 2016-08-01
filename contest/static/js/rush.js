@@ -72,7 +72,7 @@ function ContestantValidation() {
     this.firstName = '';
     this.lastName = '';
     this.gender = '';
-    this.age = '';
+    this.yearOfBirth = '';
     this.school = '';
     this.stylesDistances = '';
 
@@ -157,17 +157,17 @@ ContestantValidation.prototype = {
     /*
      * Validates age.
      */
-    validateAge: function(formId) {
+    validateYearOfBirth: function(formId) {
         'use strict';
-        this.age = document.forms['contestants'][formId + '-age'].value;
+        this.yearOfBirth = document.forms['contestants'][formId + '-year_of_birth'].value;
 
-        if (!this.age) {
-            this.raiseValidation(formId + '-age', 'Pole Wiek nie może być puste i może zawierać tylko cyfry.');
+        if (!this.yearOfBirth) {
+            this.raiseValidation(formId + '-year_of_birth', 'Pole Wiek nie może być puste i może zawierać tylko cyfry.');
         }
-        else if (this.age < minAge || this.age > maxAge ) {
-            this.raiseValidation(formId + '-age', 'Wiek zawodnika nie mieści się w przedziale przeznaczonym dla tego konkursu.');
+        else if (this.yearOfBirth  < lowestAge || this.yearOfBirth  > highestAge ) {
+            this.raiseValidation(formId + '-year_of_birth', 'Wiek zawodnika nie mieści się w przedziale przeznaczonym dla tego konkursu.');
         } else {
-            this.clearValidation(formId + '-age');
+            this.clearValidation(formId + '-year_of_birth');
         }
     },
     /*
@@ -208,7 +208,7 @@ ContestantValidation.prototype = {
 
         var validators = [
             'validateFirstName', 'validateLastName', 'validateGender',
-            'validateAge', 'validateSchool', 'validateOrganization'
+            'validateYearOfBirth', 'validateSchool', 'validateOrganization'
         ]
 
         for (var i = 0, len = validators.length ; i < len; i++) {
@@ -563,7 +563,7 @@ function parseContestantData(json) {
         ['Imię', 'first_name'],
         ['Nazwisko', 'last_name'],
         ['Płeć', 'gender'],
-        ['Wiek', 'age'],
+        ['Wiek', 'year_of_birth'],
         ['Rodzaj Szkoły', 'school'],
         ['Styl i dystans', 'style']
     ];

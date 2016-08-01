@@ -85,7 +85,7 @@ class ContestantTestCase(TestCase):
     def setUp(self):
         self.contestant = Contestant.objects.create(
             moderator=RushUser.objects.first(), first_name='Adam',
-            last_name='Kowalski', gender='M', age=2001, school='S',
+            last_name='Kowalski', gender='M', year_of_birth=2001, school='S',
             styles=['D25', 'G50'], contest=Contest.objects.first()
         )
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import uuid
+from datetime import datetime
 
 from django import forms
 from django.conf import settings
@@ -203,15 +204,21 @@ class ContestantForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         super(ContestantForm, self).__init__(*args, **kwargs)
 
+        year_dropdown = []
+        for x in range(datetime.now().year, (datetime.now().year - 41), - 1):
+            year_dropdown.append((x, x))
+
         if self.user.unit:
             self.fields['organization'].initial = self.user.unit
             self.fields['organization'].widget.attrs['readonly'] = True
+        self.fields['year_of_birth'] = forms.ChoiceField(choices=year_dropdown)
 
-    def clean_age(self):
-        age = self.cleaned_data.get('age')
+    def clean_year_of_birth(self):
+        year_of_birth = self.cleaned_data.get('year_of_birth')
+        print year_of_birth
         contest = Contest.objects.get(pk=self.contest)
-        if contest.lowest_year >= age >= contest.highest_year:
-            return age
+        if contest.lowest_year <= year_of_birth <= contest.highest_year:
+            return year_of_birth
         raise forms.ValidationError(
             'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
         )
@@ -233,7 +240,7 @@ class ContestantForm(forms.ModelForm):
         model = Contestant
         fields = (
             'first_name', 'last_name', 'gender',
-            'age', 'school'
+            'year_of_birth', 'school'
         )
 
 
@@ -248,6 +255,10 @@ class ContestForm(forms.ModelForm):
         if 'user' in kwargs:
             self.user = kwargs.pop('user')
 
+        year_dropdown = []
+        for x in range(datetime.now().year, (datetime.now().year - 41), - 1):
+            year_dropdown.append((x, x))
+
         super(ContestForm, self).__init__(*args, **kwargs)
 
         self.fields['styles'].widget.attrs = {'id': 'styles-summary'}
@@ -259,6 +270,10 @@ class ContestForm(forms.ModelForm):
         self.fields['organization'].initial = self.user.unit
         if self.user.unit:
             self.fields['organization'].widget.attrs['readonly'] = True
+        self.fields['lowest_year'] = forms.ChoiceField(choices=year_dropdown)
+        self.fields['highest_year'] = forms.ChoiceField(
+            choices=year_dropdown
+        )
 
     def clean_date(self):
         date = self.cleaned_data.get('date')
@@ -289,7 +304,7 @@ class ContestForm(forms.ModelForm):
 
     def clean_highest_year(self):
         lowest_year = self.cleaned_data.get('lowest_year')
-        highest_year = self.cleaned_data.get('age_max')
+        highest_year = self.cleaned_data.get('highest_year')
         if lowest_year > highest_year:
             raise forms.ValidationError(
                 'Przedział wiekowy jest niepoprawny. '

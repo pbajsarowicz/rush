@@ -92,6 +92,6 @@ class ContestantSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Contestant
         fields = (
-            'first_name', 'last_name', 'gender', 'age', 'school',
+            'first_name', 'last_name', 'gender', 'year_of_birth', 'school',
             'styles', 'moderator', 'contest'
         )

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from urlparse import urljoin
-from datetime import datetime
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import make_password
@@ -242,19 +241,12 @@ class Contest(UnitModelsMixin, models.Model):
     """
     Model for Contest.
     """
-    year_dropdown = []
-    for x in range(datetime.now().year, (datetime.now().year - 41), - 1):
-        year_dropdown.append((x, x))
 
     name = models.CharField('Nazwa zawodów', max_length=255)
     date = models.DateTimeField('Data')
     place = models.CharField('Miejsce', max_length=255)
-    lowest_year = models.IntegerField(
-        'Rocznik minimalny', choices=year_dropdown
-    )
-    highest_year = models.IntegerField(
-        'Rocznik maksymalny', choices=year_dropdown
-    )
+    lowest_year = models.PositiveSmallIntegerField('Rocznik minimalny')
+    highest_year = models.PositiveSmallIntegerField('Rocznik maksymalny')
     deadline = models.DateTimeField('Termin zgłaszania zawodników')
     description = models.TextField('Opis', blank=True)
     content_type = models.ForeignKey(
@@ -297,15 +289,12 @@ class Contestant(models.Model):
         ('G', 'Gimnazjum'),
         ('S', 'Szkoła średnia'),
     )
-    year_dropdown = []
-    for x in range(datetime.now().year, (datetime.now().year - 41), - 1):
-        year_dropdown.append((x, x))
 
     moderator = models.ForeignKey(RushUser)
     first_name = models.CharField('imię', max_length=32)
     last_name = models.CharField('nazwisko', max_length=32)
     gender = models.CharField('płeć', max_length=1, choices=GENDERS)
-    age = models.IntegerField('Rocznik', choices=year_dropdown)
+    year_of_birth = models.PositiveSmallIntegerField('Rocznik')
     school = models.CharField('rodzaj szkoły', max_length=1, choices=SCHOOLS)
     styles = MultiSelectField(choices=STYLES_DISTANCES)
     contest = models.ForeignKey(Contest)
