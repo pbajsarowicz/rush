@@ -13,6 +13,7 @@
           <div class="row center">
             {% csrf_token %}
             {{ form.as_p }}
+            {{ formset.as_p }}
             <label id="style">Style:</label>
             <p>
               <input type="checkbox" class="filled-in" id="dowolny" onclick="showStyles('dowolny');" name="dowolny">

@@ -331,7 +331,7 @@ class ContestAddView(PermissionRequiredMixin, View):
             formset = self.formset_class(
                 request.POST,
                 request.FILES,
-                instance=form.id
+                instance=form.pk
             )
             for file_form in formset:
                 cd = file_form.cleaned_data
