@@ -20,6 +20,7 @@ from contest.models import (
     Contestant,
     School,
     RushUser,
+    ContestFiles,
 )
 
 
@@ -200,6 +201,35 @@ class ContestantForm(forms.ModelForm):
         )
 
 
+class ContestFilesForm(forms.ModelForm):
+    """
+    Form for upload files.
+    """
+    def __init__(self, *args, **kwargs):
+        super(ContestFilesForm, self).__init__(*args, **kwargs)
+
+        self.fields['docfile'].widget.attrs['multiple'] = True
+
+    def clean_docfile(self):
+        docfile = self.cleaned_data.get('docfile', False)
+        ext = str(docfile)
+        ext = ext[-4:]
+        if docfile != 'brak':
+            if docfile._size > 10 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "Plik jest za duży (Więcej niż 10 mb)"
+                )
+            elif not '.doc' or not '.pdf' or not 'docx' in ext:
+                raise forms.ValidationError("Zły format")
+        return docfile
+
+    class Meta:
+        model = ContestFiles
+        fields = (
+            'docfile',
+        )
+
+
 class ContestForm(forms.ModelForm):
     """
     Form for creating Contests.
@@ -220,7 +250,6 @@ class ContestForm(forms.ModelForm):
         self.fields['organization'].initial = self.user.unit
         if self.user.unit:
             self.fields['organization'].widget.attrs['readonly'] = True
-        self.fields['docfile'].widget.attrs['multiple'] = True
 
     def clean_date(self):
         date = self.cleaned_data.get('date')
@@ -256,33 +285,17 @@ class ContestForm(forms.ModelForm):
             )
         return age_max
 
-    def clean_docfile(self):
-        docfile = self.cleaned_data.get('docfile', False)
-        ext = str(docfile)
-        ext = ext[-4:]
-        if docfile != 'brak':
-            if docfile._size > 10 * 1024 * 1024:
-                raise forms.ValidationError(
-                    "Plik jest za duży (Więcej niż 10 mb)"
-                )
-            elif not '.doc' or not '.pdf' or not 'docx' in ext:
-                raise forms.ValidationError("Zły format")
-        return docfile
-
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)
-
         contest.content_type = self.user.content_type
         contest.object_id = self.user.object_id
-
         if commit:
             contest.save()
-
         return contest
 
     class Meta:
         model = Contest
         fields = [
             'name', 'date', 'place', 'deadline', 'age_min',
-            'age_max', 'description', 'docfile',
+            'age_max', 'description',
         ]

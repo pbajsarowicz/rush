@@ -199,7 +199,10 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
 
 
 def contest_directory_path(instance, filename):
-    return 'contest/static/documents/contest_{0}/{1}'.format(instance.name, filename)
+    return 'contest/static/documents/contest_{0}/{1}'.format(
+        instance.id,
+        filename
+    )
 
 
 class Contest(models.Model):
@@ -219,19 +222,11 @@ class Contest(models.Model):
     )
     object_id = models.PositiveIntegerField(blank=True, null=True)
     organizer = GenericForeignKey('content_type', 'object_id')
-    docfile = models.FileField(
-        'Pliki', upload_to=contest_directory_path, default='brak'
-    )
 
     def __unicode__(self):
         return self.name or (
             '{} - {}'.format(self.place, self.date.strftime('%d-%m-%Y'))
         )
-
-    @property
-    def relative_path(self):
-        return os.path.relpath(self.path, settings.MEDIA_ROOT)
-
 
     @property
     def is_submitting_open(self):
@@ -247,6 +242,15 @@ class Contest(models.Model):
         or it has already taken place.
         """
         return self.date >= timezone.now()
+
+
+class ContestFiles(models.Model):
+    contest = models.ForeignKey(Contest)
+    uploaded_by = models.ForeignKey(RushUser)
+    date_uploaded = models.DateTimeField(auto_now_add=True)
+    docfile = models.FileField(
+        'Pliki', upload_to='trolollo/', default='brak'
+    )
 
 
 class Contestant(models.Model):

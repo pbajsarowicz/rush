@@ -83,9 +83,4 @@ urlpatterns = [
         login_required(views.ContestAddView.as_view()),
         name='contest-add'
     ),
-    url(
-        r'^zawody/pliki/(?P<contest_id>[0-9]+)/?$',
-        login_required(views.ContestFileView.as_view()),
-        name='contest-files'
-    ),
 ]

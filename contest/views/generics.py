@@ -21,12 +21,14 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
+    ContestFiles
 )
 from contest.forms import (
     ContestantForm,
     ContestForm,
+    ContestFilesForm,
 )
-import os
+
 
 class HomeView(TemplateView):
     """
@@ -35,8 +37,6 @@ class HomeView(TemplateView):
     template_name = 'contest/home.html'
 
     def get_context_data(self, **kwargs):
-        path="contest/static/documents/contest_pliki/"
-        file_list = os.listdir(path)
         context = super(HomeView, self).get_context_data(**kwargs)
         context['upcoming'] = Contest.objects.filter(
             date__gte=timezone.now()
@@ -44,7 +44,6 @@ class HomeView(TemplateView):
         context['completed'] = Contest.objects.filter(
             date__lt=timezone.now()
         ).order_by('-date')
-        context['file_list'] = file_list
 
         return context
 
@@ -287,38 +286,42 @@ class ContestAddView(PermissionRequiredMixin, View):
     permission_required = 'contest.add_contest'
     template_name = 'contest/contest_add.html'
     form_class = ContestForm
+    formset_class = formset_factory(ContestFilesForm, extra=1)
 
     def get(self, request):
         """
         Return clear form.
         """
         form = self.form_class(user=request.user)
-        return render(request, self.template_name, {'form': form})
+        formset = self.formset_class()
+        return render(
+            request,
+            self.template_name,
+            {'form': form, 'formset': formset}
+        )
 
     def post(self, request):
         """
         Create new Contest.
         """
-        form = self.form_class(request.POST, request.FILES, user=request.user,)
-        if form.is_valid():
-            form.save()
+        form = self.form_class(request.POST, user=request.user)
+        formset = self.formset_class(request.POST, request.FILES)
+        if form.is_valid() and formset.is_valid():
+            form = form.save()
+            formset = self.formset_class(
+                request.POST,
+                request.FILES,
+                instance=form.id
+            )
+            for file_form in formset:
+                cd = file_form.cleaned_data
+                docfile = cd.get('docfile')
+                files = ContestFiles(docfile=docfile)
+                files.save()
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
-        return render(request, self.template_name, {'form': form})
-
-
-class ContestFileView(View):
-    """
-    View for download file.
-    """
-    template_name = 'contest/file_download.html'
-
-    def get(self, request, *args, **kwargs):
-        """
-        Return file.
-        """
-        path="contest/static/documents/contest_pliki/"
-        img_list =os.listdir(path)
-        return render(request, self.template_name, {'images': img_list})
-
-
+        return render(
+            request,
+            self.template_name,
+            {'form': form, 'formset': formset}
+        )

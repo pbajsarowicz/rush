@@ -11,6 +11,7 @@ from contest.models import (
     School,
     Contestant,
     RushUser,
+    ContestFiles,
 )
 
 
@@ -18,6 +19,14 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = ('email', 'website', 'phone_number',)
+
+
+class ContestFilesSerializer(serializers.ModelSerializer):
+    docfile = serializers.FileField(max_length=None, use_url=True)
+
+    class Meta:
+        model = ContestFiles
+        fields = ('contest', 'uploaded_by', 'date_uploaded', 'docfile',)
 
 
 class ClubSerializer(serializers.ModelSerializer):

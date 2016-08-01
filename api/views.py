@@ -23,6 +23,7 @@ from contest.models import (
     School,
     Contestant,
     RushUser,
+    ContestFiles
 )
 
 
@@ -33,6 +34,12 @@ class ContestViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Contest.objects.all().order_by('date')
     serializer_class = ContestSerializer
+
+
+class ContestFilesViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = ContestFiles.objects.all().order_by('date_uploaded')
+    serializer_class = ContestFiles
 
 
 class ContactViewSet(viewsets.ModelViewSet):
