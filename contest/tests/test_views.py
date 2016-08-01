@@ -790,15 +790,6 @@ class ContestResultsViewTestCase(TestCase):
         )
         self.client.login(username='login', password='Password')
 
-    def test_get(self):
-        response = self.client.get(
-            reverse(
-                'contest:contest-results',
-                kwargs={'contest_id': self.contest.id}
-            )
-        )
-        self.assertEqual(response.status_code, 200)
-
     def test_get_msg_with_results(self):
         response = self.client.get(
             reverse(
@@ -851,15 +842,6 @@ class AddContestResultsViewTest(TestCase):
             email='xyz@xyz.pl', username='login', password='Password'
         )
         self.client.login(username='login', password='Password')
-
-    def test_get(self):
-        response = self.client.get(
-            reverse(
-                'contest:contest-add-results',
-                kwargs={'contest_id': self.contest.id}
-            )
-        )
-        self.assertEqual(response.status_code, 200)
 
     def test_post(self):
         response = self.client.post(

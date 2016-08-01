@@ -169,13 +169,6 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         return self.has_perm('contest.add_contest')
 
     @property
-    def is_moderator(self):
-        """
-        Returns whether this is a moderator or not.
-        """
-        return self.groups.filter(name='moderator').exists()
-
-    @property
     def unit_name(self):
         """
         Return name of user's unit.
