@@ -15,15 +15,55 @@ from django.db import models
 from django.db.models import Q
 from django.template import loader
 from django.utils.encoding import force_bytes
+from django.utils.html import format_html
 from django.utils.http import urlsafe_base64_encode
 from django.utils import timezone
+from multiselectfield import MultiSelectField
 
 from contest.manager import RushUserManager
+from contest.utils import admin_utils
 
 UNIT_LIMIT = (
     Q(app_label='contest', model='club') |
     Q(app_label='contest', model='school')
 )
+
+STYLES_DISTANCES = (
+    ('D25', 'Dowolny 25m'), ('D50', 'Dowolny 50m'),
+    ('D100', 'Dowolny 100m'), ('D200', 'Dowolny 200m'),
+    ('D400', 'Dowolny 400m'), ('D800', 'Dowolny 800m'),
+    ('D1500', 'Dowolny 1500m'), ('G25', 'Grzbietowy 25m'),
+    ('G50', 'Grzbietowy 50m'), ('G100', 'Grzbietowy 100m'),
+    ('G200', 'Grzbietowy 200m'), ('K25', 'Klasyczny 25m'),
+    ('K50', 'Klasyczny 50m'), ('K100', 'Klasyczny 100m'),
+    ('K200', 'Klasyczny 200m'), ('M25', 'Motylkowy 25m'),
+    ('M50', 'Motylkowy 50m'), ('M100', 'Motylkowy 100m'),
+    ('M200', 'Motylkowy 200m'), ('Z100', 'Zmienny 100m'),
+    ('Z200', 'Zmienny 200m')
+)
+
+
+class UnitModelsMixin(object):
+
+    def unit_name_select(self):
+        """
+        Returns organizations' names for purposes of admin panel.
+        """
+        school_options = admin_utils.get_options(
+            School, 'Szkoła', self.object_id, self.content_type
+        )
+        club_options = admin_utils.get_options(
+            Club, 'Klub', self.object_id, self.content_type
+        )
+
+        return format_html(
+            '<select id="id_unit" name="unit">{}{}</select>'.format(
+                '<br>'.join(school_options),
+                '<br>'.join(club_options)
+            )
+        )
+    unit_name_select.short_description = 'Szkoła/Klub'
+    unit_name_select = property(unit_name_select)
 
 
 class Contact(models.Model):
@@ -35,7 +75,7 @@ class Contact(models.Model):
     phone_number = models.CharField('numer telefonu', max_length=9, blank=True)
 
     def __unicode__(self):
-        return self.website
+        return '{} {} {}'.format(self.email, self.website, self.phone_number)
 
 
 class School(models.Model):
@@ -65,7 +105,7 @@ class Club(models.Model):
         return self.name
 
 
-class RushUser(AbstractBaseUser, PermissionsMixin):
+class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
     """
     User model for Rush users.
     """
@@ -144,13 +184,12 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         """
         return self.has_perm('contest.add_contest')
 
-    def get_unit_name(self):
+    @property
+    def unit_name(self):
         """
         Return name of user's unit.
         """
         return self.unit.name
-    get_unit_name.short_description = 'Szkoła/Klub'
-    unit_name = property(get_unit_name)
 
     def activate(self):
         """
@@ -199,7 +238,7 @@ class RushUser(AbstractBaseUser, PermissionsMixin):
         msg.send()
 
 
-class Contest(models.Model):
+class Contest(UnitModelsMixin, models.Model):
     """
     Model for Contest.
     """
@@ -224,6 +263,7 @@ class Contest(models.Model):
     )
     object_id = models.PositiveIntegerField(blank=True, null=True)
     organizer = GenericForeignKey('content_type', 'object_id')
+    styles = MultiSelectField(choices=STYLES_DISTANCES)
 
     def __unicode__(self):
         return self.name or (
@@ -267,7 +307,7 @@ class Contestant(models.Model):
     gender = models.CharField('płeć', max_length=1, choices=GENDERS)
     age = models.IntegerField('Rocznik', choices=year_dropdown)
     school = models.CharField('rodzaj szkoły', max_length=1, choices=SCHOOLS)
-    styles_distances = models.CharField('style i dystanse', max_length=255)
+    styles = MultiSelectField(choices=STYLES_DISTANCES)
     contest = models.ForeignKey(Contest)
 
     def __unicode__(self):

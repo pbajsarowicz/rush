@@ -184,19 +184,6 @@ ContestantValidation.prototype = {
         }
     },
     /*
-     * Validates styles and distances.
-     */
-    validateStylesDistances: function(formId) {
-        'use strict';
-        this.stylesDistances = document.forms['contestants'][formId + '-styles_distances'].value;
-
-        if (!this.stylesDistances) {
-            this.raiseValidation(formId + '-styles_distances', 'Pole Style i dystanse nie może być puste.');
-        } else {
-            this.clearValidation(formId + '-styles_distances');
-        }
-    },
-    /*
      * Validates school/club name.
      */
     validateOrganization: function(formId) {
@@ -221,8 +208,7 @@ ContestantValidation.prototype = {
 
         var validators = [
             'validateFirstName', 'validateLastName', 'validateGender',
-            'validateAge', 'validateSchool', 'validateStylesDistances',
-            'validateOrganization'
+            'validateAge', 'validateSchool', 'validateOrganization'
         ]
 
         for (var i = 0, len = validators.length ; i < len; i++) {
@@ -438,10 +424,29 @@ Contestant.prototype = {
 /*
  * Calls a method that handles adding a new form.
  */
+function nextContestant(prefix) {
+    'use strict';
+    if (checkStyles(prefix)) {
+        contestant.addNextContestant();
+    }
+}
+
+/*
+ * Calls a method that handles validating given styles.
+ */
 $('#add_more').click(function() {
     'use strict';
-    contestant.addNextContestant();
+    $("a[id^='validation-start']").get(-2).click();
 });
+
+/*
+ * Checks last contestant on submitting form.
+ */
+$('#submit_form').click(function() {
+    'use strict';
+    return checkStyles('form-' + ($("div[id^='id_form']").length - 2));
+});
+
 
 /*
  * Populates modal with contest info.
@@ -560,7 +565,7 @@ function parseContestantData(json) {
         ['Płeć', 'gender'],
         ['Wiek', 'age'],
         ['Rodzaj Szkoły', 'school'],
-        ['styl i dystans', 'styles_distances']
+        ['Styl i dystans', 'style']
     ];
     var fragment = document.createDocumentFragment();
     var elementUl = document.createElement('ul');
@@ -619,4 +624,225 @@ function removeContestant(userId) {
             location.reload();
         }
     });
+}
+
+/*
+ * Show styles input.
+ */
+function showStyles(styleName) {
+    'use strict';
+    switch (styleName) {
+        case 'dowolny':
+            if ($('#dowolny').is(':checked')) {
+                $('#dowolny-styles').removeClass('invisible');
+            } else {
+                $('#dowolny-styles').addClass('invisible');
+                ['D25', 'D50', 'D100', 'D200', 'D400', 'D800', 'D1500'].forEach(function(item) {
+                    $('#' + item).attr('checked', false);
+                });
+            }
+            break;
+        case 'grzbietowy':
+            if ($('#grzbietowy').is(':checked')) {
+                $('#grzbietowy-styles').removeClass('invisible');
+            } else {
+                $('#grzbietowy-styles').addClass('invisible');
+                ['G25', 'G50', 'G100', 'G200'].forEach(function(item) {
+                    $('#' + item).attr('checked', false);
+                });
+            }
+            break;
+        case 'klasyczny':
+            if ($('#klasyczny').is(':checked')) {
+                $('#klasyczny-styles').removeClass('invisible');
+            } else {
+                $('#klasyczny-styles').addClass('invisible');
+                ['K25', 'K50', 'K100', 'K200'].forEach(function(item) {
+                    $('#' + item).attr('checked', false);
+                });
+            }
+            break;
+        case 'motylkowy':
+            if ($('#motylkowy').is(':checked')) {
+                $('#motylkowy-styles').removeClass('invisible');
+            } else {
+                $('#motylkowy-styles').addClass('invisible');
+                ['M25', 'M50', 'M100', 'M200'].forEach(function(item) {
+                    $('#' + item).attr('checked', false);
+                });
+            }
+            break;
+        case 'zmienny':
+            if ($('#zmienny').is(':checked')) {
+                $('#zmienny-styles').removeClass('invisible');
+            } else {
+                $('#zmienny-styles').addClass('invisible');
+                ['Z100', 'Z200'].forEach(function(item) {
+                    $('#' + item).attr('checked', false);
+                });
+            }
+    }
+}
+
+/*
+ * Validate given styles when adding contest.
+ */
+function validateStyles() {
+    'use strict';
+    var errorMessage;
+    var isValidated = true;
+    if (
+        !($('#dowolny').is(':checked') || $('#grzbietowy').is(':checked') ||
+        $('#klasyczny').is(':checked') || $('#motylkowy').is(':checked') ||
+        $('#zmienny').is(':checked'))
+    ) {
+        errorMessage = 'Co najmniej jeden styl musi zostać wybrany.'
+        $('#style').after('<p class="errorlist">' + errorMessage + '</p>');
+        return false;
+    }
+
+    if ($('#dowolny').is(':checked')) {
+        if (
+            !($('#D25').is(':checked') || $('#D50').is(':checked') ||
+            $('#D100').is(':checked') || $('#D200').is(':checked') ||
+            $('#D400').is(':checked') || $('#D800').is(':checked') ||
+            $('#D1500').is(':checked'))
+        ) {
+            errorMessage = 'Nie wybrano dystansu.';
+            $('label[for="dowolny"]').html(
+                'Dowolny <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
+            );
+            isValidated = false;
+        }
+        else {
+            $('label[for="dowolny"]').html('Dowolny');
+        }
+    }
+
+    if ($('#grzbietowy').is(':checked')) {
+        if (
+            !($('#G25').is(':checked') || $('#G50').is(':checked') ||
+            $('#G100').is(':checked') || $('#G200').is(':checked'))
+        ) {
+            errorMessage = 'Nie wybrano dystansu.';
+            $('label[for="grzbietowy"]').html(
+                'Grzbietowy <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
+            );
+            isValidated = false;
+        }
+        else {
+            $('label[for="grzbietowy"]').html('Grzbietowy');
+        }
+    }
+
+    if ($('#klasyczny').is(':checked')) {
+        if (
+            !($('#K25').is(':checked') || $('#K50').is(':checked') ||
+            $('#K100').is(':checked') || $('#K200').is(':checked'))
+        ) {
+            errorMessage = 'Nie wybrano dystansu.';
+            $('label[for="klasyczny"]').html(
+                'Klasyczny <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
+            );
+            isValidated = false;
+        }
+        else {
+            $('label[for="klasyczny"]').html('Klasyczny');
+        }
+    }
+
+    if ($('#motylkowy').is(':checked')) {
+        if (
+            !($('#M25').is(':checked') || $('#M50').is(':checked') ||
+            $('#M100').is(':checked') || $('#M200').is(':checked'))
+        ) {
+            errorMessage = 'Nie wybrano dystansu.';
+            $('label[for="motylkowy"]').html(
+                'Motylkowy <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
+            );
+            isValidated = false;
+        }
+        else {
+            $('label[for="motylkowy"]').html('Motylkowy');
+        }
+    }
+
+    if ($('#zmienny').is(':checked')) {
+        if (!($('#Z100').is(':checked') || $('#Z200').is(':checked'))) {
+            errorMessage = 'Nie wybrano dystansu.';
+            $('label[for="zmienny"]').html(
+                'Zmienny <span class="errorlist" style="padding-left: 4em;">' + errorMessage + '</span>'
+            );
+            isValidated = false;
+        }
+        else {
+            $('label[for="zmienny"]').html('Zmienny');
+        }
+    }
+
+    if (isValidated) {
+        var styles = [
+            'D25', 'D50', 'D100', 'D200', 'D400', 'D800', 'D1500', 'G25', 'G50', 'G100', 'G200',
+            'K25', 'K50', 'K100', 'K200', 'M25', 'M50', 'M100', 'M200', 'Z100', 'Z200'
+        ];
+        var result = '';
+        styles.forEach(function(item) {
+            if ($('#' + item).is(':checked')) {
+                result += ',' + item;
+            }
+        });
+        $('#styles-summary').val('');
+        $('#styles-summary').val(result);
+        return true;
+    }
+    return false;
+}
+
+/*
+ * Check if user took at least 1 distance (add_contestant form).
+ */
+function checkStyles(prefix) {
+    'use strict';
+    var result = '';
+    $('.distance_' + prefix).each(function() {
+        if ($(this).is(':checked')) {
+            result += ',' + (this.id).split('_', 1);
+        }
+    });
+    if (result) {
+        $('#id_' + prefix + '-styles').val(result);
+        $('#distance-error').remove();
+        return true;
+    }
+    else {
+        if ($('#distance-error').length === 0) {
+            $('#validation-start_' + prefix).before('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.</span>');
+        }
+        return false;
+    }
+}
+
+/*
+ * Check if user took at least 1 distance (edit_contestant form).
+ */
+function checkEditedStyles() {
+    'use strict';
+    var result = '';
+    $('.distance').each(function() {
+        if ($(this).is(':checked')) {
+            result += ',' + this.id
+        }
+    });
+    if (result) {
+        $('#id_styles').val('');
+        $('#id_styles').val(result.substr(1));
+        $('#distance-error').remove();
+        return true;
+    }
+    else {
+        if ($('#distance-error').length === 0) {
+            $('#style').after('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.</span>');
+        }
+        return false;
+    }
 }

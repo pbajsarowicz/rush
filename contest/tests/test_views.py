@@ -16,10 +16,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.utils.timezone import make_aware
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from mock import patch
+
 from contest.forms import (
     ContestantForm,
     ContestForm,
@@ -35,8 +37,14 @@ from contest.models import (
     Contestant,
     RushUser,
 )
-from contest.views import RegisterView
-from contest.views import SetResetPasswordView
+from contest.views import (
+    RegisterView,
+    SetResetPasswordView,
+    server_error,
+    bad_request,
+    permission_denied
+)
+from rush import urls
 
 
 class HomeViewTests(TestCase):
@@ -530,20 +538,22 @@ class ContestantAddViewTestCase(TestCase):
             'form-0-gender': 'M',
             'form-0-last_name': 'Kowalski',
             'form-0-school': 'P',
-            'form-0-styles_distances': '1000m',
+            'form-0-styles': ',D25,G25',
             'form-0-organization': self.user.unit,
             'form-1-age': '2000',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
             'form-1-school': 'P',
-            'form-1-styles_distances': '500m',
+            'form-1-styles': ',K50,Z200',
             'form-1-organization': self.user.unit,
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
             'form-MIN_NUM_FORMS': '0',
             'form-TOTAL_FORMS': '2'
         }
+
+        styles = ['D25', 'D50', 'G25', 'K50', 'K200', 'Z200']
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
@@ -558,7 +568,20 @@ class ContestantAddViewTestCase(TestCase):
         self.contest_deadline = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
             place='Szkoła', lowest_year=2005, highest_year=2000,
-            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            styles=styles
+        )
+        self.contest_done = Contest.objects.create(
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', lowest_year=11, highest_year=16,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            styles=styles
+        )
+        self.contest_deadline = Contest.objects.create(
+            date=make_aware(datetime(2050, 12, 31)),
+            place='Szkoła', lowest_year=11, highest_year=16,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            styles=styles
         )
 
     def test_get(self):
@@ -698,7 +721,7 @@ class ContestantListViewTestCase(TestCase):
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
-            gender='M', age=2002, school='S', styles_distances='100m motyl',
+            gender='M', age=2002, school='S', styles=['M50', 'Z100'],
             contest=self.contest
         )
 
@@ -731,7 +754,7 @@ class EditContestantViewTestCase(TestCase):
             gender='M',
             age=2002,
             school='P',
-            styles_distances='100m motyl',
+            styles=',K200,D25',
             contest=Contest.objects.first(),
             moderator=self.user
         )
@@ -757,6 +780,7 @@ class EditContestantViewTestCase(TestCase):
         self.assertEqual(
             response.context['form'].initial['styles_distances'], '100m motyl'
         )
+        self.assertEqual(response.context['form'].initial['age'], 2002)
         self.assertEqual(response.context['form'].initial['age'], 2002)
 
     def test_post(self):
@@ -808,6 +832,7 @@ class ContestAddTestCase(TestCase):
             'highest_year': 1999,
             'description': 'Zapraszamy na zawody!',
             'organization': self.user_1.unit,
+            'styles': ',D25,G50,K200,Z100'
         }
 
     def test_has_access(self):
@@ -872,3 +897,32 @@ class ContestAddTestCase(TestCase):
                 'Popraw wartości i spróbuj ponownie.'
             ]
         )
+
+
+class ErrorViewTest(TestCase):
+    def test_404_error(self):
+        self.assertTrue(urls.handler404.endswith('.page_not_found'))
+        response = self.client.get('/invalid_url/')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
+
+    def test_400_error(self):
+        self.assertTrue(urls.handler400.endswith('.bad_request'))
+        request = RequestFactory().get('/')
+        response = bad_request(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(settings.SUPPORT_EMAIL, response.content)
+
+    def test_403_error(self):
+        self.assertTrue(urls.handler403.endswith('.permission_denied'))
+        request = RequestFactory().get('/')
+        response = permission_denied(request)
+        self.assertEqual(response.status_code, 403)
+        self.assertIn(settings.SUPPORT_EMAIL, response.content)
+
+    def test_500_error(self):
+        self.assertTrue(urls.handler500.endswith('.server_error'))
+        request = RequestFactory().get('/')
+        response = server_error(request)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(settings.SUPPORT_EMAIL, response.content)

@@ -5,12 +5,12 @@ from django.test import TestCase
 from django.utils import timezone
 
 from contest.models import (
-    RushUser,
-    Contest,
     Club,
-    Contestant,
-    School,
     Contact,
+    Contest,
+    Contestant,
+    RushUser,
+    School,
 )
 
 
@@ -86,7 +86,7 @@ class ContestantTestCase(TestCase):
         self.contestant = Contestant.objects.create(
             moderator=RushUser.objects.first(), first_name='Adam',
             last_name='Kowalski', gender='M', age=2001, school='S',
-            styles_distances='10m żabka', contest=Contest.objects.first()
+            styles=['D25', 'G50'], contest=Contest.objects.first()
         )
 
     def test_contestant_methods(self):
@@ -117,4 +117,28 @@ class ContactTestCase(TestCase):
         )
 
     def test_club_methods(self):
-        self.assertEqual(self.contact.__unicode__(), 'www.example.com')
+        self.assertEqual(
+            self.contact.__unicode__(),
+            'email@wp.pl www.example.com 123456789'
+        )
+
+
+class UnitModelsMixinTestCase(TestCase):
+    fixtures = [
+        'contest/fixtures/contests.json',
+        'contest/fixtures/users.json',
+        'contest/fixtures/clubs.json',
+        'contest/fixtures/schools.json',
+    ]
+
+    def test_unit_name_select(self):
+        contest = Contest.objects.first()
+        self.assertEqual(
+            contest.unit_name_select,
+            '<select id="id_unit" name="unit"><option value="2_school" >'
+            '[Szko\u0142a] Klub wodnika</option><br><option value="1_school" '
+            '>[Szko\u0142a] ZSP1 w Pile</option><option value="2_club" >'
+            '[Klub] Klub wodnika</option><br><option value="1_club" >[Klub] '
+            'ZSP1 w Pile</option></select>'
+
+        )
