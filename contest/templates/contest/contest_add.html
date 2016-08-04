@@ -9,7 +9,7 @@
           <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Ok</a>
         </div>
       {% else %}
-        <form class="col s6" action="?next={{next}}" role="form" method="post" name="contest_add">
+        <form class="col s6" enctype="multipart/form-data" action="?next={{next}}" role="form" method="post" name="contest_add">
           <div class="row center">
             {% csrf_token %}
             {{ form.as_p }}

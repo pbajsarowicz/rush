@@ -1,0 +1,34 @@
+def setUp(self):
+        self.contest = Contest.objects.create(
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            deadline=make_aware(datetime(2008, 11, 20)), results='yolo'
+        )
+        self.client.login(username='root', password='R@ootroot')
+
+    def test_get(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-add-results',
+                kwargs={'contest_id': self.contest.pk}
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_post(self):
+        response = self.client.post(
+            reverse(
+                'contest:contest-add-results',
+                kwargs={'contest_id': self.contest.pk}
+            ),
+            data={
+                'results': 'yolo'
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            response.context['form'].cleaned_data['results'], 'yolo'
+        )
+

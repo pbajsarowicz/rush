@@ -239,7 +239,6 @@ class EditContestantView(View):
         contestant = Contestant.objects.get(id=contestant_id)
         user = request.user
         contest = contestant.contest
-
         form = self.form_class(
             instance=contestant,
             contest_id=contest.id,
@@ -308,6 +307,25 @@ class ContestAddView(PermissionRequiredMixin, View):
     form_class = ContestForm
     formset_class = formset_factory(ContestFilesForm, extra=1)
 
+    @staticmethod
+    def get_formset(contest_id, data=None, files=None):
+        """
+        Returns formset of `ContestFilesForm` forms.
+        """
+        formset_class = formset_factory(ContestFilesForm, extra=1)
+        formset_class.form = staticmethod(
+            curry(ContestFilesForm, instance=contest_id)
+        )
+        return formset_class(data, files)
+
+    @staticmethod
+    def handle_uploaded_file(file):
+        if file:
+            destination = open('contest/static/documents/' + file.name, 'wb+')
+            for chunk in file.chunks():
+                destination.write(chunk)
+            destination.close()
+
     def get(self, request):
         """
         Return clear form.
@@ -324,24 +342,30 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         Create new Contest.
         """
-        form = self.form_class(request.POST, user=request.user)
+        form = self.form_class(request.POST, request.FILES, user=request.user)
         formset = self.formset_class(request.POST, request.FILES)
-        if form.is_valid() and formset.is_valid():
+        for file in request.FILES.getlist('form-0-file'):
+            self.handle_uploaded_file(file)
+        if form.is_valid():
             form = form.save()
-            formset = self.formset_class(
-                request.POST,
-                request.FILES,
-                instance=form.pk
-            )
+            contest_id = form.pk
+            formset = self.get_formset(contest_id, request.POST, request.FILES)
             for file_form in formset:
-                cd = file_form.cleaned_data
-                docfile = cd.get('docfile')
-                files = ContestFiles(docfile=docfile)
-                files.save()
-            msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
-            return render(request, self.template_name, {'message': msg})
-        return render(
-            request,
-            self.template_name,
-            {'form': form, 'formset': formset}
-        )
+                if file_form.is_valid():
+                    contest_files = file_form.save(commit=False)
+                    cd = file_form.cleaned_data
+                    file = cd.get('file')
+                    contest = Contest.objects.filter(pk=form.pk)
+                    contest_files.file = ContestFiles(
+                        file=file,
+                        contest=contest,
+                        uploaded_by=request.user
+                    )
+                    contest_files.save()
+                msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
+                return render(request, self.template_name, {'message': msg})
+            return render(
+                request,
+                self.template_name,
+                {'form': form, 'formset': formset}
+            )

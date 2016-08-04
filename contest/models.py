@@ -237,13 +237,6 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         msg.send()
 
 
-def contest_directory_path(instance, filename):
-    return 'contest/static/documents/contest_{0}/{1}'.format(
-        instance.id,
-        filename
-    )
-
-
 class Contest(UnitModelsMixin, models.Model):
     """
     Model for Contest.
@@ -288,9 +281,7 @@ class ContestFiles(models.Model):
     contest = models.ForeignKey(Contest)
     uploaded_by = models.ForeignKey(RushUser)
     date_uploaded = models.DateTimeField(auto_now_add=True)
-    docfile = models.FileField(
-        'Pliki', upload_to='trolollo/', default='brak'
-    )
+    file = models.FileField('Pliki', default='')
 
 
 class Contestant(models.Model):

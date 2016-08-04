@@ -21,12 +21,10 @@ class ContactSerializer(serializers.ModelSerializer):
         fields = ('email', 'website', 'phone_number',)
 
 
-class ContestFilesSerializer(serializers.ModelSerializer):
-    docfile = serializers.FileField(max_length=None, use_url=True)
-
+class ContestFilesSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ContestFiles
-        fields = ('contest', 'uploaded_by', 'date_uploaded', 'docfile',)
+        fields = ('contest', 'uploaded_by', 'date_uploaded', 'file',)
 
 
 class ClubSerializer(serializers.ModelSerializer):
