@@ -322,3 +322,25 @@ class ContestAddView(PermissionRequiredMixin, View):
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
+
+
+class CompletedContestView(View):
+    """
+    Completed contest details page.
+    """
+
+    template_name = 'contest/completed_contest.html'
+
+    def get(self, request, contest_id):
+        """
+        Return contest details.
+        """
+        try:
+            contest = Contest.objects.get(pk=contest_id)
+        except Contest.DoesNotExist:
+            return render(
+                request,
+                self.template_name,
+                {'msg': 'Nie znaleziono konkursu.'}
+            )
+        return render(request, self.template_name, {'contest': contest})

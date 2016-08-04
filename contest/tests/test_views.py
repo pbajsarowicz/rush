@@ -870,6 +870,29 @@ class ContestAddTestCase(TestCase):
         )
 
 
+class CompletedContestViewTestCase(TestCase):
+    fixtures = ['contests.json', 'users.json']
+
+    def setUp(self):
+        self.contest = Contest.objects.get(pk=1)
+        self.user = RushUser.objects.get(username='login321')
+        self.user.set_password('password123')
+        self.user.save()
+        self.client.login(username='login321', password='password123')
+
+    def test_valid_details(self):
+        response = self.client.get(
+            reverse('contest:completed-contest', kwargs={'contest_id': 999})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['msg'], 'Nie znaleziono konkursu.')
+        response = self.client.get(
+            reverse('contest:completed-contest', kwargs={'contest_id': 1})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['contest'], self.contest)
+
+
 class ErrorViewTest(TestCase):
     def test_404_error(self):
         self.assertTrue(urls.handler404.endswith('.page_not_found'))

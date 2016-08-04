@@ -59,7 +59,7 @@
         {% for contest in completed %}
           <li class="collection-item contest-item">
             <div class="contest-item">
-              <span class="text">{{ contest }}</span>
+              <a class="text" href="{% url 'contest:completed-contest' contest_id=contest.pk %}">{{ contest }}</a>
               <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}"
                  onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
               <div id="modal{{contest.pk}}" class="modal">
