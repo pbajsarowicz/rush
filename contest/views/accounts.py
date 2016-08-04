@@ -2,31 +2,28 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
-from django.shortcuts import (
-    render,
-    redirect
-)
+from django.shortcuts import render
 from django.template import loader
 from django.views.generic import View
 
 from contest.models import RushUser
 
 
-class AccountsView(View):
+class AccountsView(PermissionRequiredMixin, View):
     """
     Special view for Rush's admin. Displays users whose one can
     confirm or cancel, and fields 'imie' and 'nazwisko' RushUser.
     """
     template_name = 'contest/accounts.html'
+    permission_required = 'is_staff'
 
     def get(self, request, user_id):
         """
         Transfer RushUser model and render pages 'administratorzy/konta'.
         """
-        if not request.user.is_staff:
-            return redirect('contest:home')
         users = RushUser.objects.filter(is_active=False)
 
         return render(request, self.template_name, {'users': users})

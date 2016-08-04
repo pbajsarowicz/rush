@@ -416,7 +416,7 @@ class AccountsViewTestCase(TestCase):
     def test_get(self):
         self.client.login(username='normal_user', password='password123')
         response = self.client.get(reverse('contest:accounts'))
-        self.assertRedirects(response, reverse('contest:home'))
+        self.assertRedirects(response, '/zaloguj/?next=/administrator/konta/')
 
         inactive_user = RushUser.objects.create(
             email='inactive_user@user.pl', first_name='Test',
