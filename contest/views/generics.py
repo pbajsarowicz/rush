@@ -328,7 +328,6 @@ class CompletedContestView(View):
     """
     Completed contest details page.
     """
-
     template_name = 'contest/completed_contest.html'
 
     def get(self, request, contest_id):
