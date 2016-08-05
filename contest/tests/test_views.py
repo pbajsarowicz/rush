@@ -55,13 +55,14 @@ class HomeViewTests(TestCase):
     def setUp(self):
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
+            place='Szkoła', lowest_year=2000, highest_year=2005,
+            description='Opis',
             deadline=make_aware(datetime(2048, 11, 20))
         )
         self.contest_done = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20))
+            place='Szkoła', lowest_year=2000, highest_year=2005,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
         )
         self.user = RushUser.objects.create_superuser(
             email='xyz@xyz.pl', username='login', password='Password'
@@ -134,6 +135,17 @@ class LoginViewTests(TestCase):
 
         data = {
             'username': 'username',
+            'password': 'Password',
+            'next': '/redirect/page/',
+        }
+        response = self.client.post(reverse('contest:login'), data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/redirect/page/')
+        self.client.logout()
+
+        data = {
+            'username': 'xyz@xyz.pl',
             'password': 'Password',
             'next': '/redirect/page/',
         }
@@ -532,14 +544,14 @@ class ContestantAddViewTestCase(TestCase):
 
         self.form_data = {
             'csrfmiddlewaretoken': 'A33GMETyB7NE1CknWDg2jVuS1Jsm5A9y',
-            'form-0-age': '11',
+            'form-0-year_of_birth': '2005',
             'form-0-first_name': 'Jan',
             'form-0-gender': 'M',
             'form-0-last_name': 'Kowalski',
             'form-0-school': 'P',
             'form-0-styles': ',D25,G25',
             'form-0-organization': self.user.unit,
-            'form-1-age': '16',
+            'form-1-year_of_birth': '2000',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
@@ -556,18 +568,21 @@ class ContestantAddViewTestCase(TestCase):
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2048, 11, 20)), styles=styles
+            place='Szkoła', lowest_year=2000, highest_year=2005,
+            description='Opis', deadline=make_aware(datetime(2048, 11, 20)),
+            styles=styles
         )
         self.contest_done = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20)), styles=styles
+            place='Szkoła', lowest_year=2000, highest_year=2005,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            styles=styles
         )
         self.contest_deadline = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20)), styles=styles
+            place='Szkoła', lowest_year=2000, highest_year=2005,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            styles=styles
         )
 
     def test_get(self):
@@ -642,7 +657,7 @@ class ContestantAddViewTestCase(TestCase):
             'Takie zawody nie istnieją.'
         )
 
-        self.form_data['form-0-age'] = 99
+        self.form_data['form-0-year_of_birth'] = 1978
         response = self.client.post(
             reverse(
                 'contest:contestant-add',
@@ -652,13 +667,15 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         expected_error = {
-            'age': ['Zawodnik nie mieści się w wymaganym przedziale wiekowym.']
+            'year_of_birth': [
+                'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
+            ]
         }
         self.assertEqual(
             response.context['formset'].errors, [expected_error, {}]
         )
 
-        self.form_data['form-0-age'] = 15
+        self.form_data['form-0-year_of_birth'] = 2001
         self.form_data['form-0-gender'] = 'WRONG'
         response = self.client.post(
             reverse(
@@ -700,14 +717,14 @@ class ContestantListViewTestCase(TestCase):
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2048, 11, 20)),
+            place='Szkoła', lowest_year=2000, highest_year=2005,
+            description='Opis', deadline=make_aware(datetime(2048, 11, 20)),
             content_type=ContentType.objects.get_for_model(club),
             object_id=club.pk
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
-            gender='M', age=14, school='S', styles=['M50', 'Z100'],
+            gender='M', year_of_birth=2002, school='S', styles=['M50', 'Z100'],
             contest=self.contest
         )
 
@@ -738,7 +755,7 @@ class EditContestantViewTestCase(TestCase):
             first_name='Adam',
             last_name='Nowak',
             gender='M',
-            age=14,
+            year_of_birth=2002,
             school='P',
             styles=',K200,D25',
             contest=Contest.objects.first(),
@@ -763,7 +780,12 @@ class EditContestantViewTestCase(TestCase):
         )
         self.assertEqual(response.context['form'].initial['gender'], 'M')
         self.assertEqual(response.context['form'].initial['school'], 'P')
-        self.assertEqual(response.context['form'].initial['age'], 14)
+        self.assertEqual(
+            response.context['form'].initial['year_of_birth'], 2002
+        )
+        self.assertEqual(
+            response.context['form'].initial['year_of_birth'], 2002
+        )
 
     def test_post(self):
         response = self.client.post(
@@ -773,7 +795,7 @@ class EditContestantViewTestCase(TestCase):
             ),
             data={
                 'first_name': 'Karol', 'last_name': 'Kowalski',
-                'school': 'P', 'gender': 'F', 'age': 11,
+                'school': 'P', 'gender': 'F', 'year_of_birth': 2005,
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -787,7 +809,9 @@ class EditContestantViewTestCase(TestCase):
             response.context['form'].cleaned_data['school'], 'P'
         )
         self.assertEqual(response.context['form'].cleaned_data['gender'], 'F')
-        self.assertEqual(response.context['form'].cleaned_data['age'], 11)
+        self.assertEqual(
+            response.context['form'].cleaned_data['year_of_birth'], 2005
+        )
 
 
 class ContestAddTestCase(TestCase):
@@ -810,8 +834,8 @@ class ContestAddTestCase(TestCase):
             'date': '31.12.2100 16:00',
             'place': 'Majorka',
             'deadline': '29.12.2100 23:59',
-            'age_min': 14,
-            'age_max': 17,
+            'lowest_year': 1999,
+            'highest_year': 2002,
             'description': 'Zapraszamy na zawody!',
             'organization': self.user_1.unit,
             'styles': ',D25,G50,K200,Z100'
@@ -857,7 +881,7 @@ class ContestAddTestCase(TestCase):
             ]
         )
 
-        self.form_data['age_min'] = 80
+        self.form_data['lowest_year'] = 2016
         self.form_data['date'] = '02.04.2016 16:00'
         self.form_data['deadline'] = '01.04.2016 16:00'
         response = self.client.post(
@@ -873,7 +897,7 @@ class ContestAddTestCase(TestCase):
             ['Termin dodawania zwodników musi być dłuższy niż podana data.']
         )
         self.assertEqual(
-            response.context['form'].errors['age_max'],
+            response.context['form'].errors['highest_year'],
             [
                 'Przedział wiekowy jest niepoprawny. '
                 'Popraw wartości i spróbuj ponownie.'
