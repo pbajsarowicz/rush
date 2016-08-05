@@ -21,7 +21,6 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
-    ContestFiles
 )
 from contest.forms import (
     ContestantForm,
@@ -344,28 +343,23 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         form = self.form_class(request.POST, request.FILES, user=request.user)
         formset = self.formset_class(request.POST, request.FILES)
-        for file in request.FILES.getlist('form-0-file'):
-            self.handle_uploaded_file(file)
         if form.is_valid():
             form = form.save()
-            contest_id = form.pk
-            formset = self.get_formset(contest_id, request.POST, request.FILES)
             for file_form in formset:
                 if file_form.is_valid():
                     contest_files = file_form.save(commit=False)
                     cd = file_form.cleaned_data
                     file = cd.get('file')
-                    contest = Contest.objects.filter(pk=form.pk)
-                    contest_files.file = ContestFiles(
-                        file=file,
-                        contest=contest,
-                        uploaded_by=request.user
-                    )
+                    uploaded_by = request.user
+                    contest = Contest.objects.get(pk=form.pk)
+                    contest_files.file = file
+                    contest_files.uploaded_by = uploaded_by
+                    contest_files.contest = contest
                     contest_files.save()
-                msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
-                return render(request, self.template_name, {'message': msg})
-            return render(
-                request,
-                self.template_name,
-                {'form': form, 'formset': formset}
-            )
+            msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
+            return render(request, self.template_name, {'message': msg})
+        return render(
+            request,
+            self.template_name,
+            {'form': form, 'formset': formset}
+        )
