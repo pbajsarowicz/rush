@@ -464,7 +464,7 @@ function getContestInfo(pk) {
         success: function(json){
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od ' + json['age_min'] + ' do ' + json['age_max'] + ' lat' +
-            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br>Pliki' + json['file']
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br>Pliki: ' + json['file']
             organizer = json['organizer'];
             if (organizer) {
                 organizer_contact = organizer['contact'];

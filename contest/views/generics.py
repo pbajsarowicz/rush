@@ -347,15 +347,14 @@ class ContestAddView(PermissionRequiredMixin, View):
             form = form.save()
             for file_form in formset:
                 if file_form.is_valid():
-                    contest_files = file_form.save(commit=False)
-                    cd = file_form.cleaned_data
-                    file = cd.get('file')
-                    uploaded_by = request.user
-                    contest = Contest.objects.get(pk=form.pk)
-                    contest_files.file = file
-                    contest_files.uploaded_by = uploaded_by
-                    contest_files.contest = contest
-                    contest_files.save()
+                    for files in request.FILES.getlist('form-0-file'):
+                        contest_files = file_form.save(commit=False)
+                        uploaded_by = request.user
+                        contest = Contest.objects.get(pk=form.pk)
+                        contest_files.file = files
+                        contest_files.uploaded_by = uploaded_by
+                        contest_files.contest = contest
+                        contest_files.save()
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(

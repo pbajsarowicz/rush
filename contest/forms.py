@@ -225,18 +225,15 @@ class ContestFilesForm(forms.ModelForm):
 
         self.fields['file'].widget.attrs['multiple'] = True
 
-    # def clean_file(self):
-    #     docfile = self.cleaned_data.get('docfile', False)
-    #     ext = str(docfile)
-    #     ext = ext[-4:]
-    #     if docfile != 'brak':
-    #         if docfile._size > 10 * 1024 * 1024:
-    #             raise forms.ValidationError(
-    #                 "Plik jest za duży (Więcej niż 10 mb)"
-    #             )
-    #         elif not '.doc' or not '.pdf' or not 'docx' in ext:
-    #             raise forms.ValidationError("Zły format")
-    #     return docfile
+    def clean_file(self):
+        docfile = self.files['form-0-file']
+        if docfile._size > 10 * 1024 * 1024:
+            raise forms.ValidationError(
+                "Plik jest za duży (Więcej niż 10 mb)"
+            )
+        if str(docfile).endswith(('.pdf','.doc','.docx','.pdf')) is False:
+            raise forms.ValidationError("Zły format")
+        return docfile
 
     class Meta:
         model = ContestFiles
