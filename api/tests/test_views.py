@@ -54,8 +54,8 @@ class ContestTestsAPI(ApiTestCasesMixin, APITestCase):
             response.data['results'][1]['place'],
             'Basen Wodnik w Poznaniu'
         )
-        self.assertEqual(response.data['results'][0]['lowest_year'], 2006)
-        self.assertEqual(response.data['results'][0]['highest_year'], 1996)
+        self.assertEqual(response.data['results'][0]['lowest_year'], 1996)
+        self.assertEqual(response.data['results'][0]['highest_year'], 2006)
 
 
 class ContestantTestsAPI(ApiTestCasesMixin, APITestCase):

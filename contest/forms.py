@@ -25,6 +25,15 @@ from contest.models import (
 )
 
 
+YEARS_RANGE = 41
+current_year = datetime.now().year
+year_dropdown = [
+    (year, year,) for year in xrange(
+        current_year, current_year - YEARS_RANGE, -1
+    )
+]
+
+
 class RegistrationForm(forms.ModelForm):
     """
     Form for new user registration.
@@ -204,18 +213,13 @@ class ContestantForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         super(ContestantForm, self).__init__(*args, **kwargs)
 
-        year_dropdown = []
-        for x in range(datetime.now().year, (datetime.now().year - 41), - 1):
-            year_dropdown.append((x, x))
-
         if self.user.unit:
             self.fields['organization'].initial = self.user.unit
             self.fields['organization'].widget.attrs['readonly'] = True
         self.fields['year_of_birth'] = forms.ChoiceField(choices=year_dropdown)
 
     def clean_year_of_birth(self):
-        year_of_birth = self.cleaned_data.get('year_of_birth')
-        print year_of_birth
+        year_of_birth = int(self.cleaned_data.get('year_of_birth'))
         contest = Contest.objects.get(pk=self.contest)
         if contest.lowest_year <= year_of_birth <= contest.highest_year:
             return year_of_birth
@@ -254,10 +258,6 @@ class ContestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
             self.user = kwargs.pop('user')
-
-        year_dropdown = []
-        for x in range(datetime.now().year, (datetime.now().year - 41), - 1):
-            year_dropdown.append((x, x))
 
         super(ContestForm, self).__init__(*args, **kwargs)
 
