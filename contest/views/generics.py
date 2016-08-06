@@ -22,10 +22,10 @@ from contest.models import (
     Contest,
     Contestant,
 )
+
 from contest.forms import (
     ContestantForm,
     ContestForm,
-    ContestFilesForm,
 )
 
 
@@ -304,18 +304,6 @@ class ContestAddView(PermissionRequiredMixin, View):
     permission_required = 'contest.add_contest'
     template_name = 'contest/contest_add.html'
     form_class = ContestForm
-    formset_class = formset_factory(ContestFilesForm, extra=1)
-
-    @staticmethod
-    def get_formset(contest_id, data=None, files=None):
-        """
-        Returns formset of `ContestFilesForm` forms.
-        """
-        formset_class = formset_factory(ContestFilesForm, extra=1)
-        formset_class.form = staticmethod(
-            curry(ContestFilesForm, instance=contest_id)
-        )
-        return formset_class(data, files)
 
     @staticmethod
     def handle_uploaded_file(file):
@@ -330,11 +318,10 @@ class ContestAddView(PermissionRequiredMixin, View):
         Return clear form.
         """
         form = self.form_class(user=request.user)
-        formset = self.formset_class()
         return render(
             request,
             self.template_name,
-            {'form': form, 'formset': formset}
+            {'form': form}
         )
 
     def post(self, request):
@@ -342,23 +329,12 @@ class ContestAddView(PermissionRequiredMixin, View):
         Create new Contest.
         """
         form = self.form_class(request.POST, request.FILES, user=request.user)
-        formset = self.formset_class(request.POST, request.FILES)
         if form.is_valid():
             form = form.save()
-            for file_form in formset:
-                if file_form.is_valid():
-                    for files in request.FILES.getlist('form-0-file'):
-                        contest_files = file_form.save(commit=False)
-                        uploaded_by = request.user
-                        contest = Contest.objects.get(pk=form.pk)
-                        contest_files.file = files
-                        contest_files.uploaded_by = uploaded_by
-                        contest_files.contest = contest
-                        contest_files.save()
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(
             request,
             self.template_name,
-            {'form': form, 'formset': formset}
+            {'form': form}
         )

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from rest_framework import serializers
 
-
 from contest.models import (
     Contact,
     Contest,
@@ -11,7 +10,6 @@ from contest.models import (
     School,
     Contestant,
     RushUser,
-    ContestFiles,
 )
 
 
@@ -19,12 +17,6 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = ('email', 'website', 'phone_number',)
-
-
-class ContestFilesSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = ContestFiles
-        fields = ('contest', 'uploaded_by', 'date_uploaded', 'file',)
 
 
 class ClubSerializer(serializers.ModelSerializer):
@@ -72,8 +64,7 @@ class ContestSerializer(serializers.HyperlinkedModelSerializer):
         model = Contest
         fields = (
             'pk', 'name', 'date', 'place', 'age_min', 'age_max',
-            'deadline', 'description', 'organizer',
-        )
+            'deadline', 'description', 'organizer',)
 
 
 class RushUserSerializer(serializers.HyperlinkedModelSerializer):

@@ -20,7 +20,6 @@ from contest.models import (
     Contestant,
     School,
     RushUser,
-    ContestFiles,
 )
 
 
@@ -215,39 +214,16 @@ class ContestantForm(forms.ModelForm):
         )
 
 
-class ContestFilesForm(forms.ModelForm):
-    """
-    Form for upload files.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(ContestFilesForm, self).__init__(*args, **kwargs)
-
-        self.fields['file'].widget.attrs['multiple'] = True
-
-    def clean_file(self):
-        docfile = self.files['form-0-file']
-        if docfile._size > 10 * 1024 * 1024:
-            raise forms.ValidationError(
-                "Plik jest za duży (Więcej niż 10 mb)"
-            )
-        if str(docfile).endswith(('.pdf','.doc','.docx','.pdf')) is False:
-            raise forms.ValidationError("Zły format")
-        return docfile
-
-    class Meta:
-        model = ContestFiles
-        fields = [
-            'file'
-        ]
-
-
 class ContestForm(forms.ModelForm):
     """
     Form for creating Contests.
     """
     organization = forms.CharField(label='Organizacja', max_length=255)
     styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
+    file1 = forms.FileField(label='Plik1')
+    file2 = forms.FileField(label='Plik2')
+    file3 = forms.FileField(label='Plik3')
+    file4 = forms.FileField(label='Plik4')
 
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
@@ -264,6 +240,23 @@ class ContestForm(forms.ModelForm):
         self.fields['organization'].initial = self.user.unit
         if self.user.unit:
             self.fields['organization'].widget.attrs['readonly'] = True
+
+        self.fields['file1'].widget.attrs.update(
+            {'class': 'btn waves-effect waves-light'}
+        )
+        self.fields['file2'].widget.attrs.update(
+            {'class': 'btn waves-effect waves-light'}
+        )
+        self.fields['file3'].widget.attrs.update(
+            {'class': 'btn waves-effect waves-light'}
+        )
+        self.fields['file4'].widget.attrs.update(
+            {'class': 'btn waves-effect waves-light'}
+        )
+        self.fields['file1'].required = False
+        self.fields['file2'].required = False
+        self.fields['file3'].required = False
+        self.fields['file4'].required = False
 
     def clean_date(self):
         date = self.cleaned_data.get('date')
@@ -302,6 +295,58 @@ class ContestForm(forms.ModelForm):
             )
         return age_max
 
+    def clean_file1(self):
+        file = self.cleaned_data['file1']
+        if file:
+            if file._size > 10 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "Plik jest za duży (Więcej niż 10 mb)"
+                )
+            if str(file).endswith(
+                ('.pdf', '.doc', '.docx', '.ods', '.xls')
+            ) is False:
+                raise forms.ValidationError("Zły format")
+        return file
+
+    def clean_file2(self):
+        file = self.cleaned_data['file2']
+        if file:
+            if file._size > 10 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "Plik jest za duży (Więcej niż 10 mb)"
+                )
+            if str(file).endswith(
+                ('.pdf', '.doc', '.docx', '.ods', '.xls')
+            ) is False:
+                raise forms.ValidationError("Zły format")
+        return file
+
+        def clean_file3(self):
+            file = self.cleaned_data['file3']
+            if file:
+                if file._size > 10 * 1024 * 1024:
+                    raise forms.ValidationError(
+                        "Plik jest za duży (Więcej niż 10 mb)"
+                    )
+                if str(file).endswith(
+                    ('.pdf', '.doc', '.docx', '.ods', '.xls')
+                ) is False:
+                    raise forms.ValidationError("Zły format")
+        return file
+
+        def clean_file4(self):
+            file = self.cleaned_data['file4']
+            if file:
+                if file._size > 10 * 1024 * 1024:
+                    raise forms.ValidationError(
+                        "Plik jest za duży (Więcej niż 10 mb)"
+                    )
+                if str(file).endswith(
+                    ('.pdf', '.doc', '.docx', '.ods', '.xls')
+                ) is False:
+                    raise forms.ValidationError("Zły format")
+        return file
+
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)
         contest.content_type = self.user.content_type
@@ -316,5 +361,5 @@ class ContestForm(forms.ModelForm):
         model = Contest
         fields = [
             'name', 'date', 'place', 'deadline', 'age_min',
-            'age_max', 'description',
+            'age_max', 'description', 'file1', 'file2', 'file3', 'file4',
         ]

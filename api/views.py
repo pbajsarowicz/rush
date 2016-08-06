@@ -15,7 +15,6 @@ from api.serializers import (
     SchoolSerializer,
     ContestantSerializer,
     RushUserSerializer,
-    ContestFilesSerializer,
 )
 from contest.models import (
     Contact,
@@ -24,7 +23,6 @@ from contest.models import (
     School,
     Contestant,
     RushUser,
-    ContestFiles,
 )
 
 
@@ -35,12 +33,6 @@ class ContestViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Contest.objects.all().order_by('date')
     serializer_class = ContestSerializer
-
-
-class ContestFilesViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = ContestFiles.objects.all()
-    serializer_class = ContestFilesSerializer
 
 
 class ContactViewSet(viewsets.ModelViewSet):
