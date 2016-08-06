@@ -83,4 +83,9 @@ urlpatterns = [
         login_required(views.ContestAddView.as_view()),
         name='contest-add'
     ),
+    url(
+        r'^zakonczone/(?P<contest_id>[0-9]+)/?$',
+        login_required(views.CompletedContestView.as_view()),
+        name='completed-contest'
+    ),
 ]
