@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import uuid
+from datetime import datetime
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordResetForm,
@@ -21,6 +23,15 @@ from contest.models import (
     School,
     RushUser,
 )
+
+
+YEARS_RANGE = 41
+current_year = datetime.now().year
+year_dropdown = [
+    (year, year,) for year in xrange(
+        current_year, current_year - YEARS_RANGE, -1
+    )
+]
 
 
 class RegistrationForm(forms.ModelForm):
@@ -71,6 +82,7 @@ class LoginForm(AuthenticationForm):
     Build-in form to log user in. Overwriting error_messages
     to make them more clear for user.
     """
+
     error_messages = {
         'invalid_login': _(
             'Wprowadź poprawny login oraz hasło. '
@@ -78,6 +90,27 @@ class LoginForm(AuthenticationForm):
         ),
         'inactive': _('Konto nie zostało aktywowane'),
     }
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if username and password:
+            if '@' in username:
+                username = RushUser.objects.get(email=username).username
+            self.user_cache = authenticate(
+                username=username, password=password
+            )
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': self.username_field.verbose_name},
+                )
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 
 class RushResetPasswordForm(SetPasswordForm):
@@ -183,12 +216,13 @@ class ContestantForm(forms.ModelForm):
         if self.user.unit:
             self.fields['organization'].initial = self.user.unit
             self.fields['organization'].widget.attrs['readonly'] = True
+        self.fields['year_of_birth'] = forms.ChoiceField(choices=year_dropdown)
 
-    def clean_age(self):
-        age = self.cleaned_data.get('age')
+    def clean_year_of_birth(self):
+        year_of_birth = int(self.cleaned_data.get('year_of_birth'))
         contest = Contest.objects.get(pk=self.contest)
-        if contest.age_min <= age <= contest.age_max:
-            return age
+        if contest.lowest_year <= year_of_birth <= contest.highest_year:
+            return year_of_birth
         raise forms.ValidationError(
             'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
         )
@@ -210,7 +244,7 @@ class ContestantForm(forms.ModelForm):
         model = Contestant
         fields = (
             'first_name', 'last_name', 'gender',
-            'age', 'school'
+            'year_of_birth', 'school'
         )
 
 
@@ -236,6 +270,10 @@ class ContestForm(forms.ModelForm):
         self.fields['organization'].initial = self.user.unit
         if self.user.unit:
             self.fields['organization'].widget.attrs['readonly'] = True
+        self.fields['lowest_year'] = forms.ChoiceField(choices=year_dropdown)
+        self.fields['highest_year'] = forms.ChoiceField(
+            choices=year_dropdown
+        )
 
     def clean_date(self):
         date = self.cleaned_data.get('date')
@@ -264,15 +302,15 @@ class ContestForm(forms.ModelForm):
         styles = self.cleaned_data.get('styles')
         return styles.split(',')
 
-    def clean_age_max(self):
-        age_min = self.cleaned_data.get('age_min')
-        age_max = self.cleaned_data.get('age_max')
-        if age_min > age_max:
+    def clean_highest_year(self):
+        lowest_year = self.cleaned_data.get('lowest_year')
+        highest_year = self.cleaned_data.get('highest_year')
+        if lowest_year > highest_year:
             raise forms.ValidationError(
                 'Przedział wiekowy jest niepoprawny. '
                 'Popraw wartości i spróbuj ponownie.'
             )
-        return age_max
+        return highest_year
 
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)
@@ -288,8 +326,8 @@ class ContestForm(forms.ModelForm):
     class Meta:
         model = Contest
         fields = [
-            'name', 'date', 'place', 'deadline', 'age_min',
-            'age_max', 'description',
+            'name', 'date', 'place', 'deadline', 'lowest_year',
+            'highest_year', 'description',
         ]
 
 

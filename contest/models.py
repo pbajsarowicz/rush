@@ -241,11 +241,12 @@ class Contest(UnitModelsMixin, models.Model):
     """
     Model for Contest.
     """
+
     name = models.CharField('Nazwa zawodów', max_length=255)
     date = models.DateTimeField('Data')
     place = models.CharField('Miejsce', max_length=255)
-    age_min = models.SmallIntegerField('Wiek minimalny')
-    age_max = models.SmallIntegerField('Wiek maksymalny')
+    lowest_year = models.PositiveSmallIntegerField('Rocznik minimalny')
+    highest_year = models.PositiveSmallIntegerField('Rocznik maksymalny')
     deadline = models.DateTimeField('Termin zgłaszania zawodników')
     description = models.TextField('Opis', blank=True)
     results = models.TextField('Wyniki', blank=True)
@@ -289,11 +290,12 @@ class Contestant(models.Model):
         ('G', 'Gimnazjum'),
         ('S', 'Szkoła średnia'),
     )
+
     moderator = models.ForeignKey(RushUser)
     first_name = models.CharField('imię', max_length=32)
     last_name = models.CharField('nazwisko', max_length=32)
     gender = models.CharField('płeć', max_length=1, choices=GENDERS)
-    age = models.IntegerField('wiek')
+    year_of_birth = models.PositiveSmallIntegerField('Rocznik')
     school = models.CharField('rodzaj szkoły', max_length=1, choices=SCHOOLS)
     styles = MultiSelectField(choices=STYLES_DISTANCES)
     contest = models.ForeignKey(Contest)

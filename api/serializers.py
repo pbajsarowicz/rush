@@ -64,7 +64,7 @@ class ContestSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Contest
         fields = (
-            'pk', 'name', 'date', 'place', 'age_min', 'age_max',
+            'pk', 'name', 'date', 'place', 'lowest_year', 'highest_year',
             'deadline', 'description', 'organizer',
         )
 
@@ -92,6 +92,6 @@ class ContestantSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Contestant
         fields = (
-            'first_name', 'last_name', 'gender', 'age', 'school',
+            'first_name', 'last_name', 'gender', 'year_of_birth', 'school',
             'styles', 'moderator', 'contest'
         )

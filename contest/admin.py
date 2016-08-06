@@ -75,7 +75,7 @@ class ContestAdmin(UnitAdminMixin, admin.ModelAdmin):
     inlines = [ContestantInline]
 
     fields = (
-        'name', 'date', 'place', 'age_min', 'age_max', 'deadline',
+        'name', 'date', 'place', 'lowest_year', 'highest_year', 'deadline',
         'description', 'unit_name_select', 'styles'
     )
     readonly_fields = ('unit_name_select',)
