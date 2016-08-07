@@ -482,15 +482,24 @@ function getContestInfo(pk) {
              }
 
             if (files[1]) {
-                result += '<a href="' + url + '"' + 'target="_blank" download>' + url + '</a><br>';
+                url = files[0].file
+                file_name = url.substring(61 + pk_length)
+                url = url.substring(39 + pk_length)
+                result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[2]) {
-                result += '<a href="' + url + '"' + 'target="_blank" download>' + url + '</a><br>';
+                url = files[0].file
+                file_name = url.substring(61 + pk_length)
+                url = url.substring(39 + pk_length)
+                result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[3]) {
-                result += '<a href="/' + url + '"' + 'target="_blank" download>' + url + '</a><br>';
+                url = files[0].file
+                file_name = url.substring(61 + pk_length)
+                url = url.substring(39 + pk_length)
+                result += '<a href="/' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             organizer = json['organizer'];
