@@ -10,6 +10,7 @@ from contest.models import (
     Club,
     School,
     Contact,
+    ContestFiles,
 )
 from contest.utils import admin_utils
 
@@ -71,8 +72,13 @@ class ContestantInline(admin.StackedInline):
     extra = 0
 
 
+class ContestFilesInline(admin.StackedInline):
+    model = ContestFiles
+    extra = 0
+
+
 class ContestAdmin(UnitAdminMixin, admin.ModelAdmin):
-    inlines = [ContestantInline]
+    inlines = [ContestantInline, ContestFilesInline]
 
     fields = (
         'name', 'date', 'place', 'lowest_year', 'highest_year', 'deadline',

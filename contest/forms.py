@@ -282,6 +282,9 @@ class ContestForm(forms.ModelForm):
         self.fields['file1'].widget.attrs.update(
             {'class': 'btn waves-effect waves-light'}
         )
+        self.fields['file1'].widget.attrs.update(
+            {'data-buttonText': 'Przeglądaj'}
+        )
         self.fields['file2'].widget.attrs.update(
             {'class': 'btn waves-effect waves-light'}
         )

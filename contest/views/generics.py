@@ -21,6 +21,7 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
+    ContestFiles,
 )
 
 from contest.forms import (
@@ -330,7 +331,36 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         form = self.form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
-            form = form.save()
+            form = form.save(commit=False)
+            form.save()
+            if 'file1' in request.FILES:
+                file1 = ContestFiles(
+                    file=request.FILES['file1'],
+                    contest=form,
+                    uploaded_by=request.user,
+                )
+                file1.save()
+            if 'file2' in request.FILES:
+                file2 = ContestFiles(
+                    file=request.FILES['file2'],
+                    contest=form,
+                    uploaded_by=request.user,
+                )
+                file2.save()
+            if 'file3' in request.FILES:
+                file3 = ContestFiles(
+                    file=request.FILES['file3'],
+                    contest=form,
+                    uploaded_by=request.user,
+                )
+                file3.save()
+            if 'file4' in request.FILES:
+                file4 = ContestFiles(
+                    file=request.FILES['file4'],
+                    contest=form,
+                    uploaded_by=request.user,
+                )
+                file4.save()
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(

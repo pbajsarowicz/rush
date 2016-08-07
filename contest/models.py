@@ -278,6 +278,16 @@ class Contest(UnitModelsMixin, models.Model):
         return self.date >= timezone.now()
 
 
+class ContestFiles(models.Model):
+    contest = models.ForeignKey(Contest)
+    uploaded_by = models.ForeignKey(RushUser)
+    date_uploaded = models.DateTimeField(auto_now_add=True)
+    file = models.FileField()
+
+    def __unicode__(self):
+        return self.file
+
+
 class Contestant(models.Model):
     """
     Model for Rush Contestant.
