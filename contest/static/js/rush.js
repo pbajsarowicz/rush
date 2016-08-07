@@ -482,21 +482,21 @@ function getContestInfo(pk) {
              }
 
             if (files[1]) {
-                url = files[0].file
+                url = files[1].file
                 file_name = url.substring(61 + pk_length)
                 url = url.substring(39 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[2]) {
-                url = files[0].file
+                url = files[2].file
                 file_name = url.substring(61 + pk_length)
                 url = url.substring(39 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[3]) {
-                url = files[0].file
+                url = files[3].file
                 file_name = url.substring(61 + pk_length)
                 url = url.substring(39 + pk_length)
                 result += '<a href="/' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
