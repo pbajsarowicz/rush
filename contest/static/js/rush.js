@@ -459,21 +459,26 @@ function getContestInfo(pk) {
     var result = '';
     var files = '';
     var url = '';
+    var file_name = '';
+    var pk_length;
 
     $.ajax({
         url: '/api/v1/contests/' + pk + '/?format=json',
         dataType: 'json',
         success: function(json){
-            files = json['files']
-            files = JSON.stringify(files)
-            files = JSON.parse(files)
+            files = json['files'];
+            files = JSON.stringify(files);
+            pk_length = pk.toString();
+            pk_length = pk_length.length
+            files = JSON.parse(files);
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od rocznika ' + json['lowest_year'] + ' do ' + json['highest_year'] +
             '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ';
              if (files[0]) {
                 url = files[0].file
-                url = url.substring(42)
-                result += '<a href="' + url + '"' + 'target="_blank" download>' + url + '</a><br>';
+                file_name = url.substring(61 + pk_length)
+                url = url.substring(39 + pk_length)
+                result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[1]) {
