@@ -277,15 +277,18 @@ class Contest(UnitModelsMixin, models.Model):
         """
         return self.date >= timezone.now()
 
+def contest_directory_path(instance, date_uploaded):
+    return 'contest/documents/{0}/{1}'.format(
+        instance.contest.pk,
+        date_uploaded
+    )
+
 
 class ContestFiles(models.Model):
     contest = models.ForeignKey(Contest)
     uploaded_by = models.ForeignKey(RushUser)
     date_uploaded = models.DateTimeField(auto_now_add=True)
-    file = models.FileField()
-
-    def __unicode__(self):
-        return self.file
+    file = models.FileField('Pliki', upload_to=contest_directory_path)
 
 
 class Contestant(models.Model):

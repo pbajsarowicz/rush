@@ -458,6 +458,7 @@ function getContestInfo(pk) {
     var organizer_contact = '';
     var result = '';
     var files = '';
+    var url = '';
 
     $.ajax({
         url: '/api/v1/contests/' + pk + '/?format=json',
@@ -465,9 +466,28 @@ function getContestInfo(pk) {
         success: function(json){
             files = json['files']
             files = JSON.stringify(files)
+            files = JSON.parse(files)
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od rocznika ' + json['lowest_year'] + ' do ' + json['highest_year'] +
-            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ' + files;
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ';
+             if (files[0]) {
+                url = files[0].file
+                url = url.substring(42)
+                result += '<a href="' + url + '"' + 'target="_blank" download>' + url + '</a><br>';
+             }
+
+            if (files[1]) {
+                result += '<a href="' + url + '"' + 'target="_blank" download>' + url + '</a><br>';
+             }
+
+            if (files[2]) {
+                result += '<a href="' + url + '"' + 'target="_blank" download>' + url + '</a><br>';
+             }
+
+            if (files[3]) {
+                result += '<a href="/' + url + '"' + 'target="_blank" download>' + url + '</a><br>';
+             }
+
             organizer = json['organizer'];
             if (organizer) {
                 organizer_contact = organizer['contact'];
