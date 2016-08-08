@@ -475,30 +475,30 @@ function getContestInfo(pk) {
             '<br> Dla kogo: od rocznika ' + json['lowest_year'] + ' do ' + json['highest_year'] +
             '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ';
              if (files[0]) {
-                url = files[0].file
-                file_name = url.substring(61 + pk_length)
-                url = url.substring(39 + pk_length)
+                url = files[0].url
+                file_name = files[0].file
+                file_name = file_name.substring(61 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[1]) {
-                url = files[1].file
-                file_name = url.substring(61 + pk_length)
-                url = url.substring(39 + pk_length)
+                url = files[1].url
+                file_name = files[1].file
+                file_name = file_name.substring(39 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[2]) {
-                url = files[2].file
-                file_name = url.substring(61 + pk_length)
-                url = url.substring(39 + pk_length)
+                url = files[2].url
+                file_name = files[2].file
+                file_name = file_name.substring(39 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[3]) {
-                url = files[3].file
-                file_name = url.substring(61 + pk_length)
-                url = url.substring(39 + pk_length)
+                url = files[3].url
+                file_name = files[3].file
+                file_name = file_name.substring(39 + pk_length)
                 result += '<a href="/' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 

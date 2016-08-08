@@ -54,6 +54,11 @@ urlpatterns = [
         name='home'
     ),
     url(
+        r'^contest/documents/(?P<contest_id>[0-9]+)/(?P<file_name>[\w.]{0,256})$',
+        login_required(views.HomeView.as_view()),
+        name='file-download'
+    ),
+    url(
         r'^',
         include(auth_patterns),
         name='auth'

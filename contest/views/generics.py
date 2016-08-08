@@ -340,6 +340,9 @@ class ContestAddView(PermissionRequiredMixin, View):
                     uploaded_by=request.user,
                 )
                 file1.save()
+                file1.url = file1.file.url
+                file1.save()
+
             if 'file2' in request.FILES:
                 file2 = ContestFiles(
                     file=request.FILES['file2'],
@@ -347,6 +350,9 @@ class ContestAddView(PermissionRequiredMixin, View):
                     uploaded_by=request.user,
                 )
                 file2.save()
+                file2.url = file2.file.url
+                file2.save()
+
             if 'file3' in request.FILES:
                 file3 = ContestFiles(
                     file=request.FILES['file3'],
@@ -354,6 +360,9 @@ class ContestAddView(PermissionRequiredMixin, View):
                     uploaded_by=request.user,
                 )
                 file3.save()
+                file3.url = file3.file.url
+                file3.save()
+
             if 'file4' in request.FILES:
                 file4 = ContestFiles(
                     file=request.FILES['file4'],
@@ -361,6 +370,9 @@ class ContestAddView(PermissionRequiredMixin, View):
                     uploaded_by=request.user,
                 )
                 file4.save()
+                file4.url = file4.file.url
+                file4.save()
+
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(
