@@ -13,10 +13,6 @@
           <div class="row center">
             {% csrf_token %}
             {{ form.as_p }}
-            {{ formset.management_form }}
-            {% for form in formset %}
-            {{ form.as_p }}
-            {% endfor %}
             <label id="style">Style:</label>
             <p>
               <input type="checkbox" class="filled-in" id="dowolny" onclick="showStyles('dowolny');" name="dowolny">

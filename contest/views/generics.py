@@ -23,7 +23,6 @@ from contest.models import (
     Contestant,
     ContestFiles,
 )
-
 from contest.forms import (
     ContestantForm,
     ContestForm,
@@ -323,7 +322,6 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         form = self.form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
-            form = form.save(commit=False)
             form.save()
             if 'file1' in request.FILES:
                 file1 = ContestFiles(

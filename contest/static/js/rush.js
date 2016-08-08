@@ -469,7 +469,7 @@ function getContestInfo(pk) {
             files = json['files'];
             files = JSON.stringify(files);
             pk_length = pk.toString();
-            pk_length = pk_length.length
+            pk_length = pk_length.length;
             files = JSON.parse(files);
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od rocznika ' + json['lowest_year'] + ' do ' + json['highest_year'] +
@@ -484,21 +484,21 @@ function getContestInfo(pk) {
             if (files[1]) {
                 url = files[1].url
                 file_name = files[1].file
-                file_name = file_name.substring(39 + pk_length)
+                file_name = file_name.substring(61 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[2]) {
                 url = files[2].url
                 file_name = files[2].file
-                file_name = file_name.substring(39 + pk_length)
+                file_name = file_name.substring(61 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[3]) {
                 url = files[3].url
                 file_name = files[3].file
-                file_name = file_name.substring(39 + pk_length)
+                file_name = file_name.substring(61 + pk_length)
                 result += '<a href="/' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
