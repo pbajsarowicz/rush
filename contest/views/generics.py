@@ -25,6 +25,7 @@ from contest.models import (
 from contest.forms import (
     ContestantForm,
     ContestForm,
+    ContestResultsForm,
 )
 
 
@@ -322,6 +323,74 @@ class ContestAddView(PermissionRequiredMixin, View):
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
+
+
+class ContestResultsAddView(View):
+    """
+    View for adding contest results.
+    """
+    template_name = 'contest/add_results.html'
+    form_class = ContestResultsForm
+
+    def get(self, request, contest_id, *args, **kwargs):
+        """
+        Return clear form.
+        """
+        contest = Contest.objects.get(pk=contest_id)
+        form = self.form_class(instance=contest)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, contest_id, *args, **kwargs):
+        """
+        Save results.
+        """
+        contest = Contest.objects.get(pk=contest_id)
+        form = self.form_class(request.POST, instance=contest)
+        if form.is_valid():
+            form.save(commit=True)
+            return redirect('contest:contest-results', contest_id=contest_id)
+        return render(request, self.template_name, {'form': form})
+
+
+class ContestResultsView(View):
+    """
+    Displays results.
+    """
+    template_name = 'contest/contest_results.html'
+
+    @staticmethod
+    def _get_results(contest_id, request):
+        """
+        Returns a results queryset.
+        """
+        contest = Contest.objects.get(pk=contest_id)
+        return contest.results
+
+    @staticmethod
+    def _get_msg(results=None):
+        """
+        Returns a message.
+        """
+        if not results:
+            return 'Nie dodano jeszcze wyników.'
+        return ''
+
+    def get(self, request, contest_id, *args, **kwargs):
+        """
+        Get results data.
+        """
+        contest = Contest.objects.get(pk=contest_id)
+        results = self._get_results(
+            contest_id, request
+        )
+        msg = self._get_msg(results)
+
+        context = {
+            'contest': contest,
+            'results': results,
+            'msg': msg,
+        }
+        return render(request, self.template_name, context)
 
 
 class CompletedContestView(View):

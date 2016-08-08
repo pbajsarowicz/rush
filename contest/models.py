@@ -249,6 +249,7 @@ class Contest(UnitModelsMixin, models.Model):
     highest_year = models.PositiveSmallIntegerField('Rocznik maksymalny')
     deadline = models.DateTimeField('Termin zgłaszania zawodników')
     description = models.TextField('Opis', blank=True)
+    results = models.TextField('Wyniki', blank=True)
     content_type = models.ForeignKey(
         ContentType, limit_choices_to=UNIT_LIMIT,
         blank=True, null=True
