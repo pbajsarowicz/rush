@@ -279,22 +279,11 @@ class ContestForm(forms.ModelForm):
             choices=year_dropdown
         )
 
-        self.fields['file1'].widget.attrs.update(
-            {'class': 'btn waves-effect waves-light'}
-        )
-        self.fields['file2'].widget.attrs.update(
-            {'class': 'btn waves-effect waves-light'}
-        )
-        self.fields['file3'].widget.attrs.update(
-            {'class': 'btn waves-effect waves-light'}
-        )
-        self.fields['file4'].widget.attrs.update(
-            {'class': 'btn waves-effect waves-light'}
-        )
-        self.fields['file1'].required = False
-        self.fields['file2'].required = False
-        self.fields['file3'].required = False
-        self.fields['file4'].required = False
+        for name in ('file1', 'file2', 'file3', 'file4'):
+            self.fields[name].widget.attrs.update(
+                {'class': 'btn waves-effect waves-light'}
+            )
+            self.fields[name].required = False
 
     def clean_date(self):
         date = self.cleaned_data.get('date')
@@ -359,30 +348,30 @@ class ContestForm(forms.ModelForm):
                 raise forms.ValidationError("Zły format")
         return file
 
-        def clean_file3(self):
-            file = self.cleaned_data['file3']
-            if file:
-                if file._size > 10 * 1024 * 1024:
-                    raise forms.ValidationError(
-                        "Plik jest za duży (Więcej niż 10 mb)"
-                    )
-                if str(file).endswith(
-                    ('.pdf', '.doc', '.docx', '.ods', '.xls')
-                ) is False:
-                    raise forms.ValidationError("Zły format")
+    def clean_file3(self):
+        file = self.cleaned_data['file3']
+        if file:
+            if file._size > 10 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "Plik jest za duży (Więcej niż 10 mb)"
+                )
+            if str(file).endswith(
+                ('.pdf', '.doc', '.docx', '.ods', '.xls')
+            ) is False:
+                raise forms.ValidationError("Zły format")
         return file
 
-        def clean_file4(self):
-            file = self.cleaned_data['file4']
-            if file:
-                if file._size > 10 * 1024 * 1024:
-                    raise forms.ValidationError(
-                        "Plik jest za duży (Więcej niż 10 mb)"
-                    )
-                if str(file).endswith(
-                    ('.pdf', '.doc', '.docx', '.ods', '.xls')
-                ) is False:
-                    raise forms.ValidationError("Zły format")
+    def clean_file4(self):
+        file = self.cleaned_data['file4']
+        if file:
+            if file._size > 10 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "Plik jest za duży (Więcej niż 10 mb)"
+                )
+            if str(file).endswith(
+                ('.pdf', '.doc', '.docx', '.ods', '.xls')
+            ) is False:
+                raise forms.ValidationError("Zły format")
         return file
 
     def save(self, commit=True):

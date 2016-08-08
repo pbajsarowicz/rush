@@ -310,11 +310,7 @@ class ContestAddView(PermissionRequiredMixin, View):
         Return clear form.
         """
         form = self.form_class(user=request.user)
-        return render(
-            request,
-            self.template_name,
-            {'form': form}
-        )
+        return render(request, self.template_name, {'form': form})
 
     def post(self, request):
         """
@@ -366,11 +362,6 @@ class ContestAddView(PermissionRequiredMixin, View):
 
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
-        return render(
-            request,
-            self.template_name,
-            {'form': form}
-        )
         return render(request, self.template_name, {'form': form})
 
 

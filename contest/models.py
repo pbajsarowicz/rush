@@ -279,9 +279,8 @@ class Contest(UnitModelsMixin, models.Model):
 
 
 def contest_directory_path(instance, date_uploaded):
-    return 'contest/documents/{0}/{1}'.format(
-        instance.contest.pk,
-        date_uploaded
+    return 'contest/documents/{}/{}'.format(
+        instance.contest.pk, date_uploaded
     )
 
 

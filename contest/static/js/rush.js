@@ -499,7 +499,7 @@ function getContestInfo(pk) {
                 url = files[3].url
                 file_name = files[3].file
                 file_name = file_name.substring(61 + pk_length)
-                result += '<a href="/' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
+                result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             organizer = json['organizer'];
