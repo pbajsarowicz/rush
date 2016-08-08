@@ -329,7 +329,7 @@ class ContestForm(forms.ModelForm):
                 raise forms.ValidationError(
                     "Plik jest za duży (Więcej niż 10 mb)"
                 )
-            if str(file).endswith(
+            if str(file).decode("utf-8", "ignore").endswith(
                 ('.pdf', '.doc', '.docx', '.ods', '.xls')
             ) is False:
                 raise forms.ValidationError("Zły format")
@@ -342,7 +342,7 @@ class ContestForm(forms.ModelForm):
                 raise forms.ValidationError(
                     "Plik jest za duży (Więcej niż 10 mb)"
                 )
-            if str(file).endswith(
+            if str(file).decode("utf-8", "ignore").endswith(
                 ('.pdf', '.doc', '.docx', '.ods', '.xls')
             ) is False:
                 raise forms.ValidationError("Zły format")
@@ -355,7 +355,7 @@ class ContestForm(forms.ModelForm):
                 raise forms.ValidationError(
                     "Plik jest za duży (Więcej niż 10 mb)"
                 )
-            if str(file).endswith(
+            if str(file).decode("utf-8", "ignore").endswith(
                 ('.pdf', '.doc', '.docx', '.ods', '.xls')
             ) is False:
                 raise forms.ValidationError("Zły format")
@@ -368,7 +368,7 @@ class ContestForm(forms.ModelForm):
                 raise forms.ValidationError(
                     "Plik jest za duży (Więcej niż 10 mb)"
                 )
-            if str(file).endswith(
+            if str(file).decode("utf-8", "ignore").endswith(
                 ('.pdf', '.doc', '.docx', '.ods', '.xls')
             ) is False:
                 raise forms.ValidationError("Zły format")
