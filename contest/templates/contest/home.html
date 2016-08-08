@@ -59,11 +59,13 @@
         {% for contest in completed %}
           <li class="collection-item contest-item">
             <div class="contest-item">
-              <span class="text">{{ contest }}</span>
               {% if user.is_authenticated and user.is_creator %}
                 <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-add-results' contest_id=contest.pk %}">Dodaj wyniki</a>
               {% endif %}
               <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-results' contest_id=contest.pk %}">Wyniki</a>
+              <a class="text" href="{% url 'contest:completed-contest' contest_id=contest.pk %}">{{ contest }}</a>
+              <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}"
+                 onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
               <div id="modal{{contest.pk}}" class="modal">
                 <div class="modal-content">
                   <h4>Szczegóły konkursu</h4>

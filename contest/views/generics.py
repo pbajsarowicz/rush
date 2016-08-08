@@ -391,3 +391,24 @@ class ContestResultsView(View):
             'msg': msg,
         }
         return render(request, self.template_name, context)
+
+
+class CompletedContestView(View):
+    """
+    Completed contest details page.
+    """
+    template_name = 'contest/completed_contest.html'
+
+    def get(self, request, contest_id):
+        """
+        Return contest details.
+        """
+        try:
+            contest = Contest.objects.get(pk=contest_id)
+        except Contest.DoesNotExist:
+            return render(
+                request,
+                self.template_name,
+                {'msg': 'Nie znaleziono konkursu.'}
+            )
+        return render(request, self.template_name, {'contest': contest})
