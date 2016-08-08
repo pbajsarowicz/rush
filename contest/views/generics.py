@@ -306,14 +306,6 @@ class ContestAddView(PermissionRequiredMixin, View):
     template_name = 'contest/contest_add.html'
     form_class = ContestForm
 
-    @staticmethod
-    def handle_uploaded_file(file):
-        if file:
-            destination = open('contest/static/documents/' + file.name, 'wb+')
-            for chunk in file.chunks():
-                destination.write(chunk)
-            destination.close()
-
     def get(self, request):
         """
         Return clear form.
