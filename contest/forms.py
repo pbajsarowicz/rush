@@ -335,6 +335,12 @@ class ContestResultsForm(forms.ModelForm):
     """
     Form for add results.
     """
+    def __init__(self, *args, **kwargs):
+        super(ContestResultsForm, self).__init__(*args, **kwargs)
+
+        self.fields['results'].widget.attrs.update({
+            'class': 'materialize-textarea'
+        })
 
     class Meta:
         model = Contest

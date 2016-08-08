@@ -818,13 +818,14 @@ class ContestResultsViewTestCase(TestCase):
     def setUp(self):
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20)), results='yolo'
+            place='Szkoła', lowest_year=11, highest_year=16,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            results='yolo'
         )
         self.contest2 = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20))
+            place='Szkoła', lowest_year=11, highest_year=16,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
         )
 
         self.user = RushUser.objects.create_superuser(
@@ -876,8 +877,8 @@ class AddContestResultsViewTest(TestCase):
     def setUp(self):
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', age_min=11, age_max=16, description='Opis',
-            deadline=make_aware(datetime(2008, 11, 20))
+            place='Szkoła', lowest_year=11, highest_year=16,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
         )
 
         self.user = RushUser.objects.create_superuser(

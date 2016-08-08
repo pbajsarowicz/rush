@@ -76,7 +76,7 @@ class ContestAdmin(UnitAdminMixin, admin.ModelAdmin):
 
     fields = (
         'name', 'date', 'place', 'lowest_year', 'highest_year', 'deadline',
-        'description', 'unit_name_select', 'styles'
+        'description', 'unit_name_select', 'styles', 'results',
     )
     readonly_fields = ('unit_name_select',)
 
