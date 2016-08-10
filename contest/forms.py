@@ -291,11 +291,12 @@ class ContestForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Termin dodawania zwodników musi być dłuższy niż podana data.'
             )
-        elif deadline > date:
-            raise forms.ValidationError(
-                'Ostateczny termin dodawania zawodników nie może być później '
-                'niż data zawodów.'
-            )
+        if date:
+            if deadline > date:
+                raise forms.ValidationError(
+                    'Ostateczny termin dodawania zawodników nie może być '
+                    'później niż data zawodów.'
+                )
         return deadline
 
     def clean_styles(self):
