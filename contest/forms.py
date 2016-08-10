@@ -254,10 +254,10 @@ class ContestForm(forms.ModelForm):
     """
     organization = forms.CharField(label='Organizacja', max_length=255)
     styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
-    file1 = forms.FileField(label='Plik1')
-    file2 = forms.FileField(label='Plik2')
-    file3 = forms.FileField(label='Plik3')
-    file4 = forms.FileField(label='Plik4')
+    file1 = forms.FileField(label='Plik1 ')
+    file2 = forms.FileField(label='Plik2 ')
+    file3 = forms.FileField(label='Plik3 ')
+    file4 = forms.FileField(label='Plik4 ')
 
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
@@ -322,57 +322,19 @@ class ContestForm(forms.ModelForm):
             )
         return highest_year
 
-    def clean_file1(self):
-        file = self.cleaned_data['file1']
-        if file:
-            if file._size > 10 * 1024 * 1024:
-                raise forms.ValidationError(
-                    "Plik jest za duży (Więcej niż 10 mb)"
-                )
-            if str(file).decode("utf-8", "ignore").endswith(
-                ('.pdf', '.doc', '.docx', '.ods', '.xls')
-            ) is False:
-                raise forms.ValidationError("Zły format")
-        return file
-
-    def clean_file2(self):
-        file = self.cleaned_data['file2']
-        if file:
-            if file._size > 10 * 1024 * 1024:
-                raise forms.ValidationError(
-                    "Plik jest za duży (Więcej niż 10 mb)"
-                )
-            if str(file).decode("utf-8", "ignore").endswith(
-                ('.pdf', '.doc', '.docx', '.ods', '.xls')
-            ) is False:
-                raise forms.ValidationError("Zły format")
-        return file
-
-    def clean_file3(self):
-        file = self.cleaned_data['file3']
-        if file:
-            if file._size > 10 * 1024 * 1024:
-                raise forms.ValidationError(
-                    "Plik jest za duży (Więcej niż 10 mb)"
-                )
-            if str(file).decode("utf-8", "ignore").endswith(
-                ('.pdf', '.doc', '.docx', '.ods', '.xls')
-            ) is False:
-                raise forms.ValidationError("Zły format")
-        return file
-
-    def clean_file4(self):
-        file = self.cleaned_data['file4']
-        if file:
-            if file._size > 10 * 1024 * 1024:
-                raise forms.ValidationError(
-                    "Plik jest za duży (Więcej niż 10 mb)"
-                )
-            if str(file).decode("utf-8", "ignore").endswith(
-                ('.pdf', '.doc', '.docx', '.ods', '.xls')
-            ) is False:
-                raise forms.ValidationError("Zły format")
-        return file
+    def clean(self):
+        for contest_file in ('file1', 'file2', 'file3', 'file4'):
+            docfile = self.cleaned_data[contest_file]
+            if docfile:
+                if docfile._size > 10 * 1024 * 1024:
+                    raise forms.ValidationError(
+                        'Plik jest za duży (Więcej niż 10 MB)'
+                    )
+                if docfile.name.endswith(
+                    ('.pdf', '.doc', '.docx', '.ods', '.xls')
+                ) is False:
+                    raise forms.ValidationError('Zły format')
+        return docfile
 
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)

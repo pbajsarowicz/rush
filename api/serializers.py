@@ -60,7 +60,9 @@ class ContestFilesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContestFiles
-        fields = ('contest', 'uploaded_by', 'date_uploaded', 'file', 'url',)
+        fields = (
+            'contest', 'uploaded_by', 'date_uploaded', 'contest_file', 'url',
+        )
 
 
 class ContestSerializer(serializers.HyperlinkedModelSerializer):

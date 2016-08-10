@@ -466,8 +466,7 @@ function getContestInfo(pk) {
         url: '/api/v1/contests/' + pk + '/?format=json',
         dataType: 'json',
         success: function(json){
-            files = json['files'];
-            files = JSON.stringify(files);
+            files = JSON.stringify(json['files']);
             pk_length = pk.toString();
             pk_length = pk_length.length;
             files = JSON.parse(files);
@@ -476,28 +475,28 @@ function getContestInfo(pk) {
             '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ';
              if (files[0]) {
                 url = files[0].url
-                file_name = files[0].file
+                file_name = files[0].contest_file
                 file_name = file_name.substring(61 + pk_length)
-                result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
+                result += '<a href="' + 'MEDIA_URL' + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[1]) {
                 url = files[1].url
-                file_name = files[1].file
+                file_name = files[1].contest_file
                 file_name = file_name.substring(61 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[2]) {
                 url = files[2].url
-                file_name = files[2].file
+                file_name = files[2].contest_file
                 file_name = file_name.substring(61 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }
 
             if (files[3]) {
                 url = files[3].url
-                file_name = files[3].file
+                file_name = files[3].contest_file
                 file_name = file_name.substring(61 + pk_length)
                 result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
              }

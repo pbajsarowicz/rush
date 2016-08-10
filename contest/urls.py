@@ -2,6 +2,7 @@ from django.conf.urls import (
     url,
     include,
 )
+from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 
@@ -56,8 +57,8 @@ urlpatterns = [
     url(
         r'^contest/documents/(?P<contest_id>[0-9]+)/'
         r'(?P<file_name>[0-9A-Za-z_\-\w.]{0,256})$',
-        login_required(views.HomeView.as_view()),
-        name='file-download'
+        'django.views.static.serve', {'document_root': settings.MEDIA_ROOT},
+            name='file-download'
     ),
     url(
         r'^',
