@@ -21,11 +21,8 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
-<<<<<<< HEAD
     RushUser,
-=======
     ContestFiles,
->>>>>>> 2e96659a9a41740b88a8bd2c42619ab269a78b91
 )
 from contest.forms import (
     ContestantForm,
@@ -311,13 +308,15 @@ class ContestAddView(PermissionRequiredMixin, View):
     form_class = ContestForm
 
     @staticmethod
-    def send_email_about_new_contest(contest, email, link, *args, **kwargs):
+    def send_email_about_new_contest(
+            contest, email, link, files, file_link, *args, **kwargs):
         """
         Sends an email with a list contestants
         """
         text = loader.render_to_string(
             'email/new_contest_notification.html', {
-                'contest': contest, 'link': link
+                'contest': contest, 'link': link, 'files': files,
+                'file_link': file_link,
             },
         )
         msg = EmailMessage(
@@ -351,12 +350,15 @@ class ContestAddView(PermissionRequiredMixin, View):
                     'contest:contestant-add', kwargs={'contest_id': form.pk}
                 )
             )
+            file_link = 'http://{}'.format(
+                request.get_host(),
+                reverse(
+                    'contest:home'
+                )
+            )
             contest = form
             contest.organization = organization
             contest.styles = contest.styles[1:]
-            for user in users:
-                self.send_email_about_new_contest(contest, user.email, link)
-
             for form_file in ('file1', 'file2', 'file3', 'file4'):
                 if form_file in request.FILES:
                     docfile = ContestFiles(
@@ -368,6 +370,12 @@ class ContestAddView(PermissionRequiredMixin, View):
                     docfile.save()
                     docfile.url = docfile.contest_file.url
                     docfile.save()
+
+            files = ContestFiles.objects.filter(contest=form)
+            for user in users:
+                self.send_email_about_new_contest(
+                    contest, user.email, link, files, file_link
+                )
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})

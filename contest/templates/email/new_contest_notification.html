@@ -16,7 +16,10 @@
         <p>Dozwolone roczniki: od {{ contest.lowest_year }} do {{ contest.highest_year }}</p>
         <p>Style: {{ contest.get_styles_display }}</p>
         <p>Pliki: </p>
+        {% for file in files %}
+          <br><a href="{{ file_link }}{{ file.url }}">{{ file.name }}</a>
+        {% endfor %}
       </div>
-    <a href="{{ link }}">Dołącz do zawodów</a>
+    <br><a href="{{ link }}">Dołącz do zawodów</a>
   </body>
 </html>
