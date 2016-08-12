@@ -152,10 +152,9 @@ AUTH_USER_MODEL = 'contest.RushUser'
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_ROOT = 'contest/documents'
-MEDIA_URL = 'http://127.0.0.1:8000/pliki/'
-
 LOGIN_URL = '/zaloguj/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_URL = '/wyloguj/'
 SUPPORT_EMAIL = 'Sample@email.com'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

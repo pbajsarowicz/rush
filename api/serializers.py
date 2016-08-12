@@ -62,6 +62,7 @@ class ContestFilesSerializer(serializers.ModelSerializer):
         model = ContestFiles
         fields = (
             'contest', 'uploaded_by', 'date_uploaded', 'contest_file', 'url',
+            'name',
         )
 
 

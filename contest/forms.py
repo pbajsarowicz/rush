@@ -254,10 +254,26 @@ class ContestForm(forms.ModelForm):
     """
     organization = forms.CharField(label='Organizacja', max_length=255)
     styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
-    file1 = forms.FileField(label='Plik1 ')
-    file2 = forms.FileField(label='Plik2 ')
-    file3 = forms.FileField(label='Plik3 ')
-    file4 = forms.FileField(label='Plik4 ')
+    file1 = forms.FileField(
+        label='Plik1 ',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
+    )
+    file2 = forms.FileField(
+        label='Plik2 ',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
+    )
+    file3 = forms.FileField(
+        label='Plik3 ',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
+    )
+    file4 = forms.FileField(
+        label='Plik4 ',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
+    )
 
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
@@ -278,12 +294,6 @@ class ContestForm(forms.ModelForm):
         self.fields['highest_year'] = forms.ChoiceField(
             choices=year_dropdown
         )
-
-        for name in ('file1', 'file2', 'file3', 'file4'):
-            self.fields[name].widget.attrs.update(
-                {'class': 'btn waves-effect waves-light'}
-            )
-            self.fields[name].required = False
 
     def clean_date(self):
         date = self.cleaned_data.get('date')

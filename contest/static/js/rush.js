@@ -460,46 +460,24 @@ function getContestInfo(pk) {
     var files = '';
     var url = '';
     var file_name = '';
-    var pk_length;
+    var file_number = 0;
 
     $.ajax({
         url: '/api/v1/contests/' + pk + '/?format=json',
         dataType: 'json',
         success: function(json){
-            files = JSON.stringify(json['files']);
-            pk_length = pk.toString();
-            pk_length = pk_length.length;
-            files = JSON.parse(files);
+            files = json['files']
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od rocznika ' + json['lowest_year'] + ' do ' + json['highest_year'] +
             '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ';
-             if (files[0]) {
-                url = files[0].url
-                file_name = files[0].contest_file
-                file_name = file_name.substring(61 + pk_length)
-                result += '<a href="' + 'MEDIA_URL' + '"' + 'target="_blank" download>' + file_name + '</a><br>';
-             }
-
-            if (files[1]) {
-                url = files[1].url
-                file_name = files[1].contest_file
-                file_name = file_name.substring(61 + pk_length)
-                result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
-             }
-
-            if (files[2]) {
-                url = files[2].url
-                file_name = files[2].contest_file
-                file_name = file_name.substring(61 + pk_length)
-                result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
-             }
-
-            if (files[3]) {
-                url = files[3].url
-                file_name = files[3].contest_file
-                file_name = file_name.substring(61 + pk_length)
-                result += '<a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a><br>';
-             }
+             
+            for (file_number = 0; file_number <=3; file_number++) {
+                if (files[file_number]) {
+                    url = files[file_number].url
+                    file_name = files[file_number].name
+                    result += '<br><a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a>';
+                }
+            }
 
             organizer = json['organizer'];
             if (organizer) {
