@@ -21,7 +21,11 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
+<<<<<<< HEAD
     RushUser,
+=======
+    ContestFiles,
+>>>>>>> 2e96659a9a41740b88a8bd2c42619ab269a78b91
 )
 from contest.forms import (
     ContestantForm,
@@ -239,7 +243,6 @@ class EditContestantView(View):
         contestant = Contestant.objects.get(id=contestant_id)
         user = request.user
         contest = contestant.contest
-
         form = self.form_class(
             instance=contestant,
             contest_id=contest.id,
@@ -337,7 +340,7 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         Create new Contest.
         """
-        form = self.form_class(request.POST, user=request.user)
+        form = self.form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             organization = form.cleaned_data['organization']
             form = form.save()
@@ -353,6 +356,18 @@ class ContestAddView(PermissionRequiredMixin, View):
             contest.styles = contest.styles[1:]
             for user in users:
                 self.send_email_about_new_contest(contest, user.email, link)
+
+            for form_file in ('file1', 'file2', 'file3', 'file4'):
+                if form_file in request.FILES:
+                    docfile = ContestFiles(
+                        contest_file=request.FILES[form_file],
+                        contest=form,
+                        uploaded_by=request.user,
+                        name=request.FILES[form_file].name
+                    )
+                    docfile.save()
+                    docfile.url = docfile.contest_file.url
+                    docfile.save()
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})

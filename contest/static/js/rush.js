@@ -457,14 +457,27 @@ function getContestInfo(pk) {
     var contact = '';
     var organizer_contact = '';
     var result = '';
+    var files = '';
+    var url = '';
+    var file_name = '';
+    var file_number = 0;
 
     $.ajax({
         url: '/api/v1/contests/' + pk + '/?format=json',
         dataType: 'json',
         success: function(json){
+            files = json['files']
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od rocznika ' + json['lowest_year'] + ' do ' + json['highest_year'] +
-            '<br> Termin zgłaszania zawodników: ' +  json['deadline'];
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ';
+             
+            for (file_number = 0; file_number <=3; file_number++) {
+                if (files[file_number]) {
+                    url = files[file_number].url
+                    file_name = files[file_number].name
+                    result += '<br><a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a>';
+                }
+            }
 
             organizer = json['organizer'];
             if (organizer) {
