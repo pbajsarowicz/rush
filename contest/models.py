@@ -288,7 +288,7 @@ class ContestFiles(models.Model):
     date_uploaded = models.DateTimeField(auto_now_add=True)
     contest_file = models.FileField('Pliki', upload_to=contest_directory_path)
     url = models.CharField('Ścieżka do pliku', max_length=255, default='')
-    name = models.CharField('Ścieżka do pliku', max_length=255, default='')
+    name = models.CharField('Nazwa pliku', max_length=255, default='')
 
 
 class Contestant(models.Model):
