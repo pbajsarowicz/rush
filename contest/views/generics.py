@@ -21,6 +21,7 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
+    RushUser,
 )
 from contest.forms import (
     ContestantForm,
@@ -306,6 +307,25 @@ class ContestAddView(PermissionRequiredMixin, View):
     template_name = 'contest/contest_add.html'
     form_class = ContestForm
 
+    @staticmethod
+    def send_email_about_new_contest(contest, email, link, *args, **kwargs):
+        """
+        Sends an email with a list contestants
+        """
+        text = loader.render_to_string(
+            'email/new_contest_notification.html', {
+                'contest': contest, 'link': link
+            },
+        )
+        msg = EmailMessage(
+            'Stworzono nowe zawody',
+            text,
+            settings.SUPPORT_EMAIL,
+            [email],
+        )
+        msg.content_subtype = 'html'
+        msg.send()
+
     def get(self, request):
         """
         Return clear form.
@@ -319,7 +339,20 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         form = self.form_class(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
+            organization = form.cleaned_data['organization']
+            form = form.save()
+            users = RushUser.objects.all().exclude(email=request.user.email)
+            link = 'http://{}{}'.format(
+                request.get_host(),
+                reverse(
+                    'contest:contestant-add', kwargs={'contest_id': form.pk}
+                )
+            )
+            contest = form
+            contest.organization = organization
+            contest.styles = contest.styles[1:]
+            for user in users:
+                self.send_email_about_new_contest(contest, user.email, link)
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
