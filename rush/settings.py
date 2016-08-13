@@ -152,8 +152,12 @@ AUTH_USER_MODEL = 'contest.RushUser'
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
-
 LOGIN_URL = '/zaloguj/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_URL = '/wyloguj/'
 SUPPORT_EMAIL = 'Sample@email.com'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024
+PERMITTED_EXTENSION = ('.pdf', '.doc', '.docx', '.ods', '.xls',)
