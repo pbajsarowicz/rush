@@ -814,6 +814,94 @@ class EditContestantViewTestCase(TestCase):
         )
 
 
+class ContestResultsViewTestCase(TestCase):
+    def setUp(self):
+        self.contest = Contest.objects.create(
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', lowest_year=11, highest_year=16,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            results='yolo'
+        )
+        self.contest2 = Contest.objects.create(
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', lowest_year=11, highest_year=16,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
+        )
+
+        self.user = RushUser.objects.create_superuser(
+            email='xyz@xyz.pl', username='login', password='Password'
+        )
+        self.client.login(username='login', password='Password')
+
+    def test_get_msg_with_results(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-results',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['msg'],
+            ''
+        )
+
+    def test_get_msg_without_results(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-results',
+                kwargs={'contest_id': self.contest2.id}
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['msg'],
+            'Nie dodano jeszcze wyników.'
+        )
+
+    def test_get_results(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-results',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['results'],
+            self.contest.results
+        )
+
+
+class AddContestResultsViewTest(TestCase):
+    def setUp(self):
+        self.contest = Contest.objects.create(
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', lowest_year=11, highest_year=16,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
+        )
+
+        self.user = RushUser.objects.create_superuser(
+            email='xyz@xyz.pl', username='login', password='Password'
+        )
+        self.client.login(username='login', password='Password')
+
+    def test_post(self):
+        response = self.client.post(
+            reverse(
+                'contest:contest-add-results',
+                kwargs={'contest_id': self.contest.id}
+            ),
+            data={
+                'results': 'Wyniki',
+            }, follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+
+        contest = Contest.objects.get(pk=self.contest.id)
+        self.assertEqual(contest.results, 'Wyniki')
+
+
 class ContestAddTestCase(TestCase):
     def setUp(self):
         self.user_1 = RushUser.objects.create_user(

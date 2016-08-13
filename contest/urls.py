@@ -86,6 +86,16 @@ urlpatterns = [
         name='contest-add'
     ),
     url(
+        r'^zawody/wyniki/(?P<contest_id>[0-9]+)/dodaj/?$',
+        login_required(views.ContestResultsAddView.as_view()),
+        name='contest-add-results'
+    ),
+    url(
+        r'^zawody/wyniki/(?P<contest_id>[0-9]+)/?$',
+        login_required(views.ContestResultsView.as_view()),
+        name='contest-results'
+    ),
+    url(
         r'^zakonczone/(?P<contest_id>[0-9]+)/?$',
         login_required(views.CompletedContestView.as_view()),
         name='completed-contest'
