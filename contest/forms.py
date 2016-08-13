@@ -73,7 +73,7 @@ class RegistrationForm(forms.ModelForm):
         model = RushUser
         fields = (
             'email', 'first_name', 'last_name', 'organization_name',
-            'organization_address', 'club_code',
+            'organization_address', 'club_code', 'notifications',
         )
 
 

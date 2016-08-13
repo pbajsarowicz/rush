@@ -1,4 +1,5 @@
 var clubCodeInput = document.getElementById('id_club_code');
+var notificationsInput = document.getElementById('id_notifications');
 var contestant;
 
 /*
@@ -60,6 +61,18 @@ function onClubCodeValidation() {
         document.register_form.club_checkbox.checked = true;
         clubCodeInput.className = 'visible';
         clubCodeInput.required = true;
+    }
+}
+
+/*
+ * Notifications input.
+ */
+function NotificationsInput() {
+    'use strict';
+    if (document.register_form.notifications_checkbox.checked) {
+        notificationsInput.value = true;
+    } else {
+        notificationsInput.value = false;
     }
 }
 
