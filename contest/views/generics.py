@@ -21,6 +21,7 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
+    ContestFiles,
 )
 from contest.forms import (
     ContestantForm,
@@ -238,7 +239,6 @@ class EditContestantView(View):
         contestant = Contestant.objects.get(id=contestant_id)
         user = request.user
         contest = contestant.contest
-
         form = self.form_class(
             instance=contestant,
             contest_id=contest.id,
@@ -317,10 +317,11 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         Create new Contest.
         """
-        form = self.form_class(request.POST, user=request.user)
+        form = self.form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
-            form.save()
+            form = form.save()
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
+
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
 
