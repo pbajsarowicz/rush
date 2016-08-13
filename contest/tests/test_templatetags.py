@@ -53,6 +53,7 @@ class ToJSONTestCase(TestCase):
                 'is_superuser': False,
                 'last_login': None,
                 'last_name': 'Anonymous',
+                'notifications': True,
                 'object_id': None,
                 'organization_address': '',
                 'organization_name': '',
