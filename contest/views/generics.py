@@ -320,18 +320,8 @@ class ContestAddView(PermissionRequiredMixin, View):
         form = self.form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             form = form.save()
-            for form_file in ('file1', 'file2', 'file3', 'file4'):
-                if form_file in request.FILES:
-                    docfile = ContestFiles(
-                        contest_file=request.FILES[form_file],
-                        contest=form,
-                        uploaded_by=request.user,
-                        name=request.FILES[form_file].name
-                    )
-                    docfile.save()
-                    docfile.url = docfile.contest_file.url
-                    docfile.save()
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
+
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
 

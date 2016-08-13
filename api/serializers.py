@@ -57,6 +57,7 @@ class SchoolClubRelatedField(serializers.RelatedField):
 
 
 class ContestFilesSerializer(serializers.ModelSerializer):
+    url = serializers.CharField(source='contest_file.url')
 
     class Meta:
         model = ContestFiles

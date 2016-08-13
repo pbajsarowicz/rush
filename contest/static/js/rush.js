@@ -465,18 +465,14 @@ function getContestInfo(pk) {
     $.ajax({
         url: '/api/v1/contests/' + pk + '/?format=json',
         dataType: 'json',
-        success: function(json){
-            files = json['files']
+        success: function(json) {
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od rocznika ' + json['lowest_year'] + ' do ' + json['highest_year'] +
             '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ';
-             
-            for (file_number = 0; file_number <=3; file_number++) {
-                if (files[file_number]) {
-                    url = files[file_number].url
-                    file_name = files[file_number].name
-                    result += '<br><a href="' + url + '"' + 'target="_blank" download>' + file_name + '</a>';
-                }
+
+            files = json['files']
+            for (var i = 0, len = files.length ; i < len; i++) {
+                result += '<br><a href="' + files[i].url + '"' + 'target="_blank" download>' + files[i].name + '</a>';
             }
 
             organizer = json['organizer'];

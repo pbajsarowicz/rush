@@ -20,8 +20,9 @@ from contest.models import (
     Club,
     Contest,
     Contestant,
-    School,
+    ContestFiles,
     RushUser,
+    School,
 )
 
 
@@ -255,22 +256,22 @@ class ContestForm(forms.ModelForm):
     organization = forms.CharField(label='Organizacja', max_length=255)
     styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
     file1 = forms.FileField(
-        label='Plik1 ',
+        label='Plik nr 1',
         required=False,
         widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
     )
     file2 = forms.FileField(
-        label='Plik2 ',
+        label='Plik nr 2',
         required=False,
         widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
     )
     file3 = forms.FileField(
-        label='Plik3 ',
+        label='Plik nr 3',
         required=False,
         widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
     )
     file4 = forms.FileField(
-        label='Plik4 ',
+        label='Plik nr 4',
         required=False,
         widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
     )
@@ -333,27 +334,63 @@ class ContestForm(forms.ModelForm):
         return highest_year
 
     def clean(self):
-        for contest_file in ('file1', 'file2', 'file3', 'file4'):
-            docfile = self.cleaned_data[contest_file]
-            if docfile:
-                if docfile._size > 10 * 1024 * 1024:
-                    raise forms.ValidationError(
-                        'Plik jest za duży (Więcej niż 10 MB)'
+        cleaned_data = super(ContestForm, self).clean()
+
+        for contest_file_name in ('file1', 'file2', 'file3', 'file4'):
+            contest_file = cleaned_data[contest_file_name]
+
+            if not contest_file:
+                continue
+
+            if contest_file._size > settings.MAX_UPLOAD_SIZE:
+                self.add_error(
+                    contest_file_name,
+                    'Plik jest za duży. '
+                    'Rozmiar pliku nie może przekraczać 10 MB.'
+                )
+            if not contest_file.name.endswith(settings.PERMITTED_EXTENSION):
+                self.add_error(
+                    contest_file_name,
+                    'Niedozwolony format pliku. '
+                    'Obsługiwane rozszerzenia: {}'.format(
+                        ', '.join(settings.PERMITTED_EXTENSION)
                     )
-                if docfile.name.endswith(
-                    ('.pdf', '.doc', '.docx', '.ods', '.xls')
-                ) is False:
-                    raise forms.ValidationError('Zły format')
-        return docfile
+                )
+
+        return cleaned_data
+
+    def _save_uploaded_files(self):
+        contest_files = []
+
+        for contest_file_name in ('file1', 'file2', 'file3', 'file4',):
+            contest_file = self.cleaned_data[contest_file_name]
+
+            if not contest_file:
+                continue
+
+            contest_files.append(
+                ContestFiles(
+                    contest_file=contest_file,
+                    contest=self.instance,
+                    uploaded_by=self.user,
+                    name=contest_file.name
+                )
+            )
+
+        if contest_files:
+            ContestFiles.objects.bulk_create(contest_files)
 
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)
+
         contest.content_type = self.user.content_type
         contest.object_id = self.user.object_id
         contest.styles = self.cleaned_data['styles']
 
         if commit:
             contest.save()
+            self._save_uploaded_files()
+
         return contest
 
     class Meta:

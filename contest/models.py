@@ -279,8 +279,12 @@ class Contest(UnitModelsMixin, models.Model):
         return self.date >= timezone.now()
 
 
-def contest_directory_path(instance, date_uploaded):
-    return '{}/{}'.format(instance.contest.pk, date_uploaded)
+def contest_directory_path(instance, filename):
+    date_uploaded = instance.date_uploaded.strftime('%Y/%m/%d')
+
+    return 'contest/{}/{}/{}'.format(
+        instance.contest.name, date_uploaded, filename
+    )
 
 
 class ContestFiles(models.Model):
@@ -288,7 +292,6 @@ class ContestFiles(models.Model):
     uploaded_by = models.ForeignKey(RushUser)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     contest_file = models.FileField('Pliki', upload_to=contest_directory_path)
-    url = models.CharField('Ścieżka do pliku', max_length=255, default='')
     name = models.CharField('Nazwa pliku', max_length=255, default='')
 
 
