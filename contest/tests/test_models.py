@@ -73,11 +73,6 @@ class ContestTestCase(TestCase):
         )
         self.assertEqual(self.contest.__unicode__(), expected_name)
 
-        self.contest.name = 'Wodnik'
-        self.contest.save()
-
-        self.assertEqual(self.contest.__unicode__(), 'Wodnik')
-
 
 class ContestantTestCase(TestCase):
     fixtures = ['contests.json', 'clubs.json', 'users.json']

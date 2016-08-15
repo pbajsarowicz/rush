@@ -263,7 +263,6 @@ class Contest(UnitModelsMixin, models.Model):
             self.place, self.date.strftime('%d-%m-%Y'), self.name
         )
 
-
     @property
     def is_submitting_open(self):
         """
