@@ -343,7 +343,6 @@ class ContestAddView(PermissionRequiredMixin, View):
         if form.is_valid():
             organization = form.cleaned_data['organization']
             form = form.save()
-<<<<<<< HEAD
             users = RushUser.objects.all().exclude(email=request.user.email)
             link = 'http://{}{}'.format(
                 request.get_host(),
@@ -377,8 +376,6 @@ class ContestAddView(PermissionRequiredMixin, View):
                 self.send_email_about_new_contest(
                     contest, user.email, link, files, file_link
                 )
-=======
->>>>>>> 6b6ae8f612a4987dc8ce1606116f7154e73f6cbd
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
 
             return render(request, self.template_name, {'message': msg})
