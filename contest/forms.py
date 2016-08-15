@@ -114,7 +114,7 @@ class RegistrationForm(forms.ModelForm):
             )
 
         if (
-            self.cleaned_data['representative'] == self.CLUB and
+            self.cleaned_data.get('representative') == self.CLUB and
             (
                 not self.cleaned_data.get('club_code') and
                 'club_code' not in self.errors
@@ -125,7 +125,7 @@ class RegistrationForm(forms.ModelForm):
             )
 
     def clean(self):
-        if self.cleaned_data['representative'] in (self.SCHOOL, self.CLUB,):
+        if self.cleaned_data.get('representative') in (self.SCHOOL, self.CLUB):
             self._clean_organization_card()
 
         return self.cleaned_data

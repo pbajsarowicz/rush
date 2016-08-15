@@ -25,6 +25,7 @@ from mock import patch
 from contest.forms import (
     ContestantForm,
     ContestForm,
+    INDIVIDUAL_CONTESTANTS_GROUP,
     LoginForm,
     RegistrationForm,
     RushResetPasswordEmailForm,
@@ -173,6 +174,54 @@ class SetResetPasswordViewTestCase(TestCase):
         self.user_2.save()
         self.user1_uid = urlsafe_base64_encode(force_bytes(self.user_1.pk))
         self.user1_token = default_token_generator.make_token(self.user_1)
+
+    def test_set_password_individual_user(self):
+        individual_user = RushUser(
+            email='individual_user@yolo.pl', first_name='A', last_name='B',
+            username='temp_username'
+        )
+        individual_user.save()
+        individual_user.groups.add(INDIVIDUAL_CONTESTANTS_GROUP)
+
+        individual_user_uid = urlsafe_base64_encode(
+            force_bytes(individual_user.pk)
+        )
+        individual_user_token = default_token_generator.make_token(
+            individual_user
+        )
+        response = self.client.get(
+            reverse(
+                'contest:set-password',
+                kwargs={
+                    'uidb64': individual_user_uid,
+                    'token': individual_user_token,
+                }
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            isinstance(response.context['form'], RushSetPasswordForm)
+        )
+
+        form_data = {
+            'new_password1': 'pass1234', 'new_password2': 'pass1234',
+            'username': 'individual_user'
+        }
+        response = self.client.post(
+            reverse(
+                'contest:set-password',
+                kwargs={
+                    'uidb64': individual_user_uid,
+                    'token': individual_user_token,
+                }
+            ),
+            data=form_data,
+        )
+        individual_user = RushUser.objects.get(username='individual_user')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(individual_user.is_active)
 
     def test_correct_url(self):
         response = self.client.get(
@@ -492,14 +541,33 @@ class RegisterViewTests(TestCase):
         )
         response = self.client.post(reverse('contest:register'))
         self.assertEqual(response.status_code, 200)
+
         self.assertEqual(
             response.context['form'].errors,
             {
                 'first_name': ['To pole jest wymagane.'],
                 'last_name': ['To pole jest wymagane.'],
+                'email': ['To pole jest wymagane.'],
+                'representative': ['To pole jest wymagane.']
+            }
+        )
+
+    def test_register_club_user(self):
+        response = self.client.post(
+            reverse('contest:register'),
+            data={
+                'email': 'abc@tmp.com', 'first_name': 'Imie',
+                'last_name': 'Nazwisko', 'organization_name': '',
+                'organization_address': '', 'club_code': '',
+                'representative': RegistrationForm.CLUB
+            }
+        )
+        self.assertEqual(
+            response.context['form'].errors,
+            {
                 'organization_name': ['To pole jest wymagane.'],
                 'organization_address': ['To pole jest wymagane.'],
-                'email': ['To pole jest wymagane.']
+                'club_code': ['To pole jest wymagane.'],
             }
         )
 
@@ -509,23 +577,61 @@ class RegisterViewTests(TestCase):
                 'email': 'abc@tmp.com', 'first_name': 'Imie',
                 'last_name': 'Nazwisko', 'organization_name': 'Club',
                 'organization_address': 'Address', 'club_code': 12345,
+                'representative': RegistrationForm.CLUB
             }
         )
         self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
         self.assertEqual(
             RushUser.objects.get(email='abc@tmp.com').unit_name, 'Club'
         )
+
+    def test_register_school_user(self):
+        response = self.client.post(
+            reverse('contest:register'),
+            data={
+                'email': 'abc@tmp.com', 'first_name': 'Imie',
+                'last_name': 'Nazwisko', 'organization_name': '',
+                'organization_address': '',
+                'representative': RegistrationForm.SCHOOL
+            }
+        )
+        self.assertEqual(
+            response.context['form'].errors,
+            {
+                'organization_name': ['To pole jest wymagane.'],
+                'organization_address': ['To pole jest wymagane.'],
+            }
+        )
+
         response = self.client.post(
             reverse('contest:register'),
             data={
                 'email': 'abc2@tmp.com', 'first_name': 'Imie2',
                 'last_name': 'Nazwisko2', 'organization_name': 'School',
-                'organization_address': 'Address'
+                'organization_address': 'Address',
+                'representative': RegistrationForm.SCHOOL
             }
         )
         self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
         self.assertEqual(
             RushUser.objects.get(email='abc2@tmp.com').unit_name, 'School'
+        )
+
+    def test_register_individual_user(self):
+        response = self.client.post(
+            reverse('contest:register'),
+            data={
+                'email': 'individual@user.com', 'first_name': 'Imie2',
+                'last_name': 'Nazwisko2',
+                'representative': RegistrationForm.INDIVIDUAL
+            }
+        )
+        rush_user = RushUser.objects.get(email='individual@user.com')
+
+        self.assertEqual(response.context['email'], settings.SUPPORT_EMAIL)
+        self.assertEqual(rush_user.unit_name, None)
+        self.assertTrue(
+            rush_user.groups.filter(name='Individual contestants').exists()
         )
 
 
@@ -645,6 +751,103 @@ class ContestantAddViewTestCase(TestCase):
 
         self.assertEqual(contestants[0].first_name, 'Jan')
         self.assertEqual(contestants[1].first_name, 'Anna')
+
+    def test_post_already_signed_in(self):
+        individual_user = RushUser(
+            email='individual_user@yolo.pl', first_name='Aaa', last_name='Bbb',
+            username='individual_user', is_active=True
+        )
+        individual_user.set_password('P@ssw0rd')
+        individual_user.save()
+        individual_user.groups.add(INDIVIDUAL_CONTESTANTS_GROUP)
+
+        self.form_data = {
+            'csrfmiddlewaretoken': 'A33GMETyB7NE1CknWDg2jVuS1Jsm5A9y',
+            'form-0-year_of_birth': '2005',
+            'form-0-first_name': individual_user.first_name,
+            'form-0-gender': 'M',
+            'form-0-last_name': individual_user.last_name,
+            'form-0-styles': ',D25,G25',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+            'form-MIN_NUM_FORMS': '0',
+            'form-TOTAL_FORMS': '1'
+        }
+
+        self.client.login(username='individual_user', password='P@ssw0rd')
+
+        response = self.client.post(
+            reverse(
+                'contest:contestant-add',
+                kwargs={'contest_id': self.contest.id}
+            ),
+            data=self.form_data
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(
+            reverse(
+                'contest:contestant-add',
+                kwargs={'contest_id': self.contest.id}
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'], 'Jesteś już zapisany na ten konkurs'
+        )
+
+    def test_get_required_fields_individual(self):
+        user = RushUser(
+            email='individual_user@email.pl', username='individual_user',
+            password='P@ssw0rd', is_active=True
+        )
+        user.set_password('P@ssw0rd')
+        user.save()
+        user.groups.add(INDIVIDUAL_CONTESTANTS_GROUP)
+
+        self.client.login(username='individual_user', password='P@ssw0rd')
+
+        response = self.client.get(
+            reverse(
+                'contest:contestant-add',
+                kwargs={'contest_id': self.contest.id}
+            )
+        )
+        form = response.context['formset'].forms[0]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(form, ContestantForm)
+        self.assertTrue(form.fields['first_name'].widget.attrs['readonly'])
+        self.assertTrue(form.fields['last_name'].widget.attrs['readonly'])
+
+    def test_get_required_fields_non_individual(self):
+        user = RushUser(
+            email='nonindividual_user@email.pl', username='nonindividual_user',
+            password='P@ssw0rd', is_active=True
+        )
+        user.set_password('P@ssw0rd')
+        club = Club.objects.last()
+        user.object_id = club.pk
+        user.content_type = ContentType.objects.get_for_model(Club)
+
+        user.save()
+        user.groups.add(INDIVIDUAL_CONTESTANTS_GROUP)
+
+        self.client.login(username='nonindividual_user', password='P@ssw0rd')
+        response = self.client.get(
+            reverse(
+                'contest:contestant-add',
+                kwargs={'contest_id': self.contest.id}
+            )
+        )
+
+        form = response.context['formset'].forms[0]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(form, ContestantForm)
+        self.assertEqual(form.fields['organization'].initial, club)
 
     def test_post_with_validation_error(self):
         response = self.client.post(

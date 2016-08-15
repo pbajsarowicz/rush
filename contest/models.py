@@ -195,7 +195,10 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         """
         Return name of user's unit.
         """
-        return self.unit.name
+        try:
+            return self.unit.name
+        except AttributeError:
+            return None
 
     def activate(self):
         """
