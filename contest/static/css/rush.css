@@ -153,3 +153,8 @@ Base elements
   margin-top: 45px;
   position: absolute;
 }
+
+.contest-name-cut {
+  overflow: hidden;
+  width: 50%;
+}
