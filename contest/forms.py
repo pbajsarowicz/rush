@@ -104,6 +104,9 @@ class RegistrationForm(forms.ModelForm):
         return user
 
     def _clean_organization_card(self):
+        """
+        Cleans required block dependant on user's organization.
+        """
         if not self.cleaned_data.get('organization_name'):
             self.add_error(
                 'organization_name', _('This field is required.')
@@ -125,6 +128,9 @@ class RegistrationForm(forms.ModelForm):
             )
 
     def clean(self):
+        """
+        Provides additional cleaning.
+        """
         if self.cleaned_data.get('representative') in (self.SCHOOL, self.CLUB):
             self._clean_organization_card()
 
