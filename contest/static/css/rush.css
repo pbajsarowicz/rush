@@ -43,6 +43,11 @@ Contestants
     to {opacity: 1;}
 }
 
+@keyframes hide {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
 #contestants-preview {
   background-color: white;
   bottom: 0;
@@ -63,6 +68,11 @@ Contestants
 .contestant-form.animation {
   animation-name: show-up;
   animation-duration: 0.5s;
+}
+
+#representative-card {
+  animation-name: show-up;
+  animation-duration: 1s;
 }
 
 p#style {
@@ -124,6 +134,8 @@ Base elements
 /* General */
 .invisible {
   display: none;
+  animation-name: hide !important;
+  animation-duration: 1s !important;
 }
 
 .visible {
@@ -152,4 +164,9 @@ Base elements
   display: block;
   margin-top: 45px;
   position: absolute;
+}
+
+.registration-field:after {
+  text-align: left;
+  width: 300px;
 }

@@ -41,17 +41,29 @@
               <a href="{% url 'contest:home' %}" class="modal-action modal-close waves-effect waves-green btn-flat">Tak</a>
             </div>
           </div>
-          <a class="waves-effect waves-light btn modal-trigger" href="#confirmation-modal">Zakończ</a>
+          <a class="waves-effect waves-light btn modal-trigger" href="#confirmation-modal">
+            {% if not user.is_individual_contestant %}
+              Zakończ
+            {% else %}
+              Zapisz się
+            {% endif %}
+          </a>
           <div id="confirmation-modal" class="modal">
             <div class="modal-content">
-              <h4>Czy na pewno chcesz zakończyć dodawanie zawodników?</h4>
+              {% if not user.is_individual_contestant %}
+                <h4>Czy na pewno chcesz zakończyć dodawanie zawodników?</h4>
+              {% else %}
+                <h4>Czy na pewno chcesz się zapisać?</h4>
+              {% endif %}
             </div>
             <div class="modal-footer">
               <a class="modal-action modal-close waves-effect waves-green btn-flat">Powrót</a>
               <input type="submit" id="submit_form" class="modal-action modal-close waves-effect waves-green btn-flat" value="Tak">
             </div>
           </div>
-          <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
+          {% if not user.is_individual_contestant %}
+            <button type="button" value="Add More" id="add_more" class="pull-right btn btn-primary">Następny zawodnik</button>
+          {% endif %}
         </form>
       {% endif %}
     </div>
@@ -81,5 +93,6 @@
   <script>
     var lowestYear = parseInt('{{ name.lowest_year }}');
     var highestYear = parseInt('{{ name.highest_year }}');
+    var isIndividualContestant = '{{ user.is_individual_contestant }}' === 'True' ? true : false;
   </script>
 {% endblock scripts %}
