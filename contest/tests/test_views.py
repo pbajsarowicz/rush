@@ -1194,6 +1194,26 @@ class ContestAddTestCase(TestCase):
                 'Popraw wartości i spróbuj ponownie.'
             ]
         )
+        self.form_data['date'] = '02.03.2011 16:00'
+        self.form_data['deadline'] = '01.09.2016 16:00'
+
+        response = self.client.post(
+            reverse('contest:contest-add'), data=self.form_data
+        )
+        self.assertEqual(
+            response.context['form'].errors['date'],
+            ['Data zawodów nie może być wcześniejsza niż dzień dzisiejszy.']
+        )
+        self.form_data['date'] = '02.09.2016 16:00'
+        self.form_data['deadline'] = '01.09.2011 16:00'
+
+        response = self.client.post(
+            reverse('contest:contest-add'), data=self.form_data
+        )
+        self.assertEqual(
+            response.context['form'].errors['deadline'],
+            ['Termin dodawania zwodników musi być dłuższy niż podana data.']
+        )
 
 
 class CompletedContestViewTestCase(TestCase):

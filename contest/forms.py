@@ -381,14 +381,14 @@ class ContestForm(forms.ModelForm):
         deadline = self.cleaned_data.get('deadline')
         date = self.cleaned_data.get('date')
 
-        if deadline < timezone.now():
+        if deadline and deadline < timezone.now():
             raise forms.ValidationError(
                 'Termin dodawania zwodników musi być dłuższy niż podana data.'
             )
-        elif deadline > date:
+        if date and deadline > date:
             raise forms.ValidationError(
-                'Ostateczny termin dodawania zawodników nie może być później '
-                'niż data zawodów.'
+                'Ostateczny termin dodawania zawodników nie może być '
+                'później niż data zawodów.'
             )
         return deadline
 
