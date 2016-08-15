@@ -4,7 +4,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   </head>
   <body>
-    <h2>Zawodnicy dodani na zawody:</h2>
+    {% if not is_individual_contestant %}
+      <h2>Zawodnicy dodani na zawody:</h2>
+    {% else %}
+      <h2>Zostałeś dodany do zawodów.</h2>
+      <h4>Podane dane:</h4>
+    {% endif %}
     {% for contestant in contestants %}
       <div>
         <hr/>
@@ -17,6 +22,9 @@
         <p>Style i dystanse: {{ contestant.get_styles_display }}</p>
       </div>
     {% endfor %}
-    <a href="{{ link }}">Lista zawodników</a>
+
+    {% if not is_individual_contestant %}
+      <a href="{{ link }}">Lista zawodników</a>
+    {% endif %}
   </body>
 </html>
