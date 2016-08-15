@@ -21,7 +21,6 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
-    ContestFiles,
 )
 from contest.forms import (
     ContestantForm,
