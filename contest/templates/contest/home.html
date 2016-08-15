@@ -29,8 +29,10 @@
               {% endif %}
               <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}"
                  onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
-              <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}"
-                 onclick="getContestInfo({{ contest.pk }})">Dodaj zawodników</a>
+              {% if user.is_authenticated %}
+                <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}"
+                   onclick="getContestInfo({{ contest.pk }})">Dodaj zawodników</a>
+              {% endif %}
               <div id="modal{{contest.pk}}" class="modal">
                 <div class="modal-content">
                   <h4>Szczegóły konkursu</h4>
