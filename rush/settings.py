@@ -158,3 +158,6 @@ LOGOUT_URL = '/wyloguj/'
 SUPPORT_EMAIL = 'Sample@email.com'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024
+PERMITTED_EXTENSION = ('.pdf', '.doc', '.docx', '.ods', '.xls',)
