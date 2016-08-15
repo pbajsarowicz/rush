@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from rest_framework import serializers
 
-
 from contest.models import (
     Contact,
     Contest,
@@ -11,6 +10,7 @@ from contest.models import (
     School,
     Contestant,
     RushUser,
+    ContestFiles
 )
 
 
@@ -56,16 +56,28 @@ class SchoolClubRelatedField(serializers.RelatedField):
         return serializer.data
 
 
+class ContestFilesSerializer(serializers.ModelSerializer):
+    url = serializers.CharField(source='contest_file.url')
+
+    class Meta:
+        model = ContestFiles
+        fields = (
+            'contest', 'uploaded_by', 'date_uploaded', 'contest_file', 'url',
+            'name',
+        )
+
+
 class ContestSerializer(serializers.HyperlinkedModelSerializer):
     deadline = serializers.DateTimeField(format='%d.%m.%Y %H:%M')
     date = serializers.DateTimeField(format='%d.%m.%Y %H:%M')
     organizer = SchoolClubRelatedField(read_only=True)
+    files = ContestFilesSerializer(many=True, source='contestfiles_set')
 
     class Meta:
         model = Contest
         fields = (
             'pk', 'name', 'date', 'place', 'lowest_year', 'highest_year',
-            'deadline', 'description', 'organizer',
+            'deadline', 'description', 'organizer', 'files',
         )
 
 
