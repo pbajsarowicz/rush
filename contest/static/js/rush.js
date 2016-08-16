@@ -1,5 +1,5 @@
 var clubCodeInput = document.getElementById('id_club_code');
-var notificationsInput = document.getElementById('id_notifications');
+var notificationInput = document.getElementById('id_notifications');
 var contestant;
 
 /*
@@ -67,12 +67,12 @@ function onClubCodeValidation() {
 /*
  * Notifications input.
  */
-function NotificationsInput() {
+function notificationsInput() {
     'use strict';
     if (document.register_form.notifications_checkbox.checked) {
-        notificationsInput.value = true;
+        notificationInput.value = true;
     } else {
-        notificationsInput.value = false;
+        notificationInput.value = false;
     }
 }
 
