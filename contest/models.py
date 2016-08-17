@@ -330,3 +330,51 @@ class Contestant(models.Model):
 
     def __unicode__(self):
         return '{} {}'.format(self.first_name, self.last_name)
+
+
+class Style(models.Model):
+    """
+    Model for styles.
+    """
+    name = models.CharField('Nazwa stylu', max_length=32)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Distance(models.Model):
+    """
+    Model for distances.
+    """
+    value = models.CharField('Dystans', max_length=16)
+
+    def __unicode__(self):
+        return self.value
+
+
+class RoundStyleDistance(models.Model):
+    """
+    Model for pair of style and distance.
+    """
+    style = models.ForeignKey(Style)
+    distance = models.ForeignKey(Distance)
+
+    def __unicode__(self):
+        return '{} {}'.format(self.style, self.distance)
+
+
+class ContestantScore(models.Model):
+    """
+    Model for contestant's score on given distance.
+    """
+    contestant = models.ForeignKey(Contestant)
+    style_distance = models.ForeignKey(RoundStyleDistance)
+    time_result = models.TimeField('Najlepszy czas', blank=True, null=True)
+
+    def __unicode__(self):
+        return '{}: {} - {}'.format(
+            self.contestant, self.style_distance, self.time_result
+        )
+
+    class Meta:
+        unique_together = ('contestant', 'style_distance')
