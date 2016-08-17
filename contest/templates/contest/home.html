@@ -1,6 +1,6 @@
 {% extends "contest/base.html" %}
 {% load staticfiles %}
-
+{% load static %}
 {% block container %}
   <div class="container">
     <h1 class="header center">Witaj {{ user.first_name }} {{ user.last_name }}</h1>
@@ -29,8 +29,16 @@
               {% endif %}
               <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}"
                  onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
-              <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}"
-                 onclick="getContestInfo({{ contest.pk }})">Dodaj zawodników</a>
+              {% if user.is_authenticated %}
+                <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contestant-add' contest_id=contest.pk %}"
+                   onclick="getContestInfo({{ contest.pk }})">
+                    {% if not user.is_individual_contestant %}
+                      Dodaj zawodników
+                    {% else %}
+                      Zapisz się
+                    {% endif %}
+                </a>
+              {% endif %}
               <div id="modal{{contest.pk}}" class="modal">
                 <div class="modal-content">
                   <h4>Szczegóły konkursu</h4>

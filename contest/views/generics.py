@@ -37,6 +37,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
+
         context['upcoming'] = Contest.objects.filter(
             date__gte=timezone.now()
         ).order_by('date')
@@ -73,34 +74,54 @@ class ContestantAddView(View):
         formset_class.form = staticmethod(
             curry(ContestantForm, contest_id=contest_id, user=user)
         )
+
         return formset_class(data) if data else formset_class()
 
-    @staticmethod
-    def send_email_with_contestant(contestants, email, link, *args, **kwargs):
+    def send_email_with_contestant(self, contestants, link, *args, **kwargs):
         """
         Sends an email with a list contestants
         """
         text = loader.render_to_string(
             'email/contestant_add.html', {
-                'contestants': contestants, 'link': link
+                'contestants': contestants,
+                'link': link,
+                'is_individual_contestant': (
+                    self.request.user.is_individual_contestant
+                ),
             },
         )
+        subject = (
+            'Potwierdzenie dodania zawodników'
+            if not self.request.user.is_individual_contestant else
+            'Potwierdzenie dodania do zawodów'
+        )
         msg = EmailMessage(
-            'Potwierdzenie dodania zawodników',
-            text,
-            settings.SUPPORT_EMAIL,
-            [email],
+            subject, text, settings.SUPPORT_EMAIL, [self.request.user.email],
         )
         msg.content_subtype = 'html'
         msg.send()
+
+    def _can_sign_in(self, contest_id):
+        return not (
+            self.request.user.is_individual_contestant and
+            Contestant.objects.filter(
+                contest__pk=contest_id, moderator=self.request.user
+            ).exists()
+        )
 
     def get(self, request, contest_id, *args, **kwargs):
         """
         Return adding a contestant form on site.
         """
-        user = request.user
+        if not self._can_sign_in(contest_id):
+            return render(
+                request,
+                self.template_name,
+                {'message': 'Jesteś już zapisany na ten konkurs'}
+            )
+
         organization = request.user.unit
-        formset = self.get_formset(contest_id, user)
+        formset = self.get_formset(contest_id, request.user)
 
         try:
             contest = Contest.objects.get(pk=contest_id)
@@ -155,9 +176,7 @@ class ContestantAddView(View):
                 contestant.save()
                 contestants.append(contestant)
 
-            self.send_email_with_contestant(
-                contestants, request.user.email, link,
-            )
+            self.send_email_with_contestant(contestants, link)
 
             msg = (
                 'Dziękujemy! Potwierdzenie zapisów zostało wysłane na email '
@@ -238,7 +257,6 @@ class EditContestantView(View):
         contestant = Contestant.objects.get(id=contestant_id)
         user = request.user
         contest = contestant.contest
-
         form = self.form_class(
             instance=contestant,
             contest_id=contest.id,
@@ -317,10 +335,11 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         Create new Contest.
         """
-        form = self.form_class(request.POST, user=request.user)
+        form = self.form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
-            form.save()
+            form = form.save()
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
+
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
 

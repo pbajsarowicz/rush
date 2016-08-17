@@ -6,6 +6,7 @@ from datetime import datetime
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import Group
 from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordResetForm,
@@ -20,11 +21,12 @@ from contest.models import (
     Club,
     Contest,
     Contestant,
-    School,
+    ContestFiles,
     RushUser,
+    School,
 )
 
-
+INDIVIDUAL_CONTESTANTS_GROUP = Group.objects.get(name='Individual contestants')
 YEARS_RANGE = 41
 current_year = datetime.now().year
 year_dropdown = [
@@ -38,6 +40,20 @@ class RegistrationForm(forms.ModelForm):
     """
     Form for new user registration.
     """
+    SCHOOL = 'SCHOOL'
+    CLUB = 'CLUB'
+    INDIVIDUAL = 'INDIVIDUAL'
+    REPRESENTATIVE_TYPES = (
+        (SCHOOL, 'Szkoła',),
+        (CLUB, 'Klub',),
+        (INDIVIDUAL, 'Indywidualny zawodnik',)
+    )
+    representative = forms.ChoiceField(
+        initial=SCHOOL,
+        required=True,
+        choices=REPRESENTATIVE_TYPES,
+        widget=forms.RadioSelect(attrs={'class': 'with-gap'})
+    )
     club_code = forms.CharField(
         label='Kod klubowy',
         max_length=5,
@@ -45,15 +61,18 @@ class RegistrationForm(forms.ModelForm):
         validators=[
             RegexValidator(r'^\d{5}$', 'Kod klubowy musi zwierać 5 cyfr')
         ],
-        widget=forms.TextInput(attrs={'class': 'invisible'})
     )
 
-    def save(self, commit=True):
+    def _handle_individual_contestant(self):
         """
-        Handles assigning club to a user.
+        Adds an individual contentast to the appropriate group.
         """
-        user = super(RegistrationForm, self).save(commit=False)
-        user.username = uuid.uuid4()
+        self.instance.groups.add(INDIVIDUAL_CONTESTANTS_GROUP)
+
+    def _handle_nonindividual_contestant(self):
+        """
+        Assigns a nonindividual contentast to club or school.
+        """
         club_code = self.cleaned_data['club_code']
         organization = self.cleaned_data['organization_name']
 
@@ -64,16 +83,65 @@ class RegistrationForm(forms.ModelForm):
                 unit.save()
         else:
             unit, __ = School.objects.get_or_create(name=organization)
-        user.content_type = ContentType.objects.get_for_model(unit)
-        user.object_id = unit.id
 
-        user.save()
+        self.instance.content_type = ContentType.objects.get_for_model(unit)
+        self.instance.object_id = unit.id
+
+    def save(self, commit=True):
+        """
+        Prepopulates a user object prior to saving.
+        """
+        user = super(RegistrationForm, self).save(commit=False)
+        user.username = uuid.uuid4()
+
+        if not self.cleaned_data['representative'] == self.INDIVIDUAL:
+            self._handle_nonindividual_contestant()
+            user.save()
+        else:
+            user.save()
+            self._handle_individual_contestant()
+
+        return user
+
+    def _clean_organization_card(self):
+        """
+        Cleans required block dependant on user's organization.
+        """
+        if not self.cleaned_data.get('organization_name'):
+            self.add_error(
+                'organization_name', _('This field is required.')
+            )
+        if not self.cleaned_data.get('organization_address'):
+            self.add_error(
+                'organization_address', _('This field is required.')
+            )
+
+        if (
+            self.cleaned_data.get('representative') == self.CLUB and
+            (
+                not self.cleaned_data.get('club_code') and
+                'club_code' not in self.errors
+            )
+        ):
+            self.add_error(
+                'club_code', _('This field is required.')
+            )
+
+    def clean(self):
+        """
+        Provides additional cleaning.
+        """
+        if self.cleaned_data.get('representative') in (self.SCHOOL, self.CLUB):
+            self._clean_organization_card()
+
+        return self.cleaned_data
 
     class Meta:
         model = RushUser
         fields = (
             'email', 'first_name', 'last_name', 'organization_name',
             'organization_address', 'club_code', 'notifications',
+            'representative',
         )
 
 
@@ -168,6 +236,9 @@ class RushSetPasswordForm(RushResetPasswordForm):
         self.user.username = username
 
         if commit:
+            if not self.user.is_active:
+                self.user.is_active = True
+
             self.user.save()
 
         return self.user
@@ -205,7 +276,9 @@ class ContestantForm(forms.ModelForm):
     """
     Form for contestant creation.
     """
-    organization = forms.CharField(label='Klub/Szkoła', max_length=100)
+    organization = forms.CharField(
+        label='Klub/Szkoła', max_length=100, required=False
+    )
     styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
@@ -216,6 +289,14 @@ class ContestantForm(forms.ModelForm):
         if self.user.unit:
             self.fields['organization'].initial = self.user.unit
             self.fields['organization'].widget.attrs['readonly'] = True
+        if self.user.is_individual_contestant:
+            self.fields['first_name'].initial = self.user.first_name
+            self.fields['first_name'].widget.attrs['readonly'] = True
+            self.fields['last_name'].initial = self.user.last_name
+            self.fields['last_name'].widget.attrs['readonly'] = True
+            self.fields['organization'].widget = forms.HiddenInput()
+            self.fields['school'].widget = forms.HiddenInput()
+
         self.fields['year_of_birth'] = forms.ChoiceField(choices=year_dropdown)
 
     def clean_year_of_birth(self):
@@ -254,6 +335,26 @@ class ContestForm(forms.ModelForm):
     """
     organization = forms.CharField(label='Organizacja', max_length=255)
     styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
+    file1 = forms.FileField(
+        label='Plik nr 1',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
+    )
+    file2 = forms.FileField(
+        label='Plik nr 2',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
+    )
+    file3 = forms.FileField(
+        label='Plik nr 3',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
+    )
+    file4 = forms.FileField(
+        label='Plik nr 4',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'btn waves-effect waves-light'})
+    )
 
     def __init__(self, *args, **kwargs):
         if 'user' in kwargs:
@@ -287,14 +388,14 @@ class ContestForm(forms.ModelForm):
         deadline = self.cleaned_data.get('deadline')
         date = self.cleaned_data.get('date')
 
-        if deadline < timezone.now():
+        if deadline and deadline < timezone.now():
             raise forms.ValidationError(
                 'Termin dodawania zwodników musi być dłuższy niż podana data.'
             )
-        elif deadline > date:
+        if date and deadline > date:
             raise forms.ValidationError(
-                'Ostateczny termin dodawania zawodników nie może być później '
-                'niż data zawodów.'
+                'Ostateczny termin dodawania zawodników nie może być '
+                'później niż data zawodów.'
             )
         return deadline
 
@@ -312,6 +413,53 @@ class ContestForm(forms.ModelForm):
             )
         return highest_year
 
+    def clean(self):
+        cleaned_data = super(ContestForm, self).clean()
+
+        for contest_file_name in ('file1', 'file2', 'file3', 'file4'):
+            contest_file = cleaned_data[contest_file_name]
+
+            if not contest_file:
+                continue
+
+            if contest_file._size > settings.MAX_UPLOAD_SIZE:
+                self.add_error(
+                    contest_file_name,
+                    'Plik jest za duży. '
+                    'Rozmiar pliku nie może przekraczać 10 MB.'
+                )
+            if not contest_file.name.endswith(settings.PERMITTED_EXTENSION):
+                self.add_error(
+                    contest_file_name,
+                    'Niedozwolony format pliku. '
+                    'Obsługiwane rozszerzenia: {}'.format(
+                        ', '.join(settings.PERMITTED_EXTENSION)
+                    )
+                )
+
+        return cleaned_data
+
+    def _save_uploaded_files(self):
+        contest_files = []
+
+        for contest_file_name in ('file1', 'file2', 'file3', 'file4',):
+            contest_file = self.cleaned_data[contest_file_name]
+
+            if not contest_file:
+                continue
+
+            contest_files.append(
+                ContestFiles(
+                    contest_file=contest_file,
+                    contest=self.instance,
+                    uploaded_by=self.user,
+                    name=contest_file.name
+                )
+            )
+
+        if contest_files:
+            ContestFiles.objects.bulk_create(contest_files)
+
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)
 
@@ -321,13 +469,15 @@ class ContestForm(forms.ModelForm):
 
         if commit:
             contest.save()
+            self._save_uploaded_files()
+
         return contest
 
     class Meta:
         model = Contest
         fields = [
             'name', 'date', 'place', 'deadline', 'lowest_year',
-            'highest_year', 'description',
+            'highest_year', 'description', 'file1', 'file2', 'file3', 'file4',
         ]
 
 

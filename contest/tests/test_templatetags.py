@@ -55,8 +55,8 @@ class ToJSONTestCase(TestCase):
                 'last_name': 'Anonymous',
                 'notifications': True,
                 'object_id': None,
-                'organization_address': '',
-                'organization_name': '',
+                'organization_address': None,
+                'organization_name': None,
                 'user_permissions': [],
                 'username': ''
             }

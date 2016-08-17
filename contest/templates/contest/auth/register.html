@@ -2,26 +2,130 @@
 
 {% block container %}
   <div class="container">
-    <div class="row center">
-      {% if success_message %}
-        {{ success_message }}
-      {% else %}
-        <form class="col s6" action="?next={{next}}" role="form" method="post" name="register_form">
-          <div class="row center">
+    {% if success_message %}
+      {{ success_message }}
+    {% else %}
+      <form action="?next={{next}}" role="form" method="post" name="register_form">
+        <h4>Rejstracja</h4>
+        <p>Wypełnij poniższy formularz aby się zarejestrować.</p>
+        <div class="row">
+          <div class="col s5">
             {% csrf_token %}
-            {{ form.as_p }}
-            <div class="row">
-              <div class="col s12">
-                <input type="checkbox" name="club_checkbox" class="filled-in" id="filled-in-box" onclick="hideClubCode();"/>
-                <label for="filled-in-box">Klub</label>
-                <input type="checkbox" name="notifications_checkbox" class="filled-in" id="filled-box" onclick="notificationsInput();" checked/>
-                <label for="filled-box">Chcę otrzymywać powiadomienia o nowych zawodach na podany wyżej adres email.</label>
+              <div class="input-field col s12">
+                <input id="{{ form.email.auto_id }}"
+                       name="{{ form.email.name }}"
+                       class="validate {% if form.email.errors %}invalid{% endif %}"
+                       type="text"
+                       maxlength="{{ form.email.field.max_length }}"
+                       {% if form.email.value %}value="{{ form.email.value }}"{% endif %} required>
+                <label for="{{ form.email.auto_id }}"
+                       data-error="{{ form.email.errors.0 }}"
+                       class="registration-field active">{{ form.email.label }}</label>
               </div>
             </div>
-            <button type="submit" class="pull-right btn btn-primary">Wyślij zapytanie o konto</button>
+            <div class="row">
+              <div class="input-field col s12">
+                <input id="{{ form.first_name.auto_id }}"
+                       name="{{ form.first_name.name }}"
+                       class="validate {% if form.first_name.errors %}invalid{% endif %}"
+                       type="text"
+                       maxlength="{{ form.first_name.field.max_length }}"
+                       {% if form.first_name.value %}value="{{ form.first_name.value }}"{% endif %} required>
+                <label for="{{ form.first_name.auto_id }}"
+                       data-error="{{ form.first_name.errors.0 }}"
+                       class="registration-field active">{{ form.first_name.label }}</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input id="{{ form.last_name.auto_id }}"
+                       name="{{ form.last_name.name }}"
+                       class="validate {% if form.last_name.errors %}invalid{% endif %}"
+                       type="text"
+                       maxlength="{{ form.last_name.field.max_length }}"
+                       {% if form.last_name.value %}value="{{ form.last_name.value }}"{% endif %} required>
+                <label for="{{ form.last_name.auto_id }}"
+                       data-error="{{ form.last_name.errors.0 }}"
+                       class="registration-field active">{{ form.last_name.label }}</label>
+              </div>
+            </div>
+            <p>Określ jaką organizację reprezentujesz</p>
+            <div class="row s12 left-align">
+              {% for representative in form.representative %}
+                <div class="input-field col {% cycle 's3' 's3' 's6' %}">
+                  <input id="{{ form.representative.auto_id }}_{{ forloop.counter0 }}"
+                         name="{{ form.representative.name }}"
+                         class="{{ form.representative.name }} with-gap"
+                         type="radio"
+                         onclick="changeRepresentative(this);"
+                         value="{{ representative.choice_value }}"
+                         {% if form.representative.value == representative.choice_value %}checked{% endif %}/>
+                  <label for="{{ form.representative.auto_id }}_{{ forloop.counter0 }}">{{ representative.choice_label }}</label>
+                </div>
+              {% endfor %}
+            </div>
           </div>
-        </form>
-      {% endif %}
-    </div>
+          <div id="{{ form.representative.name }}-card" class="col s6 offset-s1">
+            <div class="card">
+              <div class="card-content">
+                <span id="{{ form.representative.name }}-card-title" class="card-title">Podaj dane szkoły</span>
+              </div>
+              <div class="card-action">
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input id="{{ form.organization_name.auto_id }}"
+                           name="{{ form.organization_name.name }}"
+                           class="validate {% if form.organization_name.errors %}invalid{% endif %}"
+                           type="text"
+                           maxlength="{{ form.organization_name.field.max_length }}"
+                           {% if form.organization_name.value %}value="{{ form.organization_name.value }}"{% endif %} required>
+                    <label for="{{ form.organization_name.auto_id }}"
+                           data-error="{{ form.organization_name.errors.0 }}"
+                           class="registration-field active">{{ form.organization_name.label }}</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input id="{{ form.organization_address.auto_id }}"
+                           name="{{ form.organization_address.name }}"
+                           class="validate {% if form.organization_address.errors %}invalid{% endif %}"
+                           type="text"
+                           maxlength="{{ form.organization_address.field.max_length }}"
+                           {% if form.organization_address.value %}value="{{ form.organization_address.value }}"{% endif %} required>
+                    <label for="{{ form.organization_address.auto_id }}"
+                           data-error="{{ form.organization_address.errors.0 }}"
+                           class="registration-field active">{{ form.organization_address.label }}</label>
+                  </div>
+                </div>
+                <div id="{{ form.club_code.name }}-element" class="row invisible">
+                  <div class="input-field col s12">
+                    <input id="{{ form.club_code.auto_id }}"
+                           name="{{ form.club_code.name }}"
+                           class="validate {% if form.club_code.errors %}invalid{% endif %}"
+                           type="text"
+                           maxlength="{{ form.club_code.field.max_length }}"
+                           {% if form.club_code.value %}value="{{ form.club_code.value }}"{% endif %} required>
+                    <label for="{{ form.club_code.auto_id }}"
+                           data-error="{{ form.club_code.errors.0 }}"
+                           class="registration-field active">{{ form.club_code.label }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="s12 center">
+              <input type="checkbox" name="notifications_checkbox" class="filled-in" id="filled-box" onclick="notificationsInput();" checked/>
+              <label for="filled-box">Chcę otrzymywać powiadomienia o nowych zawodach na podany wyżej adres email.</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="s12 center">
+            <button id="registration-button" type="submit" class="pull-right btn btn-primary">Wyślij zapytanie o konto</button>
+          </div>
+        </div>
+      </form>
+    {% endif %}
   </div>
 {% endblock container %}
