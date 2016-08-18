@@ -344,10 +344,11 @@ class ContestAddView(PermissionRequiredMixin, View):
         return render(request, self.template_name, {'form': form})
 
 
-class ContestResultsAddView(View):
+class ContestResultsAddView(PermissionRequiredMixin, View):
     """
     View for adding contest results.
     """
+    permission_required = 'contest.add_contest'
     template_name = 'contest/add_results.html'
     form_class = ContestResultsForm
 
