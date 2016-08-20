@@ -63,13 +63,13 @@ class ContestTestCase(TestCase):
     def setUp(self):
         self.now = timezone.now()
         self.contest = Contest.objects.create(
-            date=self.now, place='Szkoła', lowest_year=2005, highest_year=2000,
+            name='Zawody', date=self.now, place='Szkoła', lowest_year=2005, highest_year=2000,
             deadline=self.now
         )
 
     def test_contest_methods(self):
-        expected_name = '{} - {}'.format(
-            'Szkoła', self.now.strftime('%d-%m-%Y')
+        expected_name = '{} - {} - {}'.format(
+            'Zawody', 'Szkoła', self.now.strftime('%d-%m-%Y')
         )
         self.assertEqual(self.contest.__unicode__(), expected_name)
 
