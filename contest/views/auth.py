@@ -36,15 +36,17 @@ class RegisterView(View):
     form_class = RegistrationForm
     template_name = 'contest/auth/register.html'
 
-    @staticmethod
-    def the_list_of_admins():
+    @property
+    def admins_emails_list(self):
         """
-        Returning the list of admins
+        A list of emails of admin users.
         """
-        return RushUser.objects.filter(is_admin=True)
+        return RushUser.objects.filter(is_admin=True).values_list(
+            'email', flat=True
+        )
 
     @staticmethod
-    def send_email_with_new_user(name, last_name, email, page):
+    def send_email_with_new_user(name, last_name, emails, page):
         """
         Sends an email with new user to admins.
         """
@@ -53,7 +55,7 @@ class RegisterView(View):
             {'first_name': name, 'last_name': last_name, 'page': page}
         )
         msg = EmailMessage(
-            'Nowe zapytanie o konto', text, settings.SUPPORT_EMAIL, email
+            'Nowe zapytanie o konto', text, settings.SUPPORT_EMAIL, emails
         )
         msg.content_subtype = 'html'
         msg.send()
@@ -71,23 +73,28 @@ class RegisterView(View):
         Send form and check validation.
         """
         form = self.form_class(request.POST)
+
         if form.is_valid():
-            form.save()
-            emails = []
-            for admin in self.the_list_of_admins():
-                emails.append(admin.email)
-            user = RushUser.objects.get(email=form.cleaned_data['email'])
+            user = form.save()
             page = urljoin(
                 'http://{}'.format(request.get_host()),
                 reverse('contest:accounts')
             )
-            self.send_email_with_new_user(
-                user.first_name, user.last_name, emails, page
-            )
+
+            if not user.is_individual_contestant:
+                self.send_email_with_new_user(
+                    user.first_name, user.last_name,
+                    self.admins_emails_list, page
+                )
+            else:
+                user.send_reset_password_email(request, True)
 
             return render(
                 request, 'contest/auth/register_confirmation.html',
-                {'email': settings.SUPPORT_EMAIL}
+                {
+                    'email': settings.SUPPORT_EMAIL,
+                    'is_individual_contestant': user.is_individual_contestant,
+                }
             )
         return render(request, self.template_name, {'form': form})
 

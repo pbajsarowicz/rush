@@ -52,7 +52,7 @@ auth_patterns = [
 urlpatterns = [
     url(
         r'^$',
-        login_required(views.HomeView.as_view()),
+        views.HomeView.as_view(),
         name='home'
     ),
     url(
@@ -92,12 +92,12 @@ urlpatterns = [
     ),
     url(
         r'^zawody/wyniki/(?P<contest_id>[0-9]+)/?$',
-        login_required(views.ContestResultsView.as_view()),
+        views.ContestResultsView.as_view(),
         name='contest-results'
     ),
     url(
         r'^zakonczone/(?P<contest_id>[0-9]+)/?$',
-        login_required(views.CompletedContestView.as_view()),
+        views.CompletedContestView.as_view(),
         name='completed-contest'
     ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

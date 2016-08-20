@@ -57,13 +57,16 @@ def runserver():
     local('./manage.py runserver --settings=rush.local_settings')
 
 
-def rush(command):
+def rush(command=None):
     """
     Runs any Django command using `local_settings`.
 
     e.g. fab rush:runserver
     """
-    local('./manage.py {} --settings=rush.local_settings'.format(command))
+    if command:
+        local('./manage.py {} --settings=rush.local_settings'.format(command))
+    else:
+        runserver()
 
 
 def pip(reinstall='N'):

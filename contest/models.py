@@ -115,10 +115,10 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
     first_name = models.CharField('imię', max_length=32)
     last_name = models.CharField('nazwisko', max_length=32)
     organization_name = models.CharField(
-        'Nazwa Szkoły/Klubu', max_length=255
+        'Nazwa', max_length=255, blank=True, null=True
     )
     organization_address = models.CharField(
-        'Adres Szkoły/Klubu', max_length=255
+        'Adres', max_length=255, blank=True, null=True
     )
     date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
@@ -184,11 +184,21 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         return self.has_perm('contest.add_contest')
 
     @property
+    def is_individual_contestant(self):
+        """
+        Checks if it's an individual contestant.
+        """
+        return self.groups.filter(name='Individual contestants').exists()
+
+    @property
     def unit_name(self):
         """
         Return name of user's unit.
         """
-        return self.unit.name
+        try:
+            return self.unit.name
+        except AttributeError:
+            return None
 
     def activate(self):
         """
@@ -260,7 +270,7 @@ class Contest(UnitModelsMixin, models.Model):
 
     def __unicode__(self):
         return '{} - {}'.format(
-            self.place, self.date.strftime('%d-%m-%Y'), self.name
+            self.place, self.date.strftime('%d-%m-%Y')
         )
 
     @property
@@ -312,7 +322,9 @@ class Contestant(models.Model):
     last_name = models.CharField('nazwisko', max_length=32)
     gender = models.CharField('płeć', max_length=1, choices=GENDERS)
     year_of_birth = models.PositiveSmallIntegerField('Rocznik')
-    school = models.CharField('rodzaj szkoły', max_length=1, choices=SCHOOLS)
+    school = models.CharField(
+        'rodzaj szkoły', max_length=1, choices=SCHOOLS, blank=True, null=True
+    )
     styles = MultiSelectField(choices=STYLES_DISTANCES)
     contest = models.ForeignKey(Contest)
 

@@ -39,8 +39,13 @@ Contest
 Contestants
 ***********/
 @keyframes show-up {
-    from {opacity: 0;}
-    to {opacity: 1;}
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes hide {
+  from {opacity: 1;}
+  to {opacity: 0;}
 }
 
 #contestants-preview {
@@ -63,6 +68,11 @@ Contestants
 .contestant-form.animation {
   animation-name: show-up;
   animation-duration: 0.5s;
+}
+
+#representative-card {
+  animation-name: show-up;
+  animation-duration: 1s;
 }
 
 p#style {
@@ -124,6 +134,8 @@ Base elements
 /* General */
 .invisible {
   display: none;
+  animation-name: hide !important;
+  animation-duration: 1s !important;
 }
 
 .visible {
@@ -156,5 +168,16 @@ Base elements
 
 .contest-name-cut {
   overflow: hidden;
-  width: 50%;
+  width: 40%;
+}
+
+.registration-field:after {
+  text-align: left;
+  width: 300px;
+
+}
+
+.button-center {
+  position: relative;
+  bottom: 15px;
 }
