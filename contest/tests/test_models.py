@@ -63,8 +63,8 @@ class ContestTestCase(TestCase):
     def setUp(self):
         self.now = timezone.now()
         self.contest = Contest.objects.create(
-            name='Zawody', date=self.now, place='Szkoła', lowest_year=2005, highest_year=2000,
-            deadline=self.now
+            name='Zawody', date=self.now, place='Szkoła', lowest_year=2005,
+            highest_year=2000, deadline=self.now
         )
 
     def test_contest_methods(self):
