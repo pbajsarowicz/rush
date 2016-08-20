@@ -606,8 +606,8 @@ class RegisterViewTests(TestCase):
         response = self.client.post(
             reverse('contest:register'),
             data={
-                'email': 'abc2@tmp.com', 'first_name': 'Imie2',
-                'last_name': 'Nazwisko2', 'organization_name': 'School',
+                'email': 'abc2@tmp.com', 'first_name': 'Imie',
+                'last_name': 'Nazwisko', 'organization_name': 'School',
                 'organization_address': 'Address',
                 'representative': RegistrationForm.SCHOOL
             }
@@ -621,8 +621,8 @@ class RegisterViewTests(TestCase):
         response = self.client.post(
             reverse('contest:register'),
             data={
-                'email': 'individual@user.com', 'first_name': 'Imie2',
-                'last_name': 'Nazwisko2',
+                'email': 'individual@user.com', 'first_name': 'Imie',
+                'last_name': 'Nazwisko',
                 'representative': RegistrationForm.INDIVIDUAL
             }
         )
