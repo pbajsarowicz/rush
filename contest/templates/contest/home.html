@@ -23,8 +23,8 @@
           <li class="collection-item contest-item">
             <div class="contest-item">
               {% if contest.is_submitting_open and contest.is_future %}
-                <div class="contest-name-cut"><a class="text" href="{% url 'contest:contestant-list' contest_id=contest.pk %}">
-                {{ contest.name }}</div>{{ contest.place }} - {{ contest.date }}</a>
+                <div class="contest-name-cut"><a class="text" href="{% url 'contest:contestant-list' contest_id=contest.pk %}">{{ contest.name }}
+                </div>{{ contest.place }} - {{ contest.date }}</a>
               {% else %}
                 <div class="contest-name-cut"><span class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Termin dodawania zawodników minął {{ contest.deadline|date:'d.m.Y' }}">{{ contest.name }}</div>{{ contest.place }} - {{ contest.date }}</span>
               {% endif %}
@@ -60,8 +60,8 @@
         {% for contest in completed %}
           <li class="collection-item contest-item">
             <div class="contest-item">
-              <div class="contest-name-cut"><a class="text" href="{% url 'contest:completed-contest' contest_id=contest.pk %}">
-              {{ contest.name }}</div>{{ contest.place }} - {{ contest.date }}</a>
+              <div class="contest-name-cut"><a class="text" href="{% url 'contest:completed-contest' contest_id=contest.pk %}">{{ contest.name }}
+              </div>{{ contest.place }} - {{ contest.date }}</a>
               {% if user.is_authenticated and user.is_creator %}
                 <a class="button waves-effect waves-light btn modal-trigger button-center" href="{% url 'contest:contest-add-results' contest_id=contest.pk %}">
                   {% if contest.results %}
