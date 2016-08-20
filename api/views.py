@@ -15,6 +15,10 @@ from api.serializers import (
     SchoolSerializer,
     ContestantSerializer,
     RushUserSerializer,
+    StyleSerializer,
+    DistanceSerializer,
+    ContestStyleDistancesSerializer,
+    ContestantScoreSerializer,
 )
 from contest.models import (
     Contact,
@@ -23,6 +27,10 @@ from contest.models import (
     School,
     Contestant,
     RushUser,
+    Style,
+    Distance,
+    ContestStyleDistances,
+    ContestantScore,
 )
 
 
@@ -74,3 +82,35 @@ class RushUserViewSet(viewsets.ModelViewSet):
     """
     queryset = RushUser.objects.all().order_by('date_joined')
     serializer_class = RushUserSerializer
+
+
+class ContestantScoreViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allow to view Contestants' scores.
+    """
+    queryset = ContestantScore.objects.all()
+    serializer_class = ContestantScoreSerializer
+
+
+class StyleViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allow to view Styles.
+    """
+    queryset = Style.objects.all()
+    serializer_class = StyleSerializer
+
+
+class DistanceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allow to view Distances.
+    """
+    queryset = Distance.objects.all()
+    serializer_class = DistanceSerializer
+
+
+class ContestStyleDistancesViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allow to view Contests' Styles with Distances.
+    """
+    queryset = ContestStyleDistances.objects.all()
+    serializer_class = ContestStyleDistancesSerializer

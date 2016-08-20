@@ -11,6 +11,10 @@ router.register(r'clubs', views.ClubViewSet)
 router.register(r'schools', views.SchoolViewSet)
 router.register(r'contestants', views.ContestantViewSet)
 router.register(r'users', views.RushUserViewSet)
+router.register(r'contestant_scores', views.ContestantScoreViewSet)
+router.register(r'styles', views.StyleViewSet)
+router.register(r'distances', views.DistanceViewSet)
+router.register(r'contest_distances', views.ContestStyleDistancesViewSet)
 
 
 urlpatterns = [

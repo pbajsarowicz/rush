@@ -13,8 +13,8 @@ from contest.models import (
     ContestFiles,
     Style,
     Distance,
-    RoundStyleDistance,
     ContestantScore,
+    ContestStyleDistances,
 )
 from contest.utils import admin_utils
 
@@ -98,5 +98,5 @@ admin.site.register(School)
 admin.site.register(Contact)
 admin.site.register(Style)
 admin.site.register(Distance)
-admin.site.register(RoundStyleDistance)
 admin.site.register(ContestantScore)
+admin.site.register(ContestStyleDistances)

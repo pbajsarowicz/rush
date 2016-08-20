@@ -140,9 +140,7 @@ class ContestantAddView(View):
             request, self.template_name, {
                 'formset': formset,
                 'name': contest,
-                'styles': zip(
-                    contest.styles, contest.get_styles_display().split(',')
-                ),
+                'styles': contest.styles,
                 'organization': organization,
             }
         )
@@ -275,9 +273,6 @@ class EditContestantView(View):
                 'contestant': contestant,
                 'form': form,
                 'user': user,
-                'styles': zip(
-                    contest.styles, contest.get_styles_display().split(',')
-                ),
             },
         )
 

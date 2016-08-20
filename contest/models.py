@@ -247,6 +247,37 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         msg.send()
 
 
+class Distance(models.Model):
+    """
+    Model for distances.
+    """
+    value = models.CharField('Dystans', max_length=16)
+
+    def __unicode__(self):
+        return self.value
+
+
+class Style(models.Model):
+    """
+    Model for styles.
+    """
+    name = models.CharField('Styl', max_length=32)
+
+    def __unicode__(self):
+        return self.name
+
+
+class ContestStyleDistances(models.Model):
+    """
+    Model for contests' style with distances.
+    """
+    style = models.ForeignKey(Style)
+    distance = models.ManyToManyField(Distance)
+
+    def __unicode__(self):
+        return '{}: {}'.format(self.style.name, self.distance.all())
+
+
 class Contest(UnitModelsMixin, models.Model):
     """
     Model for Contest.
@@ -266,7 +297,7 @@ class Contest(UnitModelsMixin, models.Model):
     )
     object_id = models.PositiveIntegerField(blank=True, null=True)
     organizer = GenericForeignKey('content_type', 'object_id')
-    styles = MultiSelectField(choices=STYLES_DISTANCES)
+    styles = models.ManyToManyField(ContestStyleDistances)
 
     def __unicode__(self):
         return self.name or (
@@ -325,42 +356,10 @@ class Contestant(models.Model):
     school = models.CharField(
         'rodzaj szkoły', max_length=1, choices=SCHOOLS, blank=True, null=True
     )
-    styles = MultiSelectField(choices=STYLES_DISTANCES)
     contest = models.ForeignKey(Contest)
 
     def __unicode__(self):
         return '{} {}'.format(self.first_name, self.last_name)
-
-
-class Style(models.Model):
-    """
-    Model for styles.
-    """
-    name = models.CharField('Nazwa stylu', max_length=32)
-
-    def __unicode__(self):
-        return self.name
-
-
-class Distance(models.Model):
-    """
-    Model for distances.
-    """
-    value = models.CharField('Dystans', max_length=16)
-
-    def __unicode__(self):
-        return self.value
-
-
-class RoundStyleDistance(models.Model):
-    """
-    Model for pair of style and distance.
-    """
-    style = models.ForeignKey(Style)
-    distance = models.ForeignKey(Distance)
-
-    def __unicode__(self):
-        return '{} {}'.format(self.style, self.distance)
 
 
 class ContestantScore(models.Model):
@@ -368,13 +367,15 @@ class ContestantScore(models.Model):
     Model for contestant's score on given distance.
     """
     contestant = models.ForeignKey(Contestant)
-    style_distance = models.ForeignKey(RoundStyleDistance)
+    style = models.ForeignKey(Style)
+    distance = models.ForeignKey(Distance)
     time_result = models.TimeField('Najlepszy czas', blank=True, null=True)
 
     def __unicode__(self):
-        return '{}: {} - {}'.format(
-            self.contestant, self.style_distance, self.time_result
+        return '{}: {} {} - {}'.format(
+            self.contestant, self.style.name,
+            self.distance.value, self.time_result
         )
 
     class Meta:
-        unique_together = ('contestant', 'style_distance')
+        unique_together = ('contestant', 'style', 'distance')

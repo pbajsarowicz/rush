@@ -829,8 +829,8 @@ function validateStyles() {
                 result += ',' + item;
             }
         });
-        $('#styles-summary').val('');
-        $('#styles-summary').val(result);
+
+        $('#styles-summary').val(result.substr(1));
         return true;
     }
     return false;
@@ -848,7 +848,7 @@ function checkStyles(prefix) {
         }
     });
     if (result) {
-        $('#id_' + prefix + '-styles').val(result);
+        $('#id_' + prefix + '-styles').val(result.substr(1));
         $('#distance-error').remove();
         return true;
     }
@@ -857,6 +857,20 @@ function checkStyles(prefix) {
             $('#validation-start_' + prefix).before('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.</span>');
         }
         return false;
+    }
+}
+
+/*
+ * Show/hide time field for checked distance (add_contestant).
+ */
+function showTimeField(input) {
+    'use strict';
+    var id = input.id + '_timefield';
+
+    if ($('#' + id).attr('class') == 'invisible') {
+        $('#' + id).removeClass('invisible')
+    } else {
+        $('#' + id).addClass('invisible');
     }
 }
 
@@ -872,7 +886,6 @@ function checkEditedStyles() {
         }
     });
     if (result) {
-        $('#id_styles').val('');
         $('#id_styles').val(result.substr(1));
         $('#distance-error').remove();
         return true;
