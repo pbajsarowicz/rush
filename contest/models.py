@@ -17,7 +17,6 @@ from django.utils.encoding import force_bytes
 from django.utils.html import format_html
 from django.utils.http import urlsafe_base64_encode
 from django.utils import timezone
-from multiselectfield import MultiSelectField
 
 from contest.manager import RushUserManager
 from contest.utils import admin_utils
@@ -25,20 +24,6 @@ from contest.utils import admin_utils
 UNIT_LIMIT = (
     Q(app_label='contest', model='club') |
     Q(app_label='contest', model='school')
-)
-
-STYLES_DISTANCES = (
-    ('D25', 'Dowolny 25m'), ('D50', 'Dowolny 50m'),
-    ('D100', 'Dowolny 100m'), ('D200', 'Dowolny 200m'),
-    ('D400', 'Dowolny 400m'), ('D800', 'Dowolny 800m'),
-    ('D1500', 'Dowolny 1500m'), ('G25', 'Grzbietowy 25m'),
-    ('G50', 'Grzbietowy 50m'), ('G100', 'Grzbietowy 100m'),
-    ('G200', 'Grzbietowy 200m'), ('K25', 'Klasyczny 25m'),
-    ('K50', 'Klasyczny 50m'), ('K100', 'Klasyczny 100m'),
-    ('K200', 'Klasyczny 200m'), ('M25', 'Motylkowy 25m'),
-    ('M50', 'Motylkowy 50m'), ('M100', 'Motylkowy 100m'),
-    ('M200', 'Motylkowy 200m'), ('Z100', 'Zmienny 100m'),
-    ('Z200', 'Zmienny 200m')
 )
 
 
@@ -369,10 +354,10 @@ class ContestantScore(models.Model):
     contestant = models.ForeignKey(Contestant)
     style = models.ForeignKey(Style)
     distance = models.ForeignKey(Distance)
-    time_result = models.TimeField('Najlepszy czas', blank=True, null=True)
+    time_result = models.FloatField('Najlepszy czas', blank=True, null=True)
 
     def __unicode__(self):
-        return '{}: {} {} - {}'.format(
+        return '{}: {} {} - {} s'.format(
             self.contestant, self.style.name,
             self.distance.value, self.time_result
         )

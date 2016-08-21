@@ -90,8 +90,18 @@ class ContestAdmin(UnitAdminMixin, admin.ModelAdmin):
     )
     readonly_fields = ('unit_name_select',)
 
+
+class ContestantScoreInline(admin.StackedInline):
+    model = ContestantScore
+    extra = 0
+
+
+class ContestantAdmin(UnitAdminMixin, admin.ModelAdmin):
+    inlines = [ContestantScoreInline]
+
+
 admin.site.register(RushUser, RushUserAdmin)
-admin.site.register(Contestant)
+admin.site.register(Contestant, ContestantAdmin)
 admin.site.register(Contest, ContestAdmin)
 admin.site.register(Club)
 admin.site.register(School)

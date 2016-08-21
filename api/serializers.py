@@ -114,7 +114,7 @@ class RushUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = RushUser
         fields = (
-            'username', 'email', 'first_name', 'last_name',
+            'pk', 'username', 'email', 'first_name', 'last_name',
             'date_joined', 'is_active', 'is_admin', 'unit',
             'organization_name', 'organization_address'
         )
@@ -123,6 +123,9 @@ class RushUserSerializer(serializers.HyperlinkedModelSerializer):
 class ContestantScoreSerializer(serializers.HyperlinkedModelSerializer):
     style = StyleSerializer(read_only=True)
     distance = DistanceSerializer(read_only=True)
+    contestant = serializers.ReadOnlyField(
+        source='contestant.__unicode__', read_only=True
+    )
 
     class Meta:
         model = ContestantScore
@@ -134,10 +137,13 @@ class ContestantSerializer(serializers.HyperlinkedModelSerializer):
     moderator = RushUserSerializer()
     gender = serializers.CharField(source='get_gender_display')
     school = serializers.CharField(source='get_school_display')
+    score = ContestantScoreSerializer(source='contestantscore_set', many=True)
 
     class Meta:
         model = Contestant
         fields = (
-            'first_name', 'last_name', 'gender', 'year_of_birth', 'school',
-            'moderator', 'contest',
+            'pk', 'first_name', 'last_name', 'gender', 'year_of_birth',
+            'school', 'moderator', 'contest', 'score'
         )
+
+

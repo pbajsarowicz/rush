@@ -283,7 +283,7 @@ class ContestantForm(forms.ModelForm):
     organization = forms.CharField(
         label='Klub/Szkoła', max_length=100, required=False
     )
-    styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
+    styles = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         self.contest = kwargs.pop('contest_id')
@@ -312,14 +312,8 @@ class ContestantForm(forms.ModelForm):
             'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
         )
 
-    def clean_styles(self):
-        styles = self.cleaned_data.get('styles')
-        return styles.split(',')
-
     def save(self, commit=True):
         contestant = super(ContestantForm, self).save(commit=False)
-
-        contestant.styles = self.cleaned_data['styles']
 
         if commit:
             contestant.save()
@@ -405,7 +399,7 @@ class ContestForm(forms.ModelForm):
 
     def clean_styles(self):
         styles = self.cleaned_data.get('styles')
-        return self.get_styles_array(styles.split(','))
+        return styles.split(',')
 
     @staticmethod
     def get_styles_array(raw_styles):
@@ -421,7 +415,7 @@ class ContestForm(forms.ModelForm):
         for style in raw_styles:
             styles_counter[style[0]] += 1
             distances.append(
-                Distance.objects.get_or_create(value=style[1:]+'m')[0]
+                Distance.objects.get_or_create(value=style[1:] + 'm')[0]
             )
         for style, value in styles_counter.items():
             if value == 0:
@@ -506,8 +500,9 @@ class ContestForm(forms.ModelForm):
         contest.content_type = self.user.content_type
         contest.object_id = self.user.object_id
         if commit:
+            styles = self.get_styles_array(self.cleaned_data['styles'])
             contest.save()
-            for style in self.cleaned_data['styles']:
+            for style in styles:
                 contest.styles.add(style)
             contest.save()
             self._save_uploaded_files()

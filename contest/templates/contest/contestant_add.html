@@ -21,7 +21,7 @@
               <div id="id_{{ form.prefix}}" class="contestant-form animation">
                 {{ form.as_p }}
                 <p id="style">Style:</p>
-                <span class="distance-choices">
+                <span class="distance-choices" id="style_{{ form.prefix }}">
                 {% for style in styles.all %}
                   {% for distance in style.distance.all %}
                     <input type="checkbox" id="{{ style.style.name }}_{{ distance.value }}_{{ form.prefix }}" class="distance_{{ form.prefix }}"

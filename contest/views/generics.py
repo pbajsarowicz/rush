@@ -5,7 +5,10 @@ from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
-from django.forms import formset_factory
+from django.forms import (
+    formset_factory,
+    inlineformset_factory,
+)
 from django.shortcuts import (
     render,
     redirect,
@@ -21,6 +24,9 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
+    Style,
+    Distance,
+    ContestantScore
 )
 from contest.forms import (
     ContestantForm,
@@ -109,6 +115,19 @@ class ContestantAddView(View):
             ).exists()
         )
 
+    @staticmethod
+    def _save_styles(raw_styles, contestant):
+        for score in raw_styles.split(';'):
+            score = score.split(',')
+            style = Style.objects.get(name=score[0])
+            distance = Distance.objects.get(value=score[1])
+            time = int(score[2][:2]) * 60 + int(score[2][3:5])
+            time += float(score[2][6:8]) / 100
+            ContestantScore.objects.create(
+                contestant=contestant, style=style, distance=distance,
+                time_result=time
+            )
+
     def get(self, request, contest_id, *args, **kwargs):
         """
         Return adding a contestant form on site.
@@ -167,11 +186,13 @@ class ContestantAddView(View):
 
         if formset.is_valid():
             contestants = []
+            import ipdb; ipdb.set_trace()
             for form in formset:
                 contestant = form.save(commit=False)
                 contestant.moderator = request.user
                 contestant.contest = contest
                 contestant.save()
+                self._save_styles(form.cleaned_data['styles'], contestant)
                 contestants.append(contestant)
 
             self.send_email_with_contestant(contestants, link)
@@ -247,18 +268,24 @@ class EditContestantView(View):
     """
     template_name = 'contest/contestant_edit.html'
     form_class = ContestantForm
+    ContestantFormset = inlineformset_factory(
+        Contestant, ContestantScore,
+        fields=('style', 'distance', 'time_result'),
+        extra=0, can_delete=False
+    )
 
     def get(self, request, contestant_id, *args, **kwargs):
         """
         Return form with filled fields.
         """
         contestant = Contestant.objects.get(id=contestant_id)
+
         user = request.user
         contest = contestant.contest
         form = self.form_class(
             instance=contestant,
             contest_id=contest.id,
-            user=user
+            user=user,
         )
 
         if not contestant.moderator == request.user:
@@ -271,6 +298,7 @@ class EditContestantView(View):
             self.template_name,
             {
                 'contestant': contestant,
+                'formset': self.ContestantFormset(instance=contestant),
                 'form': form,
                 'user': user,
             },
@@ -288,26 +316,30 @@ class EditContestantView(View):
             instance=contestant,
             contest_id=contest.id
         )
-        if form.has_changed():
-            if form.is_valid():
-                form.save()
-                return redirect(
-                    'contest:contestant-list', contest_id=contest.id
-                )
-            return render(
-                request,
-                self.template_name,
-                {
-                    'contestant': contestant,
-                    'form': form,
-                    'styles': zip(
-                        contest.styles, contest.get_styles_display().split(',')
-                    ),
-                },
+        formset = self.ContestantFormset(request.POST, instance=contestant)
+        valid = True
+        if form.is_valid():
+            form.save()
+        else:
+            valid = False
+        if formset.has_changed():
+            if formset.is_valid():
+                for form in formset:
+                    form.save()
+            else:
+                valid = False
+        if valid:
+            return redirect(
+                'contest:contestant-list', contest_id=contest.id
             )
-        return redirect(
-            'contest:contestant-list',
-            contest_id=contestant.contest.id,
+        return render(
+            request,
+            self.template_name,
+            {
+                'contestant': contestant,
+                'form': form,
+                'formset': formset
+            },
         )
 
 

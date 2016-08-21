@@ -603,17 +603,23 @@ function parseContestantData(json) {
         ['Płeć', 'gender'],
         ['Wiek', 'year_of_birth'],
         ['Rodzaj Szkoły', 'school'],
-        ['Styl i dystans', 'style']
     ];
     var fragment = document.createDocumentFragment();
     var elementUl = document.createElement('ul');
     var elementLi;
+    var styles = '';
 
     fieldsNames.forEach(function(field) {
         elementLi = document.createElement('li');
         elementLi.appendChild(document.createTextNode(field[0] + ': ' + json[field[1]]));
         elementUl.appendChild(elementLi);
     });
+    json['score'].forEach(function(field) {
+        styles += ', ' + field['style']['name'] + ' ' + field['distance']['value'];
+    });
+    elementLi = document.createElement('li');
+    elementLi.appendChild(document.createTextNode('Style i dystanse: ' + styles.substr(2)));
+    elementUl.appendChild(elementLi);
     fragment.appendChild(elementUl);
 
     return fragment;
@@ -842,22 +848,42 @@ function validateStyles() {
 function checkStyles(prefix) {
     'use strict';
     var result = '';
+    var checkTime = RegExp('\\d{2}:\\d{2}.\\d{2}');
+    var isValidated = true;
+    var time;
     $('.distance_' + prefix).each(function() {
         if ($(this).is(':checked')) {
-            result += ',' + (this.id).split('_', 1);
+            time = $('#time_' + this.id).val();
+            result += ';' + (this.id).split('_', 2) + ',' + (time ? time : '00:00.00');
+            if(!checkTime.test(time) && time) {
+                if ($('#time-error').length === 0) {
+                    $('#style_' + prefix).before(
+                        '<span class="errorlist" id="time-error">W jedym z pól podano nieprawidłowy format czasu (mm:ss.00).'
+                        + ' Popraw te pole, albo pozostaw je puste.<br></span>'
+                    );
+                }
+                isValidated = false;
+            }
         }
     });
+
+    if (isValidated && $('#time-error').length) {
+        $('#time-error').remove();
+    }
+
     if (result) {
-        $('#id_' + prefix + '-styles').val(result.substr(1));
+        if (isValidated) {
+            $('#id_' + prefix + '-styles').val(result.substr(1));
+        }
         $('#distance-error').remove();
-        return true;
     }
     else {
         if ($('#distance-error').length === 0) {
-            $('#validation-start_' + prefix).before('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.</span>');
+            $('#style_' + prefix).before('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.<br></span>');
         }
-        return false;
+        isValidated = false;
     }
+    return isValidated;
 }
 
 /*
@@ -868,32 +894,8 @@ function showTimeField(input) {
     var id = input.id + '_timefield';
 
     if ($('#' + id).attr('class') == 'invisible') {
-        $('#' + id).removeClass('invisible')
+        $('#' + id).removeClass('invisible');
     } else {
         $('#' + id).addClass('invisible');
-    }
-}
-
-/*
- * Check if user took at least 1 distance (edit_contestant form).
- */
-function checkEditedStyles() {
-    'use strict';
-    var result = '';
-    $('.distance').each(function() {
-        if ($(this).is(':checked')) {
-            result += ',' + this.id
-        }
-    });
-    if (result) {
-        $('#id_styles').val(result.substr(1));
-        $('#distance-error').remove();
-        return true;
-    }
-    else {
-        if ($('#distance-error').length === 0) {
-            $('#style').after('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.</span>');
-        }
-        return false;
     }
 }
