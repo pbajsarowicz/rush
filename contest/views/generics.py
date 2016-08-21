@@ -186,7 +186,6 @@ class ContestantAddView(View):
 
         if formset.is_valid():
             contestants = []
-            import ipdb; ipdb.set_trace()
             for form in formset:
                 contestant = form.save(commit=False)
                 contestant.moderator = request.user
