@@ -2,8 +2,13 @@
 
 {% block container %}
   <div class="container">
-    Twoje zapytanie zostało wysłane. Odpowiedź powinna zostać wysłana na podany adres email w ciągu 24 godzin.
-    Jeśli przez ten czas odpowiedź nie nadejdzie skontaktuj się z nami:
+    {% if not is_individual_contestant %}
+        Twoje zapytanie zostało wysłane. Odpowiedź powinna zostać wysłana na podany adres email w ciągu 24 godzin.<br>
+        Jeśli przez ten czas odpowiedź nie nadejdzie skontaktuj się z nami:
+    {% else %}
+        Na podany adres email został wysłany link do aktywacji konta. Sprawdź swoją skrzynkę pocztową.<br>
+        W przypadku problemów skontaktuj się z nami:
+    {% endif %}
     <email address="{{email}}">{{email}}</email>
   </div>
 {% endblock container %}

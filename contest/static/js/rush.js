@@ -1,4 +1,3 @@
-var clubCodeInput = document.getElementById('id_club_code');
 var contestant;
 
 /*
@@ -31,36 +30,6 @@ function manageUser(user, create) {
             Materialize.toast(message, 4000);
         }
     });
-}
-
-/*
- * Hides club code input.
- */
-function hideClubCode() {
-    'use strict';
-    if (document.register_form.club_checkbox.checked) {
-        $('label[for="id_club_code"').addClass('visible');
-        clubCodeInput.className = 'visible';
-        clubCodeInput.required = true;
-    } else {
-        $('label[for="id_club_code"').removeClass('visible').addClass('invisible');
-        clubCodeInput.className = 'invisible';
-        clubCodeInput.required = false;
-        clubCodeInput.value = '';
-    }
-}
-
-/*
- * Supports initialization of club code in case of validation errors appear.
- */
-function onClubCodeValidation() {
-    'use strict';
-    if (clubCodeInput && clubCodeInput.value) {
-        $('label[for="id_club_code"').removeClass('invisible').addClass('visible');
-        document.register_form.club_checkbox.checked = true;
-        clubCodeInput.className = 'visible';
-        clubCodeInput.required = true;
-    }
 }
 
 /*
@@ -164,7 +133,7 @@ ContestantValidation.prototype = {
         if (!this.yearOfBirth) {
             this.raiseValidation(formId + '-year_of_birth', 'Pole Wiek nie może być puste i może zawierać tylko cyfry.');
         }
-        else if (this.yearOfBirth  < lowestAge || this.yearOfBirth  > highestAge ) {
+        else if (this.yearOfBirth  < lowestYear || this.yearOfBirth  > highestYear ) {
             this.raiseValidation(formId + '-year_of_birth', 'Wiek zawodnika nie mieści się w przedziale przeznaczonym dla tego konkursu.');
         } else {
             this.clearValidation(formId + '-year_of_birth');
@@ -205,11 +174,14 @@ ContestantValidation.prototype = {
 
         var totalForms = document.getElementById('id_form-TOTAL_FORMS').value;
         var id = 'id_form-' + (formId !== undefined ? formId : parseInt(totalForms - 1));
-
         var validators = [
             'validateFirstName', 'validateLastName', 'validateGender',
-            'validateYearOfBirth', 'validateSchool', 'validateOrganization'
-        ]
+            'validateYearOfBirth',
+        ];
+
+        if (!isIndividualContestant) {
+            validators.push('validateSchool', 'validateOrganization');
+        }
 
         for (var i = 0, len = validators.length ; i < len; i++) {
             this[validators[i]](id);
@@ -386,6 +358,10 @@ Contestant.prototype = {
      */
     addNextContestant: function() {
         'use strict';
+        if (isIndividualContestant) {
+            return false;
+        }
+
         var newFormId = this.getTotalForms();
 
         if(!this.validateForm()) {
@@ -505,12 +481,65 @@ function getContestInfo(pk) {
 $(document).ready(function() {
     contestant = new Contestant();
 
-    onClubCodeValidation();
-    $('label[for="id_club_code"').addClass('invisible');
     $('select').material_select();
     $('.modal-trigger').leanModal();
     $('.datetime').mask('99.99.9999 99:99', {placeholder: 'dd.mm.yyyy hh:mm'});
+
+    if (document.querySelector('.representative:checked')) {
+        document.querySelector('.representative:checked').click();
+    }
 });
+
+/*
+ * Handles representative on registration.
+ */
+function changeRepresentative(option) {
+    'use strict';
+    var fieldType = option.value;
+    var card= document.getElementById('representative-card');
+    var cardTitle= document.getElementById('representative-card-title');
+    var clubCodeElement= document.getElementById('club_code-element');
+    var registrationButton= document.getElementById('registration-button');
+    var organizationNameInput= document.getElementById('id_organization_name');
+    var organizationAddressInput= document.getElementById('id_organization_address');
+    var clubCodeInput= document.getElementById('id_club_code');
+
+    if (fieldType === 'SCHOOL') {
+        cardTitle.innerHTML = 'Podaj dane szkoły';
+        clubCodeElement.className = 'row invisible';
+        registrationButton.innerHTML = 'Wyślij zapytanie o konto';
+
+        organizationNameInput.required = true;
+        organizationAddressInput.required = true;
+        clubCodeInput.required = false;
+
+        if (card.className.indexOf('invisible') !== -1) {
+            card.className = card.className.replace(/\binvisible\b/,'');
+        }
+    } else if (fieldType === 'CLUB') {
+        cardTitle.innerHTML = 'Podaj dane klubu';
+        clubCodeElement.className = 'row';
+        registrationButton.innerHTML = 'Wyślij zapytanie o konto';
+
+        organizationNameInput.required = true;
+        organizationAddressInput.required = true;
+        clubCodeInput.required = true;
+
+        if (card.className.indexOf('invisible') !== -1) {
+            card.className =  card.className.replace(/\binvisible\b/,'');
+        }
+    } else {
+        registrationButton.innerHTML = 'Zarejestruj się';
+
+        organizationNameInput.required = false;
+        organizationAddressInput.required = false;
+        clubCodeInput.required = false;
+
+        if (card.className.indexOf('invisible') === -1) {
+            card.className += ' invisible';
+        }
+    }
+}
 
 /*
  * Parsing user data from js to html.
