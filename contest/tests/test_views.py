@@ -14,6 +14,7 @@ from django.contrib.auth.models import (
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -1120,6 +1121,7 @@ class ContestAddTestCase(TestCase):
         self.user_2.user_permissions.add(
             Permission.objects.get(name='Can add contest')
         )
+        self.files = {'file1': SimpleUploadedFile('file.mp4', b'file_content', content_type='media/mp4'), 'file2': SimpleUploadedFile('file.doc', b'file_content', content_type='media/mp4')}
         self.form_data = {
             'name': 'Wodnik',
             'date': '31.12.2100 16:00',
@@ -1129,7 +1131,9 @@ class ContestAddTestCase(TestCase):
             'highest_year': 2002,
             'description': 'Zapraszamy na zawody!',
             'organization': self.user_1.unit,
-            'styles': ',D25,G50,K200,Z100'
+            'styles': ',D25,G50,K200,Z100',
+            'file1': '',
+            'file2': ''
         }
 
     def test_has_access(self):
@@ -1148,8 +1152,9 @@ class ContestAddTestCase(TestCase):
 
     def test_post_success(self):
         self.client.login(username='right', password='pass12')
+        self.form_data['file2'] = self.files['file2']
         response = self.client.post(
-            reverse('contest:contest-add'), data=self.form_data
+            reverse('contest:contest-add'), data=self.form_data, file_data=self.files['file2']
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -1160,6 +1165,19 @@ class ContestAddTestCase(TestCase):
 
     def test_post_errors(self):
         self.client.login(username='right', password='pass12')
+        self.form_data['file1'] = self.files['file1']
+        response = self.client.post(
+            reverse('contest:contest-add'), data=self.form_data, file_data=self.files['file1']
+        )
+        self.assertEqual(
+            response.context['form'].errors,
+            {
+                u'file1': [(
+                u'Niedozwolony format pliku. Obsługiwane rozszerzenia: .pdf, '
+                '.doc, .docx, .ods, .xls'
+                )]
+            }
+        )
         self.form_data['deadline'] = '01.04.2200 16:00'
         response = self.client.post(
             reverse('contest:contest-add'), data=self.form_data
@@ -1171,7 +1189,6 @@ class ContestAddTestCase(TestCase):
                 'niż data zawodów.'
             ]
         )
-
         self.form_data['lowest_year'] = 2016
         self.form_data['date'] = '02.04.2016 16:00'
         self.form_data['deadline'] = '01.04.2016 16:00'
