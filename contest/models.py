@@ -21,6 +21,7 @@ from multiselectfield import MultiSelectField
 
 from contest.manager import RushUserManager
 from contest.utils import admin_utils
+from contest.validators import LettersValidator
 
 UNIT_LIMIT = (
     Q(app_label='contest', model='club') |
@@ -112,8 +113,12 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         'nazwa użytkownika', max_length=64, unique=True
     )
     email = models.EmailField('adres email', unique=True)
-    first_name = models.CharField('imię', max_length=32)
-    last_name = models.CharField('nazwisko', max_length=32)
+    first_name = models.CharField(
+        'imię', max_length=32, validators=[LettersValidator()]
+    )
+    last_name = models.CharField(
+        'nazwisko', max_length=32, validators=[LettersValidator()]
+    )
     organization_name = models.CharField(
         'Nazwa', max_length=255, blank=True, null=True
     )

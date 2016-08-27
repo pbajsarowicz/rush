@@ -127,27 +127,12 @@ class RegistrationForm(forms.ModelForm):
                 'club_code', _('This field is required.')
             )
 
-    def has_numbers_on_name(self, name):
-        return any(char.isdigit() for char in name)
-
-    def _clean_first_name(self):
-        first_name = self.cleaned_data.get('first_name')
-        if(self.has_numbers_on_name(first_name)):
-            self.add_error('first_name', _('nie można wpisać cyfr'))
-
-    def _clean_last_name(self):
-        last_name = self.cleaned_data.get('last_name')
-        if(self.has_numbers_on_name(last_name)):
-            self.add_error('last_name', _('nie można wpisać cyfr'))
-
     def clean(self):
         """
         Provides additional cleaning.
         """
         if self.cleaned_data.get('representative') in (self.SCHOOL, self.CLUB):
             self._clean_organization_card()
-        self._clean_first_name()
-        self._clean_last_name()
 
         return self.cleaned_data
 
