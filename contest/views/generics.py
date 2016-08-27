@@ -379,9 +379,14 @@ class ContestAddView(PermissionRequiredMixin, View):
             contest.organization = organization
             contest.styles = contest.styles[1:]
             files = ContestFiles.objects.filter(contest=form)
+            paths = []
+            for contest_file in files:
+                paths.append(contest_file.contest_file.url)
+
+            paths_and_files = zip(paths, files)
             for user in users:
                 self.send_email_about_new_contest(
-                    contest, user.email, link, files, file_link
+                    contest, user.email, link, paths_and_files, file_link,
                 )
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
 
