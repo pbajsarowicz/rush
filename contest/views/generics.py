@@ -378,18 +378,6 @@ class ContestAddView(PermissionRequiredMixin, View):
             contest = form
             contest.organization = organization
             contest.styles = contest.styles[1:]
-            for form_file in ('file1', 'file2', 'file3', 'file4'):
-                if form_file in request.FILES:
-                    docfile = ContestFiles(
-                        contest_file=request.FILES[form_file],
-                        contest=form,
-                        uploaded_by=request.user,
-                        name=request.FILES[form_file].name
-                    )
-                    docfile.save()
-                    docfile.url = docfile.contest_file.url
-                    docfile.save()
-
             files = ContestFiles.objects.filter(contest=form)
             for user in users:
                 self.send_email_about_new_contest(

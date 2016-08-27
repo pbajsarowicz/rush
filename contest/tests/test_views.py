@@ -1121,7 +1121,14 @@ class ContestAddTestCase(TestCase):
         self.user_2.user_permissions.add(
             Permission.objects.get(name='Can add contest')
         )
-        self.files = {'file1': SimpleUploadedFile('file.mp4', b'file_content', content_type='media/mp4'), 'file2': SimpleUploadedFile('file.doc', b'file_content', content_type='media/mp4')}
+        self.files = {
+            'file1': SimpleUploadedFile(
+                'file.mp4', b'file_content', content_type='media/mp4'
+            ),
+            'file2': SimpleUploadedFile(
+                'file.doc', b'file_content', content_type='media/mp4'
+            )
+        }
         self.form_data = {
             'name': 'Wodnik',
             'date': '31.12.2100 16:00',
@@ -1154,7 +1161,8 @@ class ContestAddTestCase(TestCase):
         self.client.login(username='right', password='pass12')
         self.form_data['file2'] = self.files['file2']
         response = self.client.post(
-            reverse('contest:contest-add'), data=self.form_data, file_data=self.files['file2']
+            reverse('contest:contest-add'),
+            data=self.form_data, file_data=self.files['file2']
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -1167,14 +1175,15 @@ class ContestAddTestCase(TestCase):
         self.client.login(username='right', password='pass12')
         self.form_data['file1'] = self.files['file1']
         response = self.client.post(
-            reverse('contest:contest-add'), data=self.form_data, file_data=self.files['file1']
+            reverse('contest:contest-add'),
+            data=self.form_data, file_data=self.files['file1']
         )
         self.assertEqual(
             response.context['form'].errors,
             {
                 u'file1': [(
-                u'Niedozwolony format pliku. Obsługiwane rozszerzenia: .pdf, '
-                '.doc, .docx, .ods, .xls'
+                    u'Niedozwolony format pliku. Obsługiwane rozszerzenia: '
+                    '.pdf, .doc, .docx, .ods, .xls'
                 )]
             }
         )
