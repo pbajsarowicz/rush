@@ -416,7 +416,10 @@ class ContestForm(forms.ModelForm):
         cleaned_data = super(ContestForm, self).clean()
 
         for contest_file_name in ('file1', 'file2', 'file3', 'file4'):
-            contest_file = cleaned_data[contest_file_name]
+            try:
+                contest_file = cleaned_data[contest_file_name]
+            except KeyError:
+                continue
 
             if not contest_file:
                 continue
@@ -441,9 +444,11 @@ class ContestForm(forms.ModelForm):
     def _save_uploaded_files(self):
         contest_files = []
 
-        for contest_file_name in ('file1', 'file2', 'file3', 'file4',):
-            contest_file = self.cleaned_data[contest_file_name]
-
+        for contest_file_name in ('file1', 'file2', 'file3', 'file4'):
+            try:
+                contest_file = self.cleaned_data[contest_file_name]
+            except KeyError:
+                continue
             if not contest_file:
                 continue
 
