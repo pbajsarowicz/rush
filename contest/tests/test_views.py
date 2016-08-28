@@ -1104,11 +1104,15 @@ class AddContestResultsViewTest(TestCase):
             )
         )
         self.assertEqual(response.status_code, 302)
-        contest_id = str(self.contest.id)
-        response_url = '{}/?next=/zawody/wyniki/' + contest_id + '/dodaj'
+        url = '/zaloguj/?next={}'.format(
+            reverse(
+                'contest:contest-add-results',
+                kwargs={'contest_id': self.contest.pk}
+            )
+        )
         self.assertEqual(
             response.url,
-            response_url.format(reverse('contest:login'))
+            url.format(reverse('contest:login'))
         )
 
     def test_has_access(self):
