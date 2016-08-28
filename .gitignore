@@ -71,3 +71,6 @@ local_settings.py
 # pip coverage
 .coverage
 htmlcov/
+
+# media directory
+media

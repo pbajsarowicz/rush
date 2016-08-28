@@ -141,6 +141,7 @@ class RegistrationForm(forms.ModelForm):
         fields = (
             'email', 'first_name', 'last_name', 'organization_name',
             'organization_address', 'club_code', 'representative',
+            'notifications',
         )
 
 
