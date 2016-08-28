@@ -328,13 +328,15 @@ class ContestAddView(PermissionRequiredMixin, View):
 
     @staticmethod
     def send_email_about_new_contest(
-            contest, email, link, files, file_link, *args, **kwargs):
+            contest, email, link, file_link, paths_and_files, *args, **kwargs):
         """
         Sends an email with a list contestants
         """
         text = loader.render_to_string(
             'email/new_contest_notification.html', {
-                'contest': contest, 'link': link, 'files': files,
+                'contest': contest,
+                'link': link,
+                'paths_and_files': paths_and_files,
                 'file_link': file_link,
             },
         )
@@ -386,7 +388,7 @@ class ContestAddView(PermissionRequiredMixin, View):
             paths_and_files = zip(paths, files)
             for user in users:
                 self.send_email_about_new_contest(
-                    contest, user.email, link, paths_and_files, file_link,
+                    contest, user.email, link, file_link, paths_and_files
                 )
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
 

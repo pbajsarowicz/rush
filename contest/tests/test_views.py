@@ -1127,6 +1127,9 @@ class ContestAddTestCase(TestCase):
             ),
             'file2': SimpleUploadedFile(
                 'file.doc', b'file_content', content_type='media/mp4'
+            ),
+            'file3': SimpleUploadedFile(
+                'file.doc', b'', content_type="media/mp4"
             )
         }
         self.form_data = {
@@ -1140,7 +1143,8 @@ class ContestAddTestCase(TestCase):
             'organization': self.user_1.unit,
             'styles': ',D25,G50,K200,Z100',
             'file1': '',
-            'file2': ''
+            'file2': '',
+            'file3': ''
         }
 
     def test_has_access(self):
@@ -1174,17 +1178,20 @@ class ContestAddTestCase(TestCase):
     def test_post_errors(self):
         self.client.login(username='right', password='pass12')
         self.form_data['file1'] = self.files['file1']
+        self.form_data['file3'] = self.files['file3']
         response = self.client.post(
             reverse('contest:contest-add'),
-            data=self.form_data, file_data=self.files['file1']
+            data=self.form_data, file_data=self.files
         )
         self.assertEqual(
             response.context['form'].errors,
             {
-                u'file1': [(
+                u'file3': [u'Przesłany plik jest pusty.'],
+                u'file1':
+                [
                     u'Niedozwolony format pliku. Obsługiwane rozszerzenia: '
                     '.pdf, .doc, .docx, .ods, .xls'
-                )]
+                ]
             }
         )
         self.form_data['deadline'] = '01.04.2200 16:00'
