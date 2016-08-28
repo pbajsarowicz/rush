@@ -111,26 +111,27 @@
                            class="registration-field active">{{ form.club_code.label }}</label>
                   </div>
                 </div>
-                <div id="{{ form.notifications.name }}-element" class="row invisible">
-                  <div class="input-field col s12">
-                    <input id="notificationsInputId" name="{{ form.notifications.name }}" value="True">
-                    <label for="{{ form.notifications.auto_id }}" class="registration-field active">{{ form.notifications.label }}</label>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="s12 center">
-            <input type="checkbox" name="notifications_checkbox" class="filled-in" id="filled-box" onclick="notificationsInput();" checked/>
-            <label for="filled-box">Chcę otrzymywać powiadomienia o nowych zawodach na podany wyżej adres email.</label>
-          </div>
+        <div id="{{ form.notifications.name }}" class="row">
+          <ul class="collection">
+            <li class="collection-item">
+              <input id="{{ form.notifications.auto_id }}"
+                     name="{{ form.notifications.name }}"
+                     type="checkbox"
+                     class="filled-in"
+                     checked>
+              <label for="{{ form.notifications.auto_id }}"
+                     class="registration-field active">
+                Chcę otrzymywać powiadomienia o nowych zawodach na podany wyżej adres email.
+              </label>
+            </li>
+          </ul>
         </div>
-        <div class="row">
-          <div class="s12 center">
-            <button id="registration-button" type="submit" class="pull-right btn btn-primary">Wyślij zapytanie o konto</button>
-          </div>
+        <div class="row center">
+          <button id="registration-button" type="submit" class="pull-right btn btn-primary">Wyślij zapytanie o konto</button>
         </div>
       </form>
     {% endif %}

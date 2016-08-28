@@ -1,17 +1,4 @@
 var contestant;
-var notifications = document.getElementById('notificationsInputId');
-
-/*
- * Notifications input
- */
-function notificationsInput() {
-    'use strict';
-    if (document.register_form.notifications_checkbox.checked) {
-        notifications.value = 'True';
-    } else {
-        notifications.value = 'False';
-    }
-}
 
 /*
  * Creates an account.
