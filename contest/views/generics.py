@@ -328,7 +328,12 @@ class ContestAddView(PermissionRequiredMixin, View):
 
     @staticmethod
     def send_email_about_new_contest(
-            contest, email, link, file_link, paths_and_files, *args, **kwargs):
+            contest,
+            recipient_list,
+            link, file_link,
+            paths_and_files,
+            *args,
+            **kwargs):
         """
         Sends an email with a list contestants
         """
@@ -344,7 +349,7 @@ class ContestAddView(PermissionRequiredMixin, View):
             'Stworzono nowe zawody',
             text,
             settings.SUPPORT_EMAIL,
-            [email],
+            recipient_list,
         )
         msg.content_subtype = 'html'
         msg.send()
@@ -363,12 +368,17 @@ class ContestAddView(PermissionRequiredMixin, View):
         form = self.form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             organization = form.cleaned_data['organization']
-            form = form.save()
-            users = RushUser.objects.all().exclude(email=request.user.email)
+            contest = form.save()
+            recipient_list = list(
+                RushUser.objects.exclude(email=request.user.email).values_list(
+                    'email', flat=True
+                )
+            )
+
             link = 'http://{}{}'.format(
                 request.get_host(),
                 reverse(
-                    'contest:contestant-add', kwargs={'contest_id': form.pk}
+                    'contest:contestant-add', kwargs={'contest_id': contest.pk}
                 )
             )
             file_link = 'http://{}'.format(
@@ -377,19 +387,17 @@ class ContestAddView(PermissionRequiredMixin, View):
                     'contest:home'
                 )
             )
-            contest = form
             contest.organization = organization
             contest.styles = contest.styles[1:]
-            files = ContestFiles.objects.filter(contest=form)
+            files = ContestFiles.objects.filter(contest=contest)
             paths = []
             for contest_file in files:
                 paths.append(contest_file.contest_file.url)
 
             paths_and_files = zip(paths, files)
-            for user in users:
-                self.send_email_about_new_contest(
-                    contest, user.email, link, file_link, paths_and_files
-                )
+            self.send_email_about_new_contest(
+                contest, recipient_list, link, file_link, paths_and_files
+            )
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
 
             return render(request, self.template_name, {'message': msg})
