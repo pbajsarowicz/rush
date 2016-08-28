@@ -1,0 +1,62 @@
+{% extends "contest/base.html" %}
+{% load staticfiles %}
+{% block container %}
+  <div class="container">
+    <div class="row">
+      {% if message %}
+        <p>{{ message }}</p>
+      {% else %}
+      <div class="col s5">
+        <ul class="collection">
+          {% for contestant in contestants %}
+            <li class="collection-item">{{ contestant.first_name }} {{ contestant.last_name }}</li>
+          {% endfor %}
+        <ul>
+      </div>
+      <div class="col s7">
+        <div class="left-align">
+          <p>Do zamknięcia listy zapisów pozostało:</p>
+          <div id="clockdiv">
+            <div>
+              <span class="days"></span>
+              <div>Dni</div>
+            </div>
+            <div>
+              <span class="hours"></span>
+              <div>Godzin</div>
+            </div>
+            <div>
+              <span class="minutes"></span>
+              <div>Minut</div>
+            </div>
+            <div>
+              <span class="seconds"></span>
+              <div>Sekund</div>
+            </div>
+          </div>
+          <br><a class="pull-right btn btn-large" href="#">Wygeneruj listy startowe</a>
+          <p>Data: {{ contest.date }}</p>
+          <p>Miejsce: {{ contest.place }}</p>
+          <p>Roczniki: od {{ contest.lowest_year }} do {{ contest.highest_year }}
+          <p>Opis: {{ contest.description }}</p>
+          <p>Deadline: {{ contest.deadline }}</p>
+          <p>Załączniki: </p>
+        </div>
+          {% for file in files.all %}
+            <a href="{{ file.url }}">{{ file.name }}</a><br>
+          {% endfor %}
+          <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
+          <a class="pull-right btn btn-primary" href="{% url 'contest:contest-edit' contest_id=contest.pk %}">Edytuj</a>
+
+      {% endif %}
+    </div>
+  </div>
+  <a class="button waves-effect waves-light btn modal-trigger" href="#modal{{ contest.pk }}" onclick="getEditContestInfo({{ contest.pk }})">Szczegóły</a>
+  <div id="info"></div>
+  <script src="{% static 'js/rush.js' %}"></script>
+  <script type="text/javascript">
+  var deadline = '2016-12-31';
+  initializeClock('clockdiv', deadline);
+  getEditContestInfo({{ contest.pk }});
+  </script>
+{% endblock %}

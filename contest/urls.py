@@ -100,4 +100,14 @@ urlpatterns = [
         views.CompletedContestView.as_view(),
         name='completed-contest'
     ),
+    url(
+        r'^zawody/zarzadzaj/(?P<contest_id>[0-9]+)/?$',
+        views.ManageContestView.as_view(),
+        name='contest-manage'
+    ),
+    url(
+        r'^zawody/edytuj/(?P<contest_id>[0-9]+)/?$',
+        login_required(views.ContestEditView.as_view()),
+        name='contest-edit'
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

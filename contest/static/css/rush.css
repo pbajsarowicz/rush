@@ -170,3 +170,18 @@ Base elements
   text-align: left;
   width: 300px;
 }
+
+#clockdiv{
+    display: inline-block;
+    text-align: center;
+}
+
+#clockdiv > div{
+    display: inline-block;
+}
+
+#clockdiv div > span{
+    padding: 15px;
+    display: inline-block;
+}
+

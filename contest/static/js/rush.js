@@ -884,3 +884,90 @@ function checkEditedStyles() {
         return false;
     }
 }
+
+function getTimeRemaining(endtime) {
+  var t = Date.parse(endtime) - Date.parse(new Date());
+  var seconds = Math.floor((t / 1000) % 60);
+  var minutes = Math.floor((t / 1000 / 60) % 60);
+  var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
+  var days = Math.floor(t / (1000 * 60 * 60 * 24));
+  return {
+    'total': t,
+    'days': days,
+    'hours': hours,
+    'minutes': minutes,
+    'seconds': seconds
+  };
+}
+
+function initializeClock(id, endtime) {
+  var clock = document.getElementById(id);
+  var daysSpan = clock.querySelector('.days');
+  var hoursSpan = clock.querySelector('.hours');
+  var minutesSpan = clock.querySelector('.minutes');
+  var secondsSpan = clock.querySelector('.seconds');
+
+  function updateClock() {
+    var t = getTimeRemaining(endtime);
+
+    daysSpan.innerHTML = t.days;
+    hoursSpan.innerHTML = ('0' + t.hours).slice(-2);
+    minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
+    secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
+
+    if (t.total <= 0) {
+      clearInterval(timeinterval);
+    }
+  }
+
+  updateClock();
+  var timeinterval = setInterval(updateClock, 1000);
+}
+
+function getEditContestInfo(pk) {
+    'use strict';
+    var organizer = '';
+    var contact = '';
+    var organizer_contact = '';
+    var result = '';
+    var files = '';
+    var url = '';
+    var file_name = '';
+    var file_number = 0;
+
+    $.ajax({
+        url: '/api/v1/contests/' + pk + '/?format=json',
+        dataType: 'json',
+        success: function(json) {
+            result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
+            '<br> Dla kogo: od rocznika ' + json['lowest_year'] + ' do ' + json['highest_year'] +
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ';
+
+            files = json['files']
+            for (var i = 0, len = files.length ; i < len; i++) {
+                result += '<br><a href="' + files[i].url + '"' + 'target="_blank" download>' + files[i].name + '</a>';
+            }
+
+            organizer = json['organizer'];
+            if (organizer) {
+                organizer_contact = organizer['contact'];
+                if (organizer_contact) {
+                    if(organizer['phone_number']){
+                        contact += '<br> Telefon: ' + organizer_contact['phone_number'];
+                    }
+                    contact += '<br> Email: ' + organizer_contact['email'];
+                    if(organizer_contact['website']){
+                        contact += '<br> Strona Internetowa: <a href="' + organizer_contact['website'] + '">' +
+                        organizer_contact['website'] + '</a>';
+                    }
+                }
+
+                result += '<br> Organizator: ' + organizer['name'] + ', ' + contact;
+            }
+
+            result += '<br> Opis: ' + (json['description'] ? json['description'] : 'Brak');
+
+            document.getElementById('info').innerHTML = result;
+        }
+    });
+}

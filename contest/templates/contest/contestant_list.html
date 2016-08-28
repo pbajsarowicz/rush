@@ -36,4 +36,7 @@
       <a class="pull-right btn btn-primary" href="{% url 'contest:contestant-add' contest_id=contest.pk %}">Dodaj</a>
     </div>
   </div>
+  <div class="right-align">
+    <a class="pull-right btn btn-large" href="{% url 'contest:contest-manage' contest_id=contest.pk %}">Zarządzaj zawodami</a>
+  </div>
 {% endblock container %}
