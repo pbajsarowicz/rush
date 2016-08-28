@@ -15,9 +15,9 @@
         <p>Style: {{ contest.get_styles_display }}</p>
         <p>Pliki: </p>
         {% for path, file in paths_and_files %}
-          <br><a href="{{ file_link }}{{ path }}" target="_blank" download>{{ file.name }}</a>
+          <br><a href="{{ path }}" target="_blank" download>{{ file.name }}</a>
         {% endfor %}
       </div>
-    <br><a href="{{ link }}">Dołącz do zawodów</a>
+    <br><a href="{{ add_contest_link }}">Dołącz do zawodów</a>
   </body>
 </html>

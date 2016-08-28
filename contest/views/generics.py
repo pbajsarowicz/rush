@@ -22,7 +22,6 @@ from contest.models import (
     Contest,
     Contestant,
     RushUser,
-    ContestFiles,
 )
 from contest.forms import (
     ContestantForm,
@@ -330,7 +329,7 @@ class ContestAddView(PermissionRequiredMixin, View):
     def send_email_about_new_contest(
             contest,
             recipient_list,
-            link, file_link,
+            add_contestant_link,
             paths_and_files,
             *args,
             **kwargs):
@@ -340,9 +339,8 @@ class ContestAddView(PermissionRequiredMixin, View):
         text = loader.render_to_string(
             'email/new_contest_notification.html', {
                 'contest': contest,
-                'link': link,
-                'paths_and_files': paths_and_files,
-                'file_link': file_link,
+                'add_contestant_link': add_contestant_link,
+                'paths_and_files': paths_and_files
             },
         )
         msg = EmailMessage(
@@ -375,28 +373,24 @@ class ContestAddView(PermissionRequiredMixin, View):
                 )
             )
 
-            link = 'http://{}{}'.format(
+            add_contestant_link = 'http://{}{}'.format(
                 request.get_host(),
                 reverse(
                     'contest:contestant-add', kwargs={'contest_id': contest.pk}
                 )
             )
-            file_link = 'http://{}'.format(
-                request.get_host(),
-                reverse(
-                    'contest:home'
-                )
-            )
             contest.organization = organization
             contest.styles = contest.styles[1:]
-            files = ContestFiles.objects.filter(contest=contest)
-            paths = []
-            for contest_file in files:
-                paths.append(contest_file.contest_file.url)
+            contest_files = contest.contestfiles_set.all()
+            host = request.get_host()
+            files_urls = [
+                'http://{}{}'.format(host, contest_file.contest_file.url)
+                for contest_file in contest_files
+            ]
+            paths_and_files = zip(files_urls, contest_files)
 
-            paths_and_files = zip(paths, files)
             self.send_email_about_new_contest(
-                contest, recipient_list, link, file_link, paths_and_files
+                contest, recipient_list, add_contestant_link, paths_and_files
             )
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
 
