@@ -330,7 +330,7 @@ class ContestAddView(PermissionRequiredMixin, View):
             contest,
             recipient_list,
             add_contestant_link,
-            paths_and_files,
+            files_list,
             *args,
             **kwargs):
         """
@@ -340,7 +340,7 @@ class ContestAddView(PermissionRequiredMixin, View):
             'email/new_contest_notification.html', {
                 'contest': contest,
                 'add_contestant_link': add_contestant_link,
-                'paths_and_files': paths_and_files
+                'files_list': files_list
             },
         )
         msg = EmailMessage(
@@ -368,7 +368,7 @@ class ContestAddView(PermissionRequiredMixin, View):
             organization = form.cleaned_data['organization']
             contest = form.save()
             recipient_list = list(
-                RushUser.objects.exclude(email=request.user.email).values_list(
+                RushUser.objects.exclude(email=request.user.email, notifications=True).values_list(
                     'email', flat=True
                 )
             )
@@ -383,14 +383,17 @@ class ContestAddView(PermissionRequiredMixin, View):
             contest.styles = contest.styles[1:]
             contest_files = contest.contestfiles_set.all()
             host = request.get_host()
-            files_urls = [
-                'http://{}{}'.format(host, contest_file.contest_file.url)
-                for contest_file in contest_files
-            ]
-            paths_and_files = zip(files_urls, contest_files)
+            files_list = [
+                {
+                    'name': contest_file.name,
+                    'url': 'http://{}{}'.format(
+                        host, contest_file.contest_file.url
+                    )
+                } for contest_file in contest_files
+             ]
 
             self.send_email_about_new_contest(
-                contest, recipient_list, add_contestant_link, paths_and_files
+                contest, recipient_list, add_contestant_link, files_list
             )
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
 
