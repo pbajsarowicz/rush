@@ -364,7 +364,7 @@ class ContestResultsAddView(View):
         Return clear form.
         """
         contest = Contest.objects.get(pk=contest_id)
-        if not _is_contest_organizer(contest):
+        if not self._is_contest_organizer(request, contest):
             return redirect('contest:home')
         form = self.form_class(instance=contest)
         return render(request, self.template_name, {'form': form})
