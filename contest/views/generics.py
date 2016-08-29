@@ -344,19 +344,28 @@ class ContestAddView(PermissionRequiredMixin, View):
         return render(request, self.template_name, {'form': form})
 
 
-class ContestResultsAddView(PermissionRequiredMixin, View):
+class ContestResultsAddView(View):
     """
     View for adding contest results.
     """
-    permission_required = 'contest.add_contest'
     template_name = 'contest/add_results.html'
     form_class = ContestResultsForm
+
+    @staticmethod
+    def _is_contest_organizer(request, contest):
+        """
+        Checks if contest is created by this user.
+        """
+        return request.user.object_id == contest.object_id
+
 
     def get(self, request, contest_id, *args, **kwargs):
         """
         Return clear form.
         """
         contest = Contest.objects.get(pk=contest_id)
+        if not _is_contest_organizer(contest):
+            return redirect('contest:home')
         form = self.form_class(instance=contest)
         return render(request, self.template_name, {'form': form})
 

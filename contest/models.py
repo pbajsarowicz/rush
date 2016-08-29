@@ -177,6 +177,15 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         return self.is_admin
 
     @property
+    def is_contest_organizer(self):
+        """
+        Return True if user has created this contest.
+        """
+        if self.user.object_id == self.contest.object_id:
+            return True
+
+
+    @property
     def is_creator(self):
         """
         Return True if user has permission to add contests.
