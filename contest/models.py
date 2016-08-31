@@ -108,6 +108,7 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
     date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
     is_admin = models.BooleanField(default=False)
+    notifications = models.BooleanField('powiadomienia', default=True)
     content_type = models.ForeignKey(
         ContentType, limit_choices_to=UNIT_LIMIT, blank=True, null=True
     )
