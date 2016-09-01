@@ -368,7 +368,7 @@ class ContestAddView(PermissionRequiredMixin, View):
             organization = form.cleaned_data['organization']
             contest = form.save()
             recipient_list = list(
-                RushUser.objects.exclude(email=request.user.email, notifications=True).values_list(
+                RushUser.objects.exclude(email=request.user.email, notifications=False).values_list(
                     'email', flat=True
                 )
             )
