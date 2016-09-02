@@ -121,8 +121,8 @@ class ContestantAddView(View):
             score = score.split(',')
             style = Style.objects.get(name=score[0])
             distance = Distance.objects.get(value=score[1])
-            time = int(score[2][:2]) * 60 + int(score[2][3:5])
-            time += float(score[2][6:8]) / 100
+            time = int(score[2][:2]) * 60000 + int(score[2][3:5]) * 1000
+            time += int(score[2][6:8]) * 10
             ContestantScore.objects.create(
                 contestant=contestant, style=style, distance=distance,
                 time_result=time

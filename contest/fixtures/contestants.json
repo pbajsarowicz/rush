@@ -3,8 +3,8 @@
         "model": "contest.contestant",
         "pk": 1,
         "fields": {
-            "first_name": "fhdfgb",
-            "last_name": "fgdfgdfg",
+            "first_name": "Adam",
+            "last_name": "Kowalski",
             "gender": "M",
             "year_of_birth": 1999,
             "school": "P",
@@ -16,8 +16,8 @@
       "model": "contest.contestant",
       "pk": 2,
       "fields": {
-          "first_name": "jhyuuuh",
-          "last_name": "hhhhh",
+          "first_name": "Małgosia",
+          "last_name": "Nowak",
           "gender": "F",
           "year_of_birth": 2000,
           "school": "P",
@@ -29,8 +29,8 @@
       "model": "contest.contestant",
       "pk": 3,
       "fields": {
-          "first_name": "Jakub",
-          "last_name": "Maślanka",
+          "first_name": "Krzysztof",
+          "last_name": "Walczyk",
           "gender": "M",
           "year_of_birth": 1998,
           "school": "P",
@@ -42,8 +42,8 @@
       "model": "contest.contestant",
       "pk": 4,
       "fields": {
-          "first_name": "jhyuuuh",
-          "last_name": "hhhhh",
+          "first_name": "Ewa",
+          "last_name": "Krzyż",
           "gender": "F",
           "year_of_birth": 2002,
           "school": "P",

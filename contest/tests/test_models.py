@@ -11,6 +11,10 @@ from contest.models import (
     Contestant,
     RushUser,
     School,
+    ContestantScore,
+    Style,
+    Distance,
+    ContestStyleDistances
 )
 
 
@@ -86,7 +90,7 @@ class ContestantTestCase(TestCase):
         self.contestant = Contestant.objects.create(
             moderator=RushUser.objects.first(), first_name='Adam',
             last_name='Kowalski', gender='M', year_of_birth=2001, school='S',
-            styles=['D25', 'G50'], contest=Contest.objects.first()
+            contest=Contest.objects.first()
         )
 
     def test_contestant_methods(self):
@@ -137,8 +141,41 @@ class UnitModelsMixinTestCase(TestCase):
             contest.unit_name_select,
             '<select id="id_unit" name="unit"><option value="2_school" >'
             '[Szko\u0142a] Klub wodnika</option><br><option value="1_school" '
-            '>[Szko\u0142a] ZSP1 w Pile</option><option value="2_club" >'
-            '[Klub] Klub wodnika</option><br><option value="1_club" >[Klub] '
+            'selected>[Szko\u0142a] ZSP1 w Pile</option><option value="2_club"'
+            ' >[Klub] Klub wodnika</option><br><option value="1_club" >[Klub] '
             'ZSP1 w Pile</option></select>'
+        )
 
+
+class ContestantScoreTestCase(TestCase):
+    fixtures = [
+        'contestants.json', 'styles.json', 'contests.json',
+        'distances.json', 'users.json'
+    ]
+
+    def setUp(self):
+        self.score = ContestantScore.objects.create(
+            contestant=Contestant.objects.first(), style=Style.objects.first(),
+            distance=Distance.objects.first(), time_result=655111
+        )
+
+    def test_score_display(self):
+        self.assertEqual(
+            self.score.__unicode__(), 'Adam Kowalski: Dowolny 25m - 655111 ms'
+        )
+
+
+class ContestStyleDistancesTestCase(TestCase):
+    fixtures = ['styles.json', 'distances.json']
+
+    def setUp(self):
+        self.style = ContestStyleDistances.objects.create(
+            style=Style.objects.first()
+        )
+        self.style.distance.set(Distance.objects.all()[:3])
+
+    def test_style_display(self):
+        self.assertEqual(
+            self.style.__unicode__(),
+            'Dowolny: [<Distance: 25m>, <Distance: 50m>, <Distance: 100m>]'
         )

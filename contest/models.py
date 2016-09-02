@@ -355,10 +355,10 @@ class ContestantScore(models.Model):
     contestant = models.ForeignKey(Contestant)
     style = models.ForeignKey(Style)
     distance = models.ForeignKey(Distance)
-    time_result = models.FloatField('Najlepszy czas', blank=True, null=True)
+    time_result = models.IntegerField('Najlepszy czas', blank=True, null=True)
 
     def __unicode__(self):
-        return '{}: {} {} - {} s'.format(
+        return '{}: {} {} - {} ms'.format(
             self.contestant, self.style.name,
             self.distance.value, self.time_result
         )

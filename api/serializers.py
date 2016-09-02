@@ -145,5 +145,3 @@ class ContestantSerializer(serializers.HyperlinkedModelSerializer):
             'pk', 'first_name', 'last_name', 'gender', 'year_of_birth',
             'school', 'moderator', 'contest', 'score'
         )
-
-
