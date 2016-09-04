@@ -1078,10 +1078,14 @@ class ContestResultsViewTestCase(TestCase):
 
 class AddContestResultsViewTest(TestCase):
     def setUp(self):
+        self.admin = RushUser.objects.create_superuser(
+            email='xyz@xyz.pl', username='admin', password='Password'
+        )
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
             place='Szkoła', lowest_year=11, highest_year=16,
-            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            created_by=self.admin
         )
 
         self.user = RushUser(
@@ -1091,9 +1095,6 @@ class AddContestResultsViewTest(TestCase):
         self.user.set_password('useruser123')
         self.user.save()
 
-        self.admin = RushUser.objects.create_superuser(
-            email='xyz@xyz.pl', username='admin', password='Password'
-        )
 
     def test_has_not_access(self):
         self.client.login(username='user', password='useruser123')
@@ -1104,7 +1105,7 @@ class AddContestResultsViewTest(TestCase):
             )
         )
         self.assertEqual(response.status_code, 302)
-        url = '/zaloguj/?next={}'.format(
+        url = '/'.format(
             reverse(
                 'contest:contest-add-results',
                 kwargs={'contest_id': self.contest.pk}
@@ -1112,7 +1113,7 @@ class AddContestResultsViewTest(TestCase):
         )
         self.assertEqual(
             response.url,
-            url.format(reverse('contest:login'))
+            url.format(reverse('contest:home'))
         )
 
     def test_has_access(self):
@@ -1125,7 +1126,7 @@ class AddContestResultsViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_post_without_acces(self):
+    def test_post_without_access(self):
         self.client.login(username='user', password='useruser123')
         response = self.client.post(
             reverse(

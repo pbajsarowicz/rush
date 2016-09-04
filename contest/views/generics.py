@@ -377,6 +377,8 @@ class ContestResultsAddView(View):
         """
         contest = Contest.objects.get(pk=contest_id)
         form = self.form_class(request.POST, instance=contest)
+        if self._is_contest_organizer(request, contest) is False:
+            return redirect('contest:home')
         if form.is_valid():
             form.save(commit=True)
             return redirect('contest:contest-results', contest_id=contest_id)
