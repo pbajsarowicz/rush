@@ -463,6 +463,7 @@ class ContestForm(forms.ModelForm):
         contest = super(ContestForm, self).save(commit=False)
 
         contest.content_type = self.user.content_type
+        contest.created_by = self.user
         contest.object_id = self.user.object_id
         contest.styles = self.cleaned_data['styles']
 

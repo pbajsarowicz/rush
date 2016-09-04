@@ -356,7 +356,9 @@ class ContestResultsAddView(View):
         """
         Checks if contest is created by this user.
         """
-        return request.user.object_id == contest.object_id
+        if request.user == contest.created_by:
+            return True
+        return False
 
 
     def get(self, request, contest_id, *args, **kwargs):
@@ -364,7 +366,7 @@ class ContestResultsAddView(View):
         Return clear form.
         """
         contest = Contest.objects.get(pk=contest_id)
-        if not self._is_contest_organizer(request, contest):
+        if self._is_contest_organizer(request, contest) is False:
             return redirect('contest:home')
         form = self.form_class(instance=contest)
         return render(request, self.template_name, {'form': form})

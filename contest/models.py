@@ -264,6 +264,7 @@ class Contest(UnitModelsMixin, models.Model):
         ContentType, limit_choices_to=UNIT_LIMIT,
         blank=True, null=True
     )
+    created_by = models.ForeignKey(RushUser, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     organizer = GenericForeignKey('content_type', 'object_id')
     styles = MultiSelectField(choices=STYLES_DISTANCES)
