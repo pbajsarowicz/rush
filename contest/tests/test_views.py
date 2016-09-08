@@ -1095,7 +1095,6 @@ class AddContestResultsViewTest(TestCase):
         self.user.set_password('useruser123')
         self.user.save()
 
-
     def test_has_not_access(self):
         self.client.login(username='user', password='useruser123')
         response = self.client.get(
