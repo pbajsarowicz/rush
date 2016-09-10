@@ -19,7 +19,14 @@
         </p>
         <p>Wiek: {{ contestant.year_of_birth }}</p>
         <p>Szkoła/Klub: {{ contestant.school }}</p>
-        <p>Style i dystanse: {{ contestant.get_styles_display }}</p>
+        <p>
+          Style i dystanse:
+          <ul>
+            {% for score in contestant.contestantscore_set.all %}
+              <li>{{ score.style.name }} {{ score.distance.value }} - {{ score.get_time_result }}</li>
+            {% endfor %}
+          </ul>
+        </p>
       </div>
     {% endfor %}
 

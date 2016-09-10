@@ -800,7 +800,7 @@ class ContestantAddViewTestCase(TestCase):
         self.assertEqual(contestant.contest, self.contest)
         self.assertEqual(
             contestant.contestantscore_set.first().__unicode__(),
-            'Aaa Bbb: Dowolny 50m - 131110 ms'
+            'Aaa Bbb: Dowolny 50m - 02:11.11s'
         )
 
         response = self.client.get(

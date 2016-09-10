@@ -161,7 +161,7 @@ class ContestantScoreTestCase(TestCase):
 
     def test_score_display(self):
         self.assertEqual(
-            self.score.__unicode__(), 'Adam Kowalski: Dowolny 25m - 655111 ms'
+            self.score.__unicode__(), 'Adam Kowalski: Dowolny 25m - 10:55.11s'
         )
 
 

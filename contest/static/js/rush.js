@@ -848,7 +848,7 @@ function validateStyles() {
 function checkStyles(prefix) {
     'use strict';
     var result = '';
-    var checkTime = RegExp('\\d{2}:\\d{2}.\\d{2}');
+    var checkTime = RegExp('^\\d{2}:\\d{2}.\\d{2}$');
     var isValidated = true;
     var time;
     $('.distance_' + prefix).each(function() {

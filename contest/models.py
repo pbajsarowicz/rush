@@ -358,10 +358,17 @@ class ContestantScore(models.Model):
     time_result = models.IntegerField('Najlepszy czas', blank=True, null=True)
 
     def __unicode__(self):
-        return '{}: {} {} - {} ms'.format(
+        return '{}: {} {} - {}s'.format(
             self.contestant, self.style.name,
-            self.distance.value, self.time_result
+            self.distance.value, self.get_time_result()
         )
+
+    def get_time_result(self):
+        time = int(self.time_result)
+        minutes = time / 60000
+        seconds = time / 1000 - minutes * 60
+        milliseconds = time % 1000 / 10
+        return '{:0>2}:{:0>2}.{:0>2}'.format(minutes, seconds, milliseconds)
 
     class Meta:
         unique_together = ('contestant', 'style', 'distance')
