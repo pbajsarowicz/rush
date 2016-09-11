@@ -79,7 +79,7 @@
     <div id="id_{{ formset.empty_form.prefix }}" class="contestant-form animation">
       {{ formset.empty_form.as_p }}
       <p id="style">Style:</p>
-      <span class="distance-choices">
+      <span class="distance-choices" id="style_{{ formset.empty_form.prefix }}">
       {% for style in styles.all %}
         {% for distance in style.distance.all %}
           <input type="checkbox" id="{{ style.style.name }}_{{ distance.value }}_{{ formset.empty_form.prefix }}" class="distance_{{ formset.empty_form.prefix }}"
