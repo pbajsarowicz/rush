@@ -333,7 +333,6 @@ class ContestForm(forms.ModelForm):
     """
     Form for creating Contests.
     """
-    organization = forms.CharField(label='Organizacja', max_length=255)
     styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
     file1 = forms.FileField(
         label='Plik nr 1',
@@ -477,7 +476,8 @@ class ContestForm(forms.ModelForm):
         model = Contest
         fields = [
             'name', 'date', 'place', 'deadline', 'lowest_year',
-            'highest_year', 'description', 'file1', 'file2', 'file3', 'file4',
+            'highest_year', 'description', 'organization', 'file1',
+            'file2', 'file3', 'file4',
         ]
 
 

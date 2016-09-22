@@ -77,7 +77,7 @@ class ContestSerializer(serializers.HyperlinkedModelSerializer):
         model = Contest
         fields = (
             'pk', 'name', 'date', 'place', 'lowest_year', 'highest_year',
-            'deadline', 'description', 'organizer', 'files',
+            'deadline', 'description', 'organizer', 'files', 'organization',
         )
 
 

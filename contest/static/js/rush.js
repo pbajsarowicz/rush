@@ -444,7 +444,7 @@ function getContestInfo(pk) {
         success: function(json) {
             result = 'Nazwa zawodów: ' + json['name'] + '<br> Data i godzina: ' + json['date'] + '<br> Miejsce: ' + json['place'] +
             '<br> Dla kogo: od rocznika ' + json['lowest_year'] + ' do ' + json['highest_year'] +
-            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Pliki: ';
+            '<br> Termin zgłaszania zawodników: ' +  json['deadline'] + '<br> Organizacja: ' + json['organization'] + '<br> Pliki: ';
 
             files = json['files']
             for (var i = 0, len = files.length ; i < len; i++) {
