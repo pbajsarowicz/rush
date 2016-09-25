@@ -191,6 +191,13 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         return self.groups.filter(name='Individual contestants').exists()
 
     @property
+    def is_moderator(self):
+        """
+        Checks if it's a moderator.
+        """
+        return self.groups.filter(name='Moderators').exists()
+
+    @property
     def unit_name(self):
         """
         Return name of user's unit.
