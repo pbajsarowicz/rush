@@ -67,14 +67,16 @@
         {% for contest in completed %}
           <li class="collection-item contest-item">
             <div class="contest-item">
-              {% if user.is_authenticated and user.object_id == contest.object_id %}
-                <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-add-results' contest_id=contest.pk %}">
-                  {% if contest.results %}
-                    Edytuj wyniki
-                  {% else %}
-                    Dodaj wyniki
-                  {% endif %}
-                </a>
+              {% if user.is_authenticated %}
+                {% if contest.created_by or user.is_moderator and user.content_type == contest.content_type and user.object_id == contest.object_id %}
+                  <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-add-results' contest_id=contest.pk %}">
+                    {% if contest.results %}
+                      Edytuj wyniki
+                    {% else %}
+                      Dodaj wyniki
+                    {% endif %}
+                  </a>
+                {% endif %}
               {% endif %}
               <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-results' contest_id=contest.pk %}">Wyniki</a>
               <a class="text" href="{% url 'contest:completed-contest' contest_id=contest.pk %}">{{ contest }}</a>
