@@ -410,11 +410,42 @@ class ContestResultsAddView(View):
     template_name = 'contest/add_results.html'
     form_class = ContestResultsForm
 
+    @staticmethod
+    def _is_contest_organizer(user, contest):
+        """
+        Checks if contest is created by this user.
+        """
+        return user == contest.created_by
+
+    @staticmethod
+    def _is_contest_moderator(user, contest):
+        """
+        Checks is a request user's organization matches contest's one and
+        whether it's moderator or not.
+        """
+        return (
+            user.is_moderator and
+            user.content_type == contest.content_type and
+            user.object_id == contest.object_id
+        )
+
+    def _can_add_result(self, user, contest):
+        """
+        Both a contest's creator and a moderator of an organization that
+        belongs to the contest should be able to add results.
+        """
+        return (
+            self._is_contest_organizer(user, contest) or
+            self._is_contest_moderator(user, contest)
+        )
+
     def get(self, request, contest_id, *args, **kwargs):
         """
         Return clear form.
         """
         contest = Contest.objects.get(pk=contest_id)
+        if self._can_add_result(request.user, contest) is False:
+            return redirect('contest:home')
         form = self.form_class(instance=contest)
         return render(request, self.template_name, {'form': form})
 
@@ -423,6 +454,8 @@ class ContestResultsAddView(View):
         Save results.
         """
         contest = Contest.objects.get(pk=contest_id)
+        if self._can_add_result(request.user, contest) is False:
+            return redirect('contest:home')
         form = self.form_class(request.POST, instance=contest)
         if form.is_valid():
             form.save(commit=True)

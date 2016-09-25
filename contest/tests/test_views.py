@@ -1079,18 +1079,55 @@ class ContestResultsViewTestCase(TestCase):
 
 class AddContestResultsViewTest(TestCase):
     def setUp(self):
+        self.admin = RushUser.objects.create_superuser(
+            email='xyz@xyz.pl', username='admin', password='Password'
+        )
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
             place='Szkoła', lowest_year=11, highest_year=16,
-            description='Opis', deadline=make_aware(datetime(2008, 11, 20))
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            created_by=self.admin
         )
 
-        self.user = RushUser.objects.create_superuser(
-            email='xyz@xyz.pl', username='login', password='Password'
+        self.user = RushUser(
+            email='root@root.pl', username='user',
+            password='useruser123', is_active=True
         )
-        self.client.login(username='login', password='Password')
+        self.user.set_password('useruser123')
+        self.user.save()
 
-    def test_post(self):
+    def test_has_not_access(self):
+        self.client.login(username='user', password='useruser123')
+        response = self.client.get(
+            reverse(
+                'contest:contest-add-results',
+                kwargs={'contest_id': self.contest.id}
+            )
+        )
+        self.assertEqual(response.status_code, 302)
+        url = '/'.format(
+            reverse(
+                'contest:contest-add-results',
+                kwargs={'contest_id': self.contest.pk}
+            )
+        )
+        self.assertEqual(
+            response.url,
+            url.format(reverse('contest:home'))
+        )
+
+    def test_has_access(self):
+        self.client.login(username='admin', password='Password')
+        response = self.client.get(
+            reverse(
+                'contest:contest-add-results',
+                kwargs={'contest_id': self.contest.id}
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_without_access(self):
+        self.client.login(username='user', password='useruser123')
         response = self.client.post(
             reverse(
                 'contest:contest-add-results',
@@ -1101,7 +1138,21 @@ class AddContestResultsViewTest(TestCase):
             }, follow=True
         )
         self.assertEqual(response.status_code, 200)
+        contest = Contest.objects.get(pk=self.contest.id)
+        self.assertEqual(contest.results, '')
 
+    def test_post_success(self):
+        self.client.login(username='admin', password='Password')
+        response = self.client.post(
+            reverse(
+                'contest:contest-add-results',
+                kwargs={'contest_id': self.contest.id}
+            ),
+            data={
+                'results': 'Wyniki',
+            }, follow=True
+        )
+        self.assertEqual(response.status_code, 200)
         contest = Contest.objects.get(pk=self.contest.id)
         self.assertEqual(contest.results, 'Wyniki')
 
