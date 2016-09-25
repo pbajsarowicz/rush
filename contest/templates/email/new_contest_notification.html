@@ -13,10 +13,16 @@
       <p>Miejsce: {{ contest.place }}</p>
       <p>Dozwolone roczniki: od {{ contest.lowest_year }} do {{ contest.highest_year }}</p>
       <p>Style: {{ contest.get_styles_display }}</p>
-      <p>Pliki: </p>
-      {% for file in files_list %}
-        <br><a href="{{ file.url }}" target="_blank" download>{{ file.name }}</a>
-      {% endfor %}
+      {% if files_list %}
+        <p>Pliki: </p>
+        <ul>
+          {% for file in files_list %}
+            <li>
+              <a href="{{ file.url }}" target="_blank" download>{{ file.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     </div>
     <br><a href="{{ add_contest_link }}">Dołącz do zawodów</a>
   </body>

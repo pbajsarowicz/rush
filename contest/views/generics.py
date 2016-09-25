@@ -327,16 +327,13 @@ class ContestAddView(PermissionRequiredMixin, View):
 
     @staticmethod
     def send_email_about_new_contest(
-            contest,
-            recipient_list,
-            add_contestant_link,
-            files_list,
-            *args,
-            **kwargs):
+        contest, recipient_list, add_contestant_link, files_list, *args,
+        **kwargs
+    ):
         """
         Sends an email with a list contestants
         """
-        text = loader.render_to_string(
+        body = loader.render_to_string(
             'email/new_contest_notification.html', {
                 'contest': contest,
                 'add_contestant_link': add_contestant_link,
@@ -344,10 +341,10 @@ class ContestAddView(PermissionRequiredMixin, View):
             },
         )
         msg = EmailMessage(
-            'Stworzono nowe zawody',
-            text,
-            settings.SUPPORT_EMAIL,
-            recipient_list,
+            subject='Stworzono nowe zawody',
+            body=body,
+            from_email=settings.SUPPORT_EMAIL,
+            bcc=recipient_list,
         )
         msg.content_subtype = 'html'
         msg.send()
@@ -365,24 +362,22 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         form = self.form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
-            organization = form.cleaned_data['organization']
             contest = form.save()
             recipient_list = list(
-                RushUser.objects.filter(notifications=True).exclude(
+                RushUser.objects.filter(
+                    notifications=True, is_active=True
+                ).exclude(
                     email=request.user.email
                 ).values_list(
                     'email', flat=True
                 )
             )
-
             add_contestant_link = 'http://{}{}'.format(
                 request.get_host(),
                 reverse(
                     'contest:contestant-add', kwargs={'contest_id': contest.pk}
                 )
             )
-            contest.organization = organization
-            contest.styles = contest.styles[1:]
             contest_files = contest.contestfiles_set.all()
             host = request.get_host()
             files_list = [
