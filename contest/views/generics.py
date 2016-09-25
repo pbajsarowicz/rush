@@ -21,6 +21,7 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
+    RushUser,
 )
 from contest.forms import (
     ContestantForm,
@@ -324,6 +325,30 @@ class ContestAddView(PermissionRequiredMixin, View):
     template_name = 'contest/contest_add.html'
     form_class = ContestForm
 
+    @staticmethod
+    def send_email_about_new_contest(
+        contest, recipient_list, add_contestant_link, files_list, *args,
+        **kwargs
+    ):
+        """
+        Sends an email with a list contestants
+        """
+        body = loader.render_to_string(
+            'email/new_contest_notification.html', {
+                'contest': contest,
+                'add_contestant_link': add_contestant_link,
+                'files_list': files_list
+            },
+        )
+        msg = EmailMessage(
+            subject='Stworzono nowe zawody',
+            body=body,
+            from_email=settings.SUPPORT_EMAIL,
+            bcc=recipient_list,
+        )
+        msg.content_subtype = 'html'
+        msg.send()
+
     def get(self, request):
         """
         Return clear form.
@@ -337,7 +362,36 @@ class ContestAddView(PermissionRequiredMixin, View):
         """
         form = self.form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
-            form = form.save()
+            contest = form.save()
+            recipient_list = list(
+                RushUser.objects.filter(
+                    notifications=True, is_active=True
+                ).exclude(
+                    email=request.user.email
+                ).values_list(
+                    'email', flat=True
+                )
+            )
+            add_contestant_link = 'http://{}{}'.format(
+                request.get_host(),
+                reverse(
+                    'contest:contestant-add', kwargs={'contest_id': contest.pk}
+                )
+            )
+            contest_files = contest.contestfiles_set.all()
+            host = request.get_host()
+            files_list = [
+                {
+                    'name': contest_file.name,
+                    'url': 'http://{}{}'.format(
+                        host, contest_file.contest_file.url
+                    )
+                } for contest_file in contest_files
+             ]
+
+            self.send_email_about_new_contest(
+                contest, recipient_list, add_contestant_link, files_list
+            )
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
 
             return render(request, self.template_name, {'message': msg})
