@@ -934,6 +934,7 @@ function getEditContestInfo(pk) {
     var url = '';
     var file_name = '';
     var file_number = 0;
+    document.write(Pliki)
 
     $.ajax({
         url: '/api/v1/contests/' + pk + '/?format=json',
@@ -966,6 +967,7 @@ function getEditContestInfo(pk) {
             }
 
             result += '<br> Opis: ' + (json['description'] ? json['description'] : 'Brak');
+
 
             document.getElementById('info').innerHTML = result;
         }

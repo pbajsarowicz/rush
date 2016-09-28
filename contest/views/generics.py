@@ -492,7 +492,9 @@ class ContestEditView(View):
         """
         contest = Contest.objects.get(id=contest_id)
         form = self.form_class(user=request.user, instance=contest)
-        return render(request, self.template_name, {'form': form})
+        return render(
+            request, self.template_name, {'form': form, 'contest': contest}
+        )
 
     def post(self, request, contest_id, *args, **kwargs):
         """

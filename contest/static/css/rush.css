@@ -185,3 +185,10 @@ Base elements
     display: inline-block;
 }
 
+.textcontainer{
+  display: inline-block;
+  text-align: left;
+}
+
+.listdots{
+  list-style-type: disc;
