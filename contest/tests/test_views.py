@@ -38,6 +38,7 @@ from contest.models import (
     Contest,
     Contestant,
     RushUser,
+    ContestFiles,
 )
 from contest.views import (
     RegisterView,
@@ -1155,6 +1156,130 @@ class AddContestResultsViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         contest = Contest.objects.get(pk=self.contest.id)
         self.assertEqual(contest.results, 'Wyniki')
+
+
+class ManageContestViewTestCase(TestCase):
+    def setUp(self):
+        self.admin = RushUser.objects.create_superuser(
+            email='xyz@xyz.pl', username='admin', password='Password'
+        )
+        self.contest = Contest.objects.create(
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', lowest_year=11, highest_year=16,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            created_by=self.admin
+        )
+        self.contestant = Contestant.objects.create(
+            moderator=self.admin, first_name='Adam', last_name='Nowak',
+            gender='M', year_of_birth=2002, school='S', styles=['M50', 'Z100'],
+            contest=self.contest
+        )
+        self.client.login(username='admin', password='Password')
+        self.contestants = [self.contestant]
+        self.files = {
+            'file1': SimpleUploadedFile(
+                'file.docx', b'file_content', content_type='media/mp4'
+            ),
+        }
+        self.contestFiles = ContestFiles.objects.create(
+            contest=self.contest, uploaded_by=self.admin,
+            date_uploaded=make_aware(datetime(2050, 12, 31)),
+            contest_file=self.files['file1'], name='file.docx'
+        )
+
+    def test_get_contestants(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-manage',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['contestants'],
+            self.contestants
+        )
+
+    def test_get_files(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-manage',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(
+            response.context['files'],
+            self.contestFiles
+        )
+
+    def test_get_msg(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-manage',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(
+            response.context['msg'],
+            ''
+        )
+
+
+class ContestEditViewTestCase(TestCase):
+    def setUp(self):
+        self.admin = RushUser.objects.create_superuser(
+            email='xyz@xyz.pl', username='admin', password='Password'
+        )
+        self.contest = Contest.objects.create(
+            name='abc',
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', lowest_year=11, highest_year=16,
+            styles=',D25,G50,K200,Z100',
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            created_by=self.admin
+        )
+        self.client.login(username='admin', password='Password')
+
+    def test_get(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-edit',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(isinstance(response.context['form'], ContestForm))
+        self.assertEqual(
+            response.context['form'].initial['lowest_year'], 11
+        )
+        self.assertEqual(
+            response.context['form'].initial['highest_year'], 16
+        )
+        self.assertEqual(
+            response.context['form'].initial['description'], 'Opis'
+        )
+        self.assertEqual(response.context['form'].initial['place'], 'Szkoła')
+
+    def test_post(self):
+        response = self.client.post(
+            reverse(
+                'contest:contest-edit',
+                kwargs={'contest_id': self.contest.id}
+            ),
+            data={
+                'lowest_year': 1, 'highest_year': 10,
+                'description': '', 'place': 'Piła',
+                'styles': ',D25,G50,K200,Z100',
+                'organization': 'szkoła',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['form'].cleaned_data['description'], ''
+        )
+        self.assertEqual(
+            response.context['form'].cleaned_data['place'], 'Piła'
+        )
 
 
 class ContestAddTestCase(TestCase):
