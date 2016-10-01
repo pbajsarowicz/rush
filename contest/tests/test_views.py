@@ -1165,29 +1165,41 @@ class ManageContestViewTestCase(TestCase):
         )
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
-            place='Szkoła', lowest_year=11, highest_year=16,
+            place='Szkoła', lowest_year=1997, highest_year=2000,
             description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
             created_by=self.admin
         )
-        self.contestant = Contestant.objects.create(
-            moderator=self.admin, first_name='Adam', last_name='Nowak',
-            gender='M', year_of_birth=2002, school='S', styles=['M50', 'Z100'],
-            contest=self.contest
-        )
         self.client.login(username='admin', password='Password')
-        self.contestants = [self.contestant]
         self.files = {
             'file1': SimpleUploadedFile(
                 'file.docx', b'file_content', content_type='media/mp4'
             ),
         }
-        self.contestFiles = ContestFiles.objects.create(
+        self.contestFiles = [ContestFiles.objects.create(
             contest=self.contest, uploaded_by=self.admin,
             date_uploaded=make_aware(datetime(2050, 12, 31)),
             contest_file=self.files['file1'], name='file.docx'
+        )]
+
+    def test_get_msg_without_contestants(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-manage',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(
+            response.context['msg'],
+            'Zawodnicy nie zostali jeszcze dodani.'
         )
 
     def test_get_contestants(self):
+        self.contestant = Contestant.objects.create(
+            moderator=self.admin, first_name='Adam', last_name='Nowak',
+            gender='M', year_of_birth=2002, school='S', styles=['M50', 'Z100'],
+            contest=self.contest
+        )
+        self.contestants = [self.contestant]
         response = self.client.get(
             reverse(
                 'contest:contest-manage',
@@ -1196,8 +1208,12 @@ class ManageContestViewTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.context['contestants'],
-            self.contestants
+            response.context['contestants'][0],
+            self.contestants[0]
+        )
+        self.assertEqual(
+            response.context['msg'],
+            ''
         )
 
     def test_get_files(self):
@@ -1208,20 +1224,8 @@ class ManageContestViewTestCase(TestCase):
             ),
         )
         self.assertEqual(
-            response.context['files'],
-            self.contestFiles
-        )
-
-    def test_get_msg(self):
-        response = self.client.get(
-            reverse(
-                'contest:contest-manage',
-                kwargs={'contest_id': self.contest.id}
-            ),
-        )
-        self.assertEqual(
-            response.context['msg'],
-            ''
+            response.context['files'][0],
+            self.contestFiles[0]
         )
 
 
@@ -1267,13 +1271,14 @@ class ContestEditViewTestCase(TestCase):
                 kwargs={'contest_id': self.contest.id}
             ),
             data={
-                'lowest_year': 1, 'highest_year': 10,
+                'lowest_year': 11, 'highest_year': 16,
                 'description': '', 'place': 'Piła',
                 'styles': ',D25,G50,K200,Z100',
                 'organization': 'szkoła',
             }
         )
         self.assertEqual(response.status_code, 200)
+
         self.assertEqual(
             response.context['form'].cleaned_data['description'], ''
         )

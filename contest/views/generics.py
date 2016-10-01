@@ -593,7 +593,6 @@ class ContestEditView(View):
         )
         if form.is_valid():
             form = form.save()
-            msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
-
+            msg = 'Zawody zostały edytowane.'
             return render(request, self.template_name, {'message': msg})
         return render(request, self.template_name, {'form': form})
