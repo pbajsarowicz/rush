@@ -141,6 +141,7 @@ class RegistrationForm(forms.ModelForm):
         fields = (
             'email', 'first_name', 'last_name', 'organization_name',
             'organization_address', 'club_code', 'representative',
+            'notifications',
         )
 
 
@@ -416,7 +417,10 @@ class ContestForm(forms.ModelForm):
         cleaned_data = super(ContestForm, self).clean()
 
         for contest_file_name in ('file1', 'file2', 'file3', 'file4'):
-            contest_file = cleaned_data[contest_file_name]
+            try:
+                contest_file = cleaned_data[contest_file_name]
+            except KeyError:
+                continue
 
             if not contest_file:
                 continue
@@ -441,9 +445,11 @@ class ContestForm(forms.ModelForm):
     def _save_uploaded_files(self):
         contest_files = []
 
-        for contest_file_name in ('file1', 'file2', 'file3', 'file4',):
-            contest_file = self.cleaned_data[contest_file_name]
-
+        for contest_file_name in ('file1', 'file2', 'file3', 'file4'):
+            try:
+                contest_file = self.cleaned_data[contest_file_name]
+            except KeyError:
+                continue
             if not contest_file:
                 continue
 
@@ -462,6 +468,7 @@ class ContestForm(forms.ModelForm):
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)
 
+        contest.created_by = self.user
         contest.content_type = self.user.content_type
         contest.object_id = self.user.object_id
         contest.styles = self.cleaned_data['styles']

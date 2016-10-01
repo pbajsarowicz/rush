@@ -26,7 +26,11 @@
                 <div class="contest-name-cut"><a class="text" href="{% url 'contest:contestant-list' contest_id=contest.pk %}">{{ contest.name }}
                 </div>{{ contest.place }} - {{ contest.date }}</a>
               {% else %}
-                <div class="contest-name-cut"><span class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Termin dodawania zawodników minął {{ contest.deadline|date:'d.m.Y' }}">{{ contest.name }}</div>{{ contest.place }} - {{ contest.date }}</span>
+                <div class="contest-name-cut">
+                  <span class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Termin dodawania zawodników minął {{ contest.deadline|date:'d.m.Y' }}">
+                  {{ contest.name }} {{ contest.place }} - {{ contest.date }}
+                  </span>
+                </div>
               {% endif %}
               <a class="button waves-effect waves-light btn modal-trigger button-center" href="#modal{{ contest.pk }}"
                  onclick="getContestInfo({{ contest.pk }})">Szczegóły</a>
@@ -62,14 +66,16 @@
             <div class="contest-item">
               <div class="contest-name-cut"><a class="text" href="{% url 'contest:completed-contest' contest_id=contest.pk %}">{{ contest.name }}
               </div>{{ contest.place }} - {{ contest.date }}</a>
-              {% if user.is_authenticated and user.is_creator %}
-                <a class="button waves-effect waves-light btn modal-trigger button-center" href="{% url 'contest:contest-add-results' contest_id=contest.pk %}">
-                  {% if contest.results %}
-                    Edytuj wyniki
-                  {% else %}
-                    Dodaj wyniki
-                  {% endif %}
-                </a>
+              {% if user.is_authenticated %}
+                {% if contest.created_by or user.is_moderator and user.content_type == contest.content_type and user.object_id == contest.object_id %}
+                  <a class="button waves-effect waves-light btn modal-trigger button-center" href="{% url 'contest:contest-add-results' contest_id=contest.pk %}">
+                    {% if contest.results %}
+                      Edytuj wyniki
+                    {% else %}
+                      Dodaj wyniki
+                    {% endif %}
+                  </a>
+                {% endif %}
               {% endif %}
               <a class="button waves-effect waves-light btn modal-trigger button-center" href="{% url 'contest:contest-results' contest_id=contest.pk %}">Wyniki</a>
               <a class="button waves-effect waves-light btn modal-trigger button-center" href="#modal{{ contest.pk }}"
