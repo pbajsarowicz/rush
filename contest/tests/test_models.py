@@ -172,7 +172,7 @@ class ContestStyleDistancesTestCase(TestCase):
         self.style = ContestStyleDistances.objects.create(
             style=Style.objects.first()
         )
-        self.style.distance.set(Distance.objects.all()[:3])
+        self.style.distances.set(Distance.objects.all()[:3])
 
     def test_style_display(self):
         self.assertEqual(

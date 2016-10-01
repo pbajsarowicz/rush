@@ -177,6 +177,13 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         return self.groups.filter(name='Individual contestants').exists()
 
     @property
+    def is_moderator(self):
+        """
+        Checks if it's a moderator.
+        """
+        return self.groups.filter(name='Moderators').exists()
+
+    @property
     def unit_name(self):
         """
         Return name of user's unit.
@@ -258,10 +265,10 @@ class ContestStyleDistances(models.Model):
     Model for contests' style with distances.
     """
     style = models.ForeignKey(Style)
-    distance = models.ManyToManyField(Distance)
+    distances = models.ManyToManyField(Distance)
 
     def __unicode__(self):
-        return '{}: {}'.format(self.style.name, self.distance.all())
+        return '{}: {}'.format(self.style.name, self.distances.all())
 
 
 class Contest(UnitModelsMixin, models.Model):
@@ -281,6 +288,7 @@ class Contest(UnitModelsMixin, models.Model):
         ContentType, limit_choices_to=UNIT_LIMIT,
         blank=True, null=True
     )
+    created_by = models.ForeignKey(RushUser, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     organizer = GenericForeignKey('content_type', 'object_id')
     styles = models.ManyToManyField(ContestStyleDistances)
@@ -365,10 +373,9 @@ class ContestantScore(models.Model):
 
     def get_time_result(self):
         time = int(self.time_result)
-        minutes = time / 60000
-        seconds = time / 1000 - minutes * 60
-        milliseconds = time % 1000 / 10
-        return '{:0>2}:{:0>2}.{:0>2}'.format(minutes, seconds, milliseconds)
+        minutes, time = divmod(time, 60000)
+        seconds, ms = divmod(time, 1000)
+        return '{:0>2}:{:0>2}.{:0>2}'.format(minutes, seconds, ms / 10)
 
     class Meta:
         unique_together = ('contestant', 'style', 'distance')

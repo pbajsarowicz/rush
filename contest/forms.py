@@ -416,25 +416,26 @@ class ContestForm(forms.ModelForm):
         for style in raw_styles:
             styles_counter[style[0]] += 1
             distances.append(
-                Distance.objects.get_or_create(value=style[1:] + 'm')[0]
+                Distance.objects.get(value=style[1:] + 'm')
             )
         for style, value in styles_counter.items():
             if value == 0:
                 continue
-            new_contest_style = ContestStyleDistances.objects.annotate(
-                c=Count('distance')
-            ).filter(c=value, style__name=shortcuts[style])
-            for distance in distances[:value]:
-                new_contest_style = new_contest_style.filter(distance=distance)
-            if not new_contest_style:
-                new_contest_style = ContestStyleDistances.objects.create(
-                    style=Style.objects.get_or_create(name=shortcuts[style])[0]
+            contest_style = ContestStyleDistances.objects.annotate(
+                c=Count('distances')
+            ).filter(
+                c=value, style__name=shortcuts[style],
+                distances__in=distances[:value]
+            )
+            if not contest_style:
+                contest_style = ContestStyleDistances.objects.create(
+                    style=Style.objects.get(name=shortcuts[style])
                 )
-                new_contest_style.distance = distances[:value]
-                new_contest_style.save()
-                styles.append(new_contest_style)
+                contest_style.distances = distances[:value]
+                contest_style.save()
+                styles.append(contest_style)
             else:
-                styles.append(new_contest_style[0])
+                styles.append(contest_style[0])
             del distances[:value]
         return styles
 
@@ -452,7 +453,10 @@ class ContestForm(forms.ModelForm):
         cleaned_data = super(ContestForm, self).clean()
 
         for contest_file_name in ('file1', 'file2', 'file3', 'file4'):
-            contest_file = cleaned_data[contest_file_name]
+            try:
+                contest_file = cleaned_data[contest_file_name]
+            except KeyError:
+                continue
 
             if not contest_file:
                 continue
@@ -477,9 +481,11 @@ class ContestForm(forms.ModelForm):
     def _save_uploaded_files(self):
         contest_files = []
 
-        for contest_file_name in ('file1', 'file2', 'file3', 'file4',):
-            contest_file = self.cleaned_data[contest_file_name]
-
+        for contest_file_name in ('file1', 'file2', 'file3', 'file4'):
+            try:
+                contest_file = self.cleaned_data[contest_file_name]
+            except KeyError:
+                continue
             if not contest_file:
                 continue
 
@@ -498,13 +504,13 @@ class ContestForm(forms.ModelForm):
     def save(self, commit=True):
         contest = super(ContestForm, self).save(commit=False)
 
+        contest.created_by = self.user
         contest.content_type = self.user.content_type
         contest.object_id = self.user.object_id
         if commit:
-            styles = self.get_styles_array(self.cleaned_data['styles'])
             contest.save()
-            for style in styles:
-                contest.styles.add(style)
+            styles = self.get_styles_array(self.cleaned_data['styles'])
+            contest.styles.add(*styles)
             contest.save()
             self._save_uploaded_files()
 

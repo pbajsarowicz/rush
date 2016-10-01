@@ -23,7 +23,7 @@
                 <p id="style">Style:</p>
                 <span class="distance-choices" id="style_{{ form.prefix }}">
                 {% for style in styles.all %}
-                  {% for distance in style.distance.all %}
+                  {% for distance in style.distances.all %}
                     <input type="checkbox" id="{{ style.style.name }}_{{ distance.value }}_{{ form.prefix }}" class="distance_{{ form.prefix }}"
                            onclick="showTimeField(this)">
                     <label for="{{ style.style.name }}_{{ distance.value }}_{{ form.prefix }}">{{ style.style.name }} {{ distance.value }}</label>
@@ -81,7 +81,7 @@
       <p id="style">Style:</p>
       <span class="distance-choices" id="style_{{ formset.empty_form.prefix }}">
       {% for style in styles.all %}
-        {% for distance in style.distance.all %}
+        {% for distance in style.distances.all %}
           <input type="checkbox" id="{{ style.style.name }}_{{ distance.value }}_{{ formset.empty_form.prefix }}" class="distance_{{ formset.empty_form.prefix }}"
                  onclick="showTimeField(this)">
           <label for="{{ style.style.name }}_{{ distance.value }}_{{ formset.empty_form.prefix }}">{{ style.style.name }} {{ distance.value }}</label>

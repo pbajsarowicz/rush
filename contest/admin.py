@@ -71,6 +71,11 @@ class RushUserAdmin(UnitAdminMixin, admin.ModelAdmin):
     filter_horizontal = ['user_permissions']
 
 
+class ContestantScoreInline(admin.StackedInline):
+    model = ContestantScore
+    extra = 0
+
+
 class ContestantInline(admin.StackedInline):
     model = Contestant
     extra = 0
@@ -89,11 +94,6 @@ class ContestAdmin(UnitAdminMixin, admin.ModelAdmin):
         'description', 'unit_name_select', 'styles', 'results',
     )
     readonly_fields = ('unit_name_select',)
-
-
-class ContestantScoreInline(admin.StackedInline):
-    model = ContestantScore
-    extra = 0
 
 
 class ContestantAdmin(UnitAdminMixin, admin.ModelAdmin):
