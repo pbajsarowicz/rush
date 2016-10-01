@@ -128,6 +128,7 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
     date_joined = models.DateTimeField('data dołączenia', auto_now_add=True)
     is_active = models.BooleanField('użytkownik zaakceptowany', default=False)
     is_admin = models.BooleanField(default=False)
+    notifications = models.BooleanField('powiadomienia', default=True)
     content_type = models.ForeignKey(
         ContentType, limit_choices_to=UNIT_LIMIT, blank=True, null=True
     )
@@ -194,6 +195,13 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         Checks if it's an individual contestant.
         """
         return self.groups.filter(name='Individual contestants').exists()
+
+    @property
+    def is_moderator(self):
+        """
+        Checks if it's a moderator.
+        """
+        return self.groups.filter(name='Moderators').exists()
 
     @property
     def unit_name(self):
@@ -269,6 +277,7 @@ class Contest(UnitModelsMixin, models.Model):
         ContentType, limit_choices_to=UNIT_LIMIT,
         blank=True, null=True
     )
+    created_by = models.ForeignKey(RushUser, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     organizer = GenericForeignKey('content_type', 'object_id')
     styles = MultiSelectField(choices=STYLES_DISTANCES)
