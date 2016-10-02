@@ -171,24 +171,24 @@ Base elements
   width: 300px;
 }
 
-#clockdiv{
+#clockdiv {
   display: inline-block;
   text-align: center;
 }
 
-#clockdiv > div{
+#clockdiv > div {
   display: inline-block;
 }
 
-#clockdiv div > span{
+#clockdiv div > span {
   padding: 15px;
   display: inline-block;
 }
 
-.textcontainer{
+.textcontainer {
   display: inline-block;
   text-align: left;
 }
 
-.listdots{
+.listdots {
   list-style-type: disc;

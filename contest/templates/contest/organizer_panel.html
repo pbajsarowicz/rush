@@ -3,48 +3,46 @@
 {% block container %}
   <div class="container">
     <div class="row">
-      {% if message %}
-        <p>{{ message }}</p>
-      {% else %}
-        <div class="col s5">
+      <div class="col s5">
         {% if contestants %}
           <ul class="listdots">
             {% for contestant in contestants %}
               <li class="listdots">{{ contestant.first_name }} {{ contestant.last_name }}</li>
             {% endfor %}
           </ul>
+        {% else %}
+          <p>{{ msg }}</p>
         {% endif %}
-        </div>
-        <div class="col s7">
-          <div class="center-align">
-	          <div class="textcontainer">
-	            <p>Do zamknięcia listy zapisów pozostało:</p>
-	            <div id="clockdiv">
-	              <div>
-	                <span class="days"></span>
-	                <div>Dni</div>
-	              </div>
-	              <div>
-	                <span class="hours"></span>
-	                <div>Godzin</div>
-	              </div>
-	              <div>
-	                <span class="minutes"></span>
-	                <div>Minut</div>
-	              </div>
-	              <div>
-	                <span class="seconds"></span>
-	                <div>Sekund</div>
-	              </div>
+      </div>
+      <div class="col s7">
+        <div class="center-align">
+	        <div class="textcontainer">
+	          <p>Do zamknięcia listy zapisów pozostało:</p>
+	          <div id="clockdiv">
+	            <div>
+	              <span class="days"></span>
+	              <div>Dni</div>
 	            </div>
-	            <br><br><a class="pull-right btn btn-primary" href="#">Wygeneruj listy startowe</a><br><br>
-	            <div id="text{{ contest.pk }}"></div><br>
-	            <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
-	            <a class="pull-right btn btn-primary" href="{% url 'contest:contest-edit' contest_id=contest.pk %}">Edytuj</a>
+	            <div>
+	              <span class="hours"></span>
+	              <div>Godzin</div>
+	            </div>
+	            <div>
+	              <span class="minutes"></span>
+	              <div>Minut</div>
+	            </div>
+	            <div>
+	              <span class="seconds"></span>
+	              <div>Sekund</div>
+	            </div>
 	          </div>
-          </div>
+	          <br><br><a class="pull-right btn btn-primary" href="#">Wygeneruj listy startowe</a><br><br>
+	          <div id="text{{ contest.pk }}"></div><br>
+	          <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
+	          <a class="pull-right btn btn-primary" href="{% url 'contest:contest-edit' contest_id=contest.pk %}">Edytuj</a>
+	        </div>
         </div>
-      {% endif %}
+      </div>
     </div>
   </div>
   <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.5.1.js"></script>

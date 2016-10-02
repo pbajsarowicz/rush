@@ -38,7 +38,6 @@ from contest.models import (
     Contest,
     Contestant,
     RushUser,
-    ContestFiles,
 )
 from contest.views import (
     RegisterView,
@@ -1170,16 +1169,6 @@ class ManageContestViewTestCase(TestCase):
             created_by=self.admin
         )
         self.client.login(username='admin', password='Password')
-        self.files = {
-            'file1': SimpleUploadedFile(
-                'file.docx', b'file_content', content_type='media/mp4'
-            ),
-        }
-        self.contestFiles = [ContestFiles.objects.create(
-            contest=self.contest, uploaded_by=self.admin,
-            date_uploaded=make_aware(datetime(2050, 12, 31)),
-            contest_file=self.files['file1'], name='file.docx'
-        )]
 
     def test_get_msg_without_contestants(self):
         response = self.client.get(
@@ -1214,18 +1203,6 @@ class ManageContestViewTestCase(TestCase):
         self.assertEqual(
             response.context['msg'],
             ''
-        )
-
-    def test_get_files(self):
-        response = self.client.get(
-            reverse(
-                'contest:contest-manage',
-                kwargs={'contest_id': self.contest.id}
-            ),
-        )
-        self.assertEqual(
-            response.context['files'][0],
-            self.contestFiles[0]
         )
 
 

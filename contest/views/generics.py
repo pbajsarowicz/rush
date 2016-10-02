@@ -21,7 +21,6 @@ from django.views.generic import (
 from contest.models import (
     Contest,
     Contestant,
-    ContestFiles,
     RushUser,
 )
 from contest.forms import (
@@ -532,15 +531,7 @@ class ManageContestView(View):
         """
         Returns a contestans queryset.
         """
-        return (contest.contestant_set.all())
-
-    @staticmethod
-    def _get_files(contest, request):
-        """
-        Returns a files queryset.
-        """
-        contest_files = ContestFiles.objects.all().filter(pk=contest.pk)
-        return (contest_files)
+        return contest.contestant_set.all()
 
     @staticmethod
     def _get_msg(contestants=None):
@@ -557,13 +548,11 @@ class ManageContestView(View):
         """
         contest = Contest.objects.get(pk=contest_id)
         contestants = self._get_contestants(contest, request)
-        files = self._get_files(contest, request)
         msg = self._get_msg(contestants)
         context = {
             'contest': contest,
             'contestants': contestants,
             'msg': msg,
-            'files': files,
         }
         return render(request, self.template_name, context)
 
