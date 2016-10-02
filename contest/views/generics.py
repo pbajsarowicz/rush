@@ -553,7 +553,7 @@ class ManageContestView(View):
 
     def get(self, request, contest_id, *args, **kwargs):
         """
-        Return contest details
+        Return contest details.
         """
         contest = Contest.objects.get(pk=contest_id)
         contestants = self._get_contestants(contest, request)

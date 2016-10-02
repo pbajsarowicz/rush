@@ -172,17 +172,17 @@ Base elements
 }
 
 #clockdiv{
-    display: inline-block;
-    text-align: center;
+  display: inline-block;
+  text-align: center;
 }
 
 #clockdiv > div{
-    display: inline-block;
+  display: inline-block;
 }
 
 #clockdiv div > span{
-    padding: 15px;
-    display: inline-block;
+  padding: 15px;
+  display: inline-block;
 }
 
 .textcontainer{
