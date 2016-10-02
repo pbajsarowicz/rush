@@ -7,6 +7,6 @@ from django.utils import six
 
 
 class LettersValidator(RegexValidator):
-    regex = r'^[a-zA-Z- ]+$'
+    regex = r"^[a-zA-Z  'ąćęłńóśźż' 'ĄĆĘŁŃÓŚŹŻ']+$"
     message = 'Dozowlone są tylko litery.'
     flags = re.UNICODE if six.PY2 else 0
