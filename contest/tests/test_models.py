@@ -68,8 +68,8 @@ class ContestTestCase(TestCase):
         )
 
     def test_contest_methods(self):
-        expected_name = '{} - {} - {}'.format(
-            'Zawody', 'Szkoła', self.now.strftime('%d-%m-%Y')
+        expected_name = 'Zawody - Szkoła - {}'.format(
+            self.now.strftime('%d-%m-%Y')
         )
         self.assertEqual(self.contest.__unicode__(), expected_name)
 
