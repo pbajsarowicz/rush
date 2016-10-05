@@ -25,14 +25,15 @@
               {% if contest.is_submitting_open and contest.is_future %}
                 <div class="contest-name-cut">
                   <a class="text" href="{% url 'contest:contestant-list' contest_id=contest.pk %}">
-                    {{ contest.name }} </br>
+                    {{ contest.name }} <br>
                     {{ contest.place }} - {{ contest.date }}
                   </a>
                 </div>
               {% else %}
                 <div class="contest-name-cut">
                   <span class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Termin dodawania zawodników minął {{ contest.deadline|date:'d.m.Y' }}">
-                  {{ contest.name }} {{ contest.place }} - {{ contest.date }}
+                  {{ contest.name }} <br>
+                  {{ contest.place }} - {{ contest.date }}
                   </span>
                 </div>
               {% endif %}
@@ -70,7 +71,7 @@
             <div class="contest-item">
               <div class="contest-name-cut">
                 <a class="text" href="{% url 'contest:completed-contest' contest_id=contest.pk %}">
-                  {{ contest.name }} </br>
+                  {{ contest.name }} <br>
                   {{ contest.place }} - {{ contest.date }}
                 </a>
               </div>
