@@ -182,9 +182,10 @@ ContestantValidation.prototype = {
         if (!isIndividualContestant) {
             validators.push('validateSchool', 'validateOrganization');
         }
-
-        for (var i = 0, len = validators.length ; i < len; i++) {
-            this[validators[i]](id);
+        if(isEmpty(!formId)) {
+            for (var i = 0, len = validators.length ; i < len; i++) {
+                this[validators[i]](id);
+            }
         }
 
         return !this.validationRaised;
@@ -230,6 +231,13 @@ Contestant.prototype = {
 
         return parseInt(this.getTotalForms() - formId) === 1;
     },
+    isEmpty: function (formId) {
+        var form = this.getForm(formId);
+        for (var i = 0; i < form.length; ++i)
+            if(form[i].innerHTML != null)
+                return false;
+        return true;
+    }
     /*
      * Returns value of TOTAL_FORMS.
      */
@@ -884,3 +892,4 @@ function checkEditedStyles() {
         return false;
     }
 }
+
