@@ -533,6 +533,29 @@ class AccountsViewTestCase(TestCase):
         self.assertEqual(response.status_code, 500)
 
 
+class CancelNotificationsViewTests(TestCase):
+    def test_get(self):
+        user = RushUser.objects.create(
+            email='test@aa.aa', first_name='Adam', last_name='NieAdmin',
+            is_active=True, username='user', is_admin=False
+        )
+        user.notifications = True
+        user.set_password('password123')
+        user.save()
+
+        self.client.login(username='user', password='password123')
+
+        response = self.client.get(reverse('contest:cancel-notification'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['msg'], 'Powiadomienia zostały wyłączone.'
+        )
+        user.delete()
+
+        response = self.client.get(reverse('contest:cancel-notification'))
+        self.assertEqual(response.status_code, 302)
+
+
 class RegisterViewTests(TestCase):
     def test_register_view(self):
         response = self.client.get(reverse('contest:register'))

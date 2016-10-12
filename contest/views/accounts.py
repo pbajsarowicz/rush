@@ -65,3 +65,27 @@ class AccountsView(PermissionRequiredMixin, View):
         )
         msg.content_subtype = 'html'
         msg.send()
+
+
+class CancelNotificationsView(View):
+    """
+    Special link, that canceled notifications.
+    """
+    template_name = 'contest/cancel_notification.html'
+
+    def get(self, request):
+        """
+        Cancel notifications.
+        """
+        try:
+            user = RushUser.objects.get(pk=request.user.pk)
+            user.cancel_notifications()
+        except RushUser.DoesNotExist:
+            return render(
+                request, self.template_name,
+                {'msg': 'Niestety coś poszło nie tak'}
+            )
+        return render(
+            request, self.template_name,
+            {'msg': 'Powiadomienia zostały wyłączone.'}
+        )

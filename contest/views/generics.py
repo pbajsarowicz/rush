@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from urlparse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -327,14 +328,19 @@ class ContestAddView(PermissionRequiredMixin, View):
 
     @staticmethod
     def send_email_about_new_contest(
-        contest, recipient_list, add_contestant_link, files_list, *args,
-        **kwargs
+        contest, recipient_list, add_contestant_link, files_list, request,
+        *args, **kwargs
     ):
         """
         Sends an email with a list contestants
         """
+        page = urljoin(
+            'http://{}'.format(request.get_host()),
+            reverse('contest:cancel-notification')
+        )
         body = loader.render_to_string(
             'email/new_contest_notification.html', {
+                'link': page,
                 'contest': contest,
                 'add_contestant_link': add_contestant_link,
                 'files_list': files_list
@@ -387,10 +393,11 @@ class ContestAddView(PermissionRequiredMixin, View):
                         host, contest_file.contest_file.url
                     )
                 } for contest_file in contest_files
-             ]
+            ]
 
             self.send_email_about_new_contest(
-                contest, recipient_list, add_contestant_link, files_list
+                contest, recipient_list, add_contestant_link,
+                files_list, request
             )
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
 

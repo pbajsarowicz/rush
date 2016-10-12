@@ -31,6 +31,7 @@ class UserMethodTests(TestCase):
             password='P@ssw0rd'
         )
         self.user.is_active = True
+        self.user.notifications = True
         self.user.set_password('Password')
         self.user.save()
 
@@ -39,10 +40,12 @@ class UserMethodTests(TestCase):
         Checking status and informations for user.
         """
         user_test = RushUser.objects.get(email='test@xyz.pl')
+        user_test.cancel_notifications()
         self.assertEqual(user_test.get_full_name(), 'Name Last Name')
         self.assertEqual(user_test.get_short_name(), 'Last Name')
         self.assertFalse(user_test.has_perm('contest.add_contest'))
         self.assertTrue(user_test.has_module_perms(None))
+        self.assertEqual(user_test.notifications, False)
         self.assertFalse(user_test.is_staff)
         self.assertEqual(user_test.__unicode__(), 'test@xyz.pl')
         user_test.discard()
