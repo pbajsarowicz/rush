@@ -328,7 +328,7 @@ class ContestAddView(PermissionRequiredMixin, View):
 
     @staticmethod
     def send_email_about_new_contest(
-        contest, recipient_list, add_contestant_link, files_list, request,
+        request, contest, recipient_list, add_contestant_link, files_list,
         *args, **kwargs
     ):
         """
