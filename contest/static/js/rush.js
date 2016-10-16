@@ -734,8 +734,8 @@ function validateStyles() {
         $('#klasyczny').is(':checked') || $('#motylkowy').is(':checked') ||
         $('#zmienny').is(':checked'))
     ) {
-        errorMessage = 'Co najmniej jeden styl musi zostać wybrany.';
         if ($('#style-error').length === 0) {
+        	errorMessage = 'Co najmniej jeden styl musi zostać wybrany.';
             $('#style').after('<p class="errorlist" id="style-error">' + errorMessage + '</p>');
         }
         return false;
