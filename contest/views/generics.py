@@ -328,19 +328,19 @@ class ContestAddView(PermissionRequiredMixin, View):
 
     @staticmethod
     def send_email_about_new_contest(
-        request, contest, recipient_list, add_contestant_link, files_list,
+        contest, recipient_list, add_contestant_link, files_list, request,
         *args, **kwargs
     ):
         """
         Sends an email with a list contestants
         """
-        page = urljoin(
+        cancel_notifications_link = urljoin(
             'http://{}'.format(request.get_host()),
             reverse('contest:cancel-notification')
         )
         body = loader.render_to_string(
             'email/new_contest_notification.html', {
-                'link': page,
+                'link': cancel_notifications_link,
                 'contest': contest,
                 'add_contestant_link': add_contestant_link,
                 'files_list': files_list

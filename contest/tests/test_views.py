@@ -548,7 +548,8 @@ class CancelNotificationsViewTests(TestCase):
         response = self.client.get(reverse('contest:cancel-notification'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.context['msg'], 'Powiadomienia zostały wyłączone.'
+            response.context['msg'],
+            'Powiadomienia odnośnie nowych zawodów zostały wyłączone.'
         )
         user.delete()
 

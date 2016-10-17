@@ -3,7 +3,7 @@
 {% block container %}
   <div class="container">
     <div class="center">
-      <p>{{ msg }}</p>
+      <p> {{ msg }} <a href="{{ email }}">{{ email }}</a> </p>
       <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Strona główna</a>
     </div>
   </div>

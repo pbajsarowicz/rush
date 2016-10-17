@@ -78,14 +78,16 @@ class CancelNotificationsView(View):
         Cancel notifications.
         """
         try:
-            user = RushUser.objects.get(pk=request.user.pk)
-            user.cancel_notifications()
+            request.user.cancel_notifications()
         except RushUser.DoesNotExist:
             return render(
-                request, self.template_name,
-                {'msg': 'Niestety coś poszło nie tak'}
+                request, self.template_name, {
+                    'msg': """Nie udało się wyłączyć powiadomień.
+                     Spróbuj ponownie. Jeśli problem się pojawi
+                     skontaktuj się z nami:""", 'email': settings.SUPPORT_EMAIL
+                }
             )
         return render(
             request, self.template_name,
-            {'msg': 'Powiadomienia zostały wyłączone.'}
+            {'msg': 'Powiadomienia odnośnie nowych zawodów zostały wyłączone.'}
         )
