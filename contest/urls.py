@@ -66,6 +66,11 @@ urlpatterns = [
         name='accounts'
     ),
     url(
+        r'^anuluj_powiadomienia/?$',
+        login_required(views.CancelNotificationsView.as_view()),
+        name='cancel-notification'
+    ),
+    url(
         r'^zawodnicy/(?P<contest_id>[0-9]+)/?$',
         login_required(views.ContestantListView.as_view()),
         name='contestant-list'

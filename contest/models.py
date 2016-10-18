@@ -215,6 +215,13 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         self.is_active = True
         self.save()
 
+    def cancel_notifications(self):
+        """
+        Cancel notifications.
+        """
+        self.notifications = False
+        self.save()
+
     def discard(self):
         """
         Discards an account request.
