@@ -415,7 +415,7 @@ class ContestResultsAddView(View):
     @staticmethod
     def _is_admin(user):
         """
-        Checks if contest is created by this user.
+        Checks if user is an admin.
         """
         return user.is_admin
 
