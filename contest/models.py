@@ -17,7 +17,6 @@ from django.utils.encoding import force_bytes
 from django.utils.html import format_html
 from django.utils.http import urlsafe_base64_encode
 from django.utils import timezone
-from multiselectfield import MultiSelectField
 
 from contest.manager import RushUserManager
 from contest.utils import admin_utils
@@ -25,20 +24,6 @@ from contest.utils import admin_utils
 UNIT_LIMIT = (
     Q(app_label='contest', model='club') |
     Q(app_label='contest', model='school')
-)
-
-STYLES_DISTANCES = (
-    ('D25', 'Dowolny 25m'), ('D50', 'Dowolny 50m'),
-    ('D100', 'Dowolny 100m'), ('D200', 'Dowolny 200m'),
-    ('D400', 'Dowolny 400m'), ('D800', 'Dowolny 800m'),
-    ('D1500', 'Dowolny 1500m'), ('G25', 'Grzbietowy 25m'),
-    ('G50', 'Grzbietowy 50m'), ('G100', 'Grzbietowy 100m'),
-    ('G200', 'Grzbietowy 200m'), ('K25', 'Klasyczny 25m'),
-    ('K50', 'Klasyczny 50m'), ('K100', 'Klasyczny 100m'),
-    ('K200', 'Klasyczny 200m'), ('M25', 'Motylkowy 25m'),
-    ('M50', 'Motylkowy 50m'), ('M100', 'Motylkowy 100m'),
-    ('M200', 'Motylkowy 200m'), ('Z100', 'Zmienny 100m'),
-    ('Z200', 'Zmienny 200m')
 )
 
 
@@ -262,6 +247,37 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         msg.send()
 
 
+class Distance(models.Model):
+    """
+    Model for distances.
+    """
+    value = models.CharField('Dystans', max_length=16)
+
+    def __unicode__(self):
+        return self.value
+
+
+class Style(models.Model):
+    """
+    Model for styles.
+    """
+    name = models.CharField('Styl', max_length=32)
+
+    def __unicode__(self):
+        return self.name
+
+
+class ContestStyleDistances(models.Model):
+    """
+    Model for contests' style with distances.
+    """
+    style = models.ForeignKey(Style)
+    distances = models.ManyToManyField(Distance)
+
+    def __unicode__(self):
+        return '{}: {}'.format(self.style.name, self.distances.all())
+
+
 class Contest(UnitModelsMixin, models.Model):
     """
     Model for Contest.
@@ -282,7 +298,7 @@ class Contest(UnitModelsMixin, models.Model):
     created_by = models.ForeignKey(RushUser, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     organizer = GenericForeignKey('content_type', 'object_id')
-    styles = MultiSelectField(choices=STYLES_DISTANCES)
+    styles = models.ManyToManyField(ContestStyleDistances)
 
     def __unicode__(self):
         return '{} - {} - {}'.format(
@@ -342,8 +358,32 @@ class Contestant(models.Model):
     school = models.CharField(
         'rodzaj szkoły', max_length=1, choices=SCHOOLS, blank=True, null=True
     )
-    styles = MultiSelectField(choices=STYLES_DISTANCES)
     contest = models.ForeignKey(Contest)
 
     def __unicode__(self):
         return '{} {}'.format(self.first_name, self.last_name)
+
+
+class ContestantScore(models.Model):
+    """
+    Model for contestant's score on given distance.
+    """
+    contestant = models.ForeignKey(Contestant)
+    style = models.ForeignKey(Style)
+    distance = models.ForeignKey(Distance)
+    time_result = models.IntegerField('Najlepszy czas', blank=True, null=True)
+
+    def __unicode__(self):
+        return '{}: {} {} - {}s'.format(
+            self.contestant, self.style.name,
+            self.distance.value, self.get_time_result()
+        )
+
+    def get_time_result(self):
+        time = int(self.time_result)
+        minutes, time = divmod(time, 60000)
+        seconds, ms = divmod(time, 1000)
+        return '{:0>2}:{:0>2}.{:0>2}'.format(minutes, seconds, ms / 10)
+
+    class Meta:
+        unique_together = ('contestant', 'style', 'distance')
