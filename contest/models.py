@@ -215,6 +215,13 @@ class RushUser(UnitModelsMixin, PermissionsMixin, AbstractBaseUser):
         self.is_active = True
         self.save()
 
+    def cancel_notifications(self):
+        """
+        Cancel notifications.
+        """
+        self.notifications = False
+        self.save()
+
     def discard(self):
         """
         Discards an account request.
@@ -300,9 +307,10 @@ class Contest(UnitModelsMixin, models.Model):
 
 def contest_directory_path(instance, filename):
     date_uploaded = instance.date_uploaded.strftime('%Y/%m/%d')
+    filename = filename[:255]
 
     return 'contest/{}/{}/{}'.format(
-        instance.contest.name, date_uploaded, filename
+        instance.contest.name[:50], date_uploaded, filename
     )
 
 

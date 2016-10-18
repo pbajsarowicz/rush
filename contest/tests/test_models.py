@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 
@@ -8,7 +9,9 @@ from contest.models import (
     Club,
     Contact,
     Contest,
+    contest_directory_path,
     Contestant,
+    ContestFiles,
     RushUser,
     School,
 )
@@ -31,6 +34,7 @@ class UserMethodTests(TestCase):
             password='P@ssw0rd'
         )
         self.user.is_active = True
+        self.user.notifications = True
         self.user.set_password('Password')
         self.user.save()
 
@@ -39,10 +43,12 @@ class UserMethodTests(TestCase):
         Checking status and informations for user.
         """
         user_test = RushUser.objects.get(email='test@xyz.pl')
+        user_test.cancel_notifications()
         self.assertEqual(user_test.get_full_name(), 'Name Last Name')
         self.assertEqual(user_test.get_short_name(), 'Last Name')
         self.assertFalse(user_test.has_perm('contest.add_contest'))
         self.assertTrue(user_test.has_module_perms(None))
+        self.assertEqual(user_test.notifications, False)
         self.assertFalse(user_test.is_staff)
         self.assertEqual(user_test.__unicode__(), 'test@xyz.pl')
         user_test.discard()
@@ -58,7 +64,7 @@ class UserMethodTests(TestCase):
 
 
 class ContestTestCase(TestCase):
-    fixtures = ['clubs.json']
+    fixtures = ['clubs.json', 'users.json']
 
     def setUp(self):
         self.now = timezone.now()
@@ -72,6 +78,35 @@ class ContestTestCase(TestCase):
             self.now.strftime('%d-%m-%Y')
         )
         self.assertEqual(self.contest.__unicode__(), expected_name)
+
+        expected_name = 'Wodnik - Szkoła - {}'.format(
+            self.now.strftime('%d-%m-%Y')
+        )
+        self.contest.name = 'Wodnik'
+        self.contest.save()
+
+        self.assertEqual(self.contest.__unicode__(), expected_name)
+
+    def test_contest_directory_path(self):
+        filename = 'abcde' * 60
+        self.contest.name = 'ab' * 26
+        self.contest.save()
+
+        contest_file = ContestFiles.objects.create(
+            contest=self.contest,
+            uploaded_by=RushUser.objects.last(),
+            contest_file=SimpleUploadedFile('test_file.pdf', str(filename))
+        )
+
+        result = contest_directory_path(contest_file, filename)
+
+        self.assertEqual(
+            result, 'contest/{}/{}/{}'.format(
+                'ab' * 25,
+                contest_file.date_uploaded.strftime('%Y/%m/%d'),
+                'abcde' * 51
+            )
+        )
 
 
 class ContestantTestCase(TestCase):

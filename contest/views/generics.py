@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from urlparse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -327,14 +328,19 @@ class ContestAddView(PermissionRequiredMixin, View):
 
     @staticmethod
     def send_email_about_new_contest(
-        contest, recipient_list, add_contestant_link, files_list, *args,
-        **kwargs
+        contest, recipient_list, add_contestant_link, files_list, request,
+        *args, **kwargs
     ):
         """
         Sends an email with a list contestants
         """
+        cancel_notifications_link = urljoin(
+            'http://{}'.format(request.get_host()),
+            reverse('contest:cancel-notification')
+        )
         body = loader.render_to_string(
             'email/new_contest_notification.html', {
+                'link': cancel_notifications_link,
                 'contest': contest,
                 'add_contestant_link': add_contestant_link,
                 'files_list': files_list
@@ -387,10 +393,11 @@ class ContestAddView(PermissionRequiredMixin, View):
                         host, contest_file.contest_file.url
                     )
                 } for contest_file in contest_files
-             ]
+            ]
 
             self.send_email_about_new_contest(
-                contest, recipient_list, add_contestant_link, files_list
+                contest, recipient_list, add_contestant_link,
+                files_list, request
             )
             msg = 'Dziękujemy! Możesz teraz dodać zawodników.'
 
@@ -431,7 +438,8 @@ class ContestResultsAddView(View):
         """
         return (
             self._is_contest_organizer(user, contest) or
-            self._is_contest_moderator(user, contest)
+            self._is_contest_moderator(user, contest) or
+            user.is_staff
         )
 
     def get(self, request, contest_id, *args, **kwargs):
@@ -518,3 +526,70 @@ class CompletedContestView(View):
                 {'msg': 'Nie znaleziono konkursu.'}
             )
         return render(request, self.template_name, {'contest': contest})
+
+
+class ManageContestView(View):
+    """
+    Organizer's panel.
+    """
+    template_name = 'contest/organizer_panel.html'
+
+    @staticmethod
+    def _get_contestants(contest, request):
+        """
+        Returns a contestans queryset.
+        """
+        return contest.contestant_set.all()
+
+    @staticmethod
+    def _get_msg(contestants=None):
+        """
+        Returns a message.
+        """
+        if not contestants:
+            return 'Zawodnicy nie zostali jeszcze dodani.'
+        return ''
+
+    def get(self, request, contest_id, *args, **kwargs):
+        """
+        Return contest details.
+        """
+        contest = Contest.objects.get(pk=contest_id)
+        contestants = self._get_contestants(contest, request)
+        msg = self._get_msg(contestants)
+        context = {
+            'contest': contest,
+            'contestants': contestants,
+            'msg': msg,
+        }
+        return render(request, self.template_name, context)
+
+
+class ContestEditView(View):
+    permission_required = 'contest.add_contest'
+    template_name = 'contest/contest_edit.html'
+    form_class = ContestForm
+
+    def get(self, request, contest_id, *args, **kwargs):
+        """
+        Return clear form.
+        """
+        contest = Contest.objects.get(id=contest_id)
+        form = self.form_class(user=request.user, instance=contest)
+        return render(
+            request, self.template_name, {'form': form, 'contest': contest}
+        )
+
+    def post(self, request, contest_id, *args, **kwargs):
+        """
+        Edit Contest.
+        """
+        contest = Contest.objects.get(id=contest_id)
+        form = self.form_class(
+            request.POST, request.FILES, instance=contest, user=request.user
+        )
+        if form.is_valid():
+            form = form.save()
+            msg = 'Zawody zostały edytowane.'
+            return render(request, self.template_name, {'message': msg})
+        return render(request, self.template_name, {'form': form})
