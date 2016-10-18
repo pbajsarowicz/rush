@@ -387,7 +387,7 @@ class ContestAddView(PermissionRequiredMixin, View):
                         host, contest_file.contest_file.url
                     )
                 } for contest_file in contest_files
-             ]
+            ]
 
             self.send_email_about_new_contest(
                 contest, recipient_list, add_contestant_link, files_list

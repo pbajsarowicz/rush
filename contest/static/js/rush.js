@@ -830,7 +830,7 @@ function validateStyles() {
             }
         });
         $('#styles-summary').val('');
-        $('#styles-summary').val(result);
+        $('#styles-summary').val(result.substring(1));
         return true;
     }
     return false;
