@@ -1,0 +1,37 @@
+[
+  {
+    "model": "contest.conteststyledistances",
+    "pk": 1,
+    "fields": {
+      "style": 1,
+      "distances": [
+        2,
+        4,
+        6,
+        7
+      ]
+    }
+  },
+  {
+    "model": "contest.conteststyledistances",
+    "pk": 2,
+    "fields": {
+      "style": 4,
+      "distances": [
+        2,
+        3,
+        4
+      ]
+    }
+  },
+  {
+    "model": "contest.conteststyledistances",
+    "pk": 3,
+    "fields": {
+      "style": 5,
+      "distances": [
+        4
+      ]
+    }
+  }
+]
