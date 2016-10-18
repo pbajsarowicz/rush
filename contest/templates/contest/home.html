@@ -68,7 +68,7 @@
           <li class="collection-item contest-item">
             <div class="contest-item">
               {% if user.is_authenticated %}
-                {% if contest.created_by or user.is_moderator and user.content_type == contest.content_type and user.object_id == contest.object_id %}
+                {% if contest.created_by == user or user.is_admin or user.is_moderator and user.content_type == contest.content_type and user.object_id == contest.object_id %}
                   <a class="button waves-effect waves-light btn modal-trigger" href="{% url 'contest:contest-add-results' contest_id=contest.pk %}">
                     {% if contest.results %}
                       Edytuj wyniki

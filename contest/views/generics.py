@@ -413,6 +413,13 @@ class ContestResultsAddView(View):
         return user == contest.created_by
 
     @staticmethod
+    def _is_admin(user):
+        """
+        Checks if contest is created by this user.
+        """
+        return user.is_admin
+
+    @staticmethod
     def _is_contest_moderator(user, contest):
         """
         Checks is a request user's organization matches contest's one and
@@ -431,7 +438,8 @@ class ContestResultsAddView(View):
         """
         return (
             self._is_contest_organizer(user, contest) or
-            self._is_contest_moderator(user, contest)
+            self._is_contest_moderator(user, contest) or
+            self._is_admin(user)
         )
 
     def get(self, request, contest_id, *args, **kwargs):
