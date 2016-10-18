@@ -470,7 +470,7 @@ function getContestInfo(pk) {
 
             result += '<br> Opis: ' + (json['description'] ? json['description'] : 'Brak');
 
-            document.getElementById('text' + pk).innerHTML = result;
+            document.getElementById('text-' + pk).innerHTML = result;
         }
     });
 }
@@ -740,8 +740,10 @@ function validateStyles() {
         $('#klasyczny').is(':checked') || $('#motylkowy').is(':checked') ||
         $('#zmienny').is(':checked'))
     ) {
-        errorMessage = 'Co najmniej jeden styl musi zostać wybrany.'
-        $('#style').after('<p class="errorlist">' + errorMessage + '</p>');
+        if ($('#style-error').length === 0) {
+        	errorMessage = 'Co najmniej jeden styl musi zostać wybrany.';
+            $('#style').after('<p class="errorlist" id="style-error">' + errorMessage + '</p>');
+        }
         return false;
     }
 
@@ -829,14 +831,16 @@ function validateStyles() {
             'D25', 'D50', 'D100', 'D200', 'D400', 'D800', 'D1500', 'G25', 'G50', 'G100', 'G200',
             'K25', 'K50', 'K100', 'K200', 'M25', 'M50', 'M100', 'M200', 'Z100', 'Z200'
         ];
-        var result = '';
+        var chosen_styles = [];
+
         styles.forEach(function(item) {
             if ($('#' + item).is(':checked')) {
-                result += ',' + item;
+                chosen_styles.push(item);
             }
         });
 
-        $('#styles-summary').val(result.substr(1));
+        $('#styles-summary').val(chosen_styles.join());
+
         return true;
     }
     return false;
@@ -897,5 +901,41 @@ function showTimeField(input) {
         $('#' + id).removeClass('invisible');
     } else {
         $('#' + id).addClass('invisible');
+    }
+}
+
+function getTimeRemaining(endtime) {
+    var total = Date.parse(endtime) - Date.parse(new Date());
+    var seconds = Math.floor((total / 1000) % 60);
+    var minutes = Math.floor((total / 1000 / 60) % 60);
+    var hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+    var days = Math.floor(total / (1000 * 60 * 60 * 24));
+    return {
+        'total': total,
+        'days': days,
+        'hours': hours,
+        'minutes': minutes,
+        'seconds': seconds
+    };
+}
+
+function initializeClock(id, endtime) {
+    var clock = document.getElementById(id);
+    var daysSpan = clock.querySelector('.days');
+    var hoursSpan = clock.querySelector('.hours');
+    var minutesSpan = clock.querySelector('.minutes');
+    var secondsSpan = clock.querySelector('.seconds');
+    var timeinterval = setInterval(updateClock, 1000);
+
+    function updateClock() {
+        var total = getTimeRemaining(endtime);
+        daysSpan.innerHTML = total.days;
+        hoursSpan.innerHTML = ('0' + total.hours).slice(-2);
+        minutesSpan.innerHTML = ('0' + total.minutes).slice(-2);
+        secondsSpan.innerHTML = ('0' + total.seconds).slice(-2);
+
+        if (total.total <= 0) {
+            clearInterval(timeinterval);
+        }
     }
 }

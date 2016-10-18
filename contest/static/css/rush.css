@@ -12,6 +12,13 @@ Contest
 .contest-item .button {
   float: right;
   margin-left: 20px;
+  position: relative;
+  bottom: 55px;
+}
+
+.contest-item .name-cut {
+  overflow: hidden;
+  width: 40%;
 }
 
 .distance-choices [type="checkbox"] + label {
@@ -169,4 +176,28 @@ Base elements
 .registration-field:after {
   text-align: left;
   width: 300px;
+
+}
+
+#clock {
+  display: inline-block;
+  text-align: center;
+}
+
+#clock > div {
+  display: inline-block;
+}
+
+#clock div > span {
+  padding: 15px;
+  display: inline-block;
+}
+
+.text_container {
+  display: inline-block;
+  text-align: left;
+}
+
+.listdots {
+  list-style-type: disc;
 }

@@ -65,3 +65,29 @@ class AccountsView(PermissionRequiredMixin, View):
         )
         msg.content_subtype = 'html'
         msg.send()
+
+
+class CancelNotificationsView(View):
+    """
+    Special link, that canceled notifications.
+    """
+    template_name = 'contest/cancel_notification.html'
+
+    def get(self, request):
+        """
+        Cancel notifications.
+        """
+        try:
+            request.user.cancel_notifications()
+        except RushUser.DoesNotExist:
+            return render(
+                request, self.template_name, {
+                    'msg': """Nie udało się wyłączyć powiadomień.
+                     Spróbuj ponownie. Jeśli problem się pojawi
+                     skontaktuj się z nami:""", 'email': settings.SUPPORT_EMAIL
+                }
+            )
+        return render(
+            request, self.template_name,
+            {'msg': 'Powiadomienia odnośnie nowych zawodów zostały wyłączone.'}
+        )

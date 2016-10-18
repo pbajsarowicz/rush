@@ -1,0 +1,96 @@
+{% extends "contest/base.html" %}
+{% load staticfiles %}
+{% block container %}
+  <div class="container">
+    <div class="row center">
+      {% if message %}
+        {{ message }}
+        <div class="row center">
+          <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Ok</a>
+        </div>
+      {% else %}
+        <form class="col s6" enctype="multipart/form-data" action="?next={{next}}" role="form" method="post" name="contest_add">
+          <div class="row center">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <label id="style">Style:</label>
+            <p>
+              <input type="checkbox" class="filled-in" id="dowolny" onclick="showStyles('dowolny');" name="dowolny">
+              <label for="dowolny">Dowolny</label><br>
+              <span id="dowolny-styles" class="distance-choices invisible">
+                <input type="checkbox" id="D25" name="D25">
+                <label for="D25">25m</label>
+                <input type="checkbox" id="D50" name="D50">
+                <label for="D50">50m</label>
+                <input type="checkbox" id="D100" name="D100">
+                <label for="D100">100m</label>
+                <input type="checkbox" id="D200" name="D200">
+                <label for="D200">200m</label><br>
+                <input type="checkbox" id="D400" name="D400">
+                <label for="D400">400m</label>
+                <input type="checkbox" id="D800" name="D800">
+                <label for="D800">800m</label>
+                <input type="checkbox" id="D1500" name="D1500">
+                <label for="D1500">1500m</label>
+              </span>
+            </p>
+            <p>
+              <input type="checkbox" class="filled-in" id="grzbietowy" onclick="showStyles('grzbietowy');" name="grzbietowy">
+              <label for="grzbietowy">Grzbietowy</label><br>
+              <span id="grzbietowy-styles" class="distance-choices invisible">
+                <input type="checkbox" id="G25" name="G25">
+                <label for="G25">25m</label>
+                <input type="checkbox" id="G50" name="G50">
+                <label for="G50">50m</label>
+                <input type="checkbox" id="G100" name="G100">
+                <label for="G100">100m</label>
+                <input type="checkbox" id="G200" name="G200">
+                <label for="G200">200m</label>
+              </span>
+            </p>
+            <p>
+              <input type="checkbox" class="filled-in" id="klasyczny" onclick="showStyles('klasyczny');" name="klasyczny">
+              <label for="klasyczny">Klasyczny</label><br>
+              <span id="klasyczny-styles" class="distance-choices invisible">
+                <input type="checkbox" id="K25" name="K25">
+                <label for="K25">25m</label>
+                <input type="checkbox" id="K50" name="K50">
+                <label for="K50">50m</label>
+                <input type="checkbox" id="K100" name="K100">
+                <label for="K100">100m</label>
+                <input type="checkbox" id="K200" name="K200">
+                <label for="K200">200m</label>
+              </span>
+            </p>
+            <p>
+              <input type="checkbox" class="filled-in" id="motylkowy" onclick="showStyles('motylkowy');" name="motylkowy">
+              <label for="motylkowy">Motylkowy</label><br>
+              <span id="motylkowy-styles" class="distance-choices invisible">
+                <input type="checkbox" id="M25" name="M25">
+                <label for="M25">25m</label>
+                <input type="checkbox" id="M50" name="M50">
+                <label for="M50">50m</label>
+                <input type="checkbox" id="M100" name="M100">
+                <label for="M100">100m</label>
+                <input type="checkbox" id="M200" name="M200">
+                <label for="M200">200m</label>
+              </span>
+            </p>
+            <p>
+              <input type="checkbox" class="filled-in" id="zmienny" onclick="showStyles('zmienny');" name="zmienny">
+              <label for="zmienny">Zmienny</label><br>
+              <span id="zmienny-styles" class="distance-choices invisible">
+                <input type="checkbox" id="Z100" name="Z100">
+                <label for="Z100">100m</label>
+                <input type="checkbox" id="Z200" name="Z200">
+                <label for="Z200">200m</label>
+              </span>
+            </p>
+            <a class="waves-effect waves-light btn modal-trigger" href="{% url 'contest:home' %}">Anuluj</a>
+            <button type="submit" class="pull-right btn btn-primary" onclick="return validateStyles();">Gotowe</button>
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
