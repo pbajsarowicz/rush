@@ -285,8 +285,8 @@ class Contest(UnitModelsMixin, models.Model):
     styles = MultiSelectField(choices=STYLES_DISTANCES)
 
     def __unicode__(self):
-        return self.name or (
-            '{} - {}'.format(self.place, self.date.strftime('%d-%m-%Y'))
+        return '{} - {} - {}'.format(
+            self.name, self.place, self.date.strftime('%d-%m-%Y')
         )
 
     @property

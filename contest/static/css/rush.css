@@ -12,6 +12,13 @@ Contest
 .contest-item .button {
   float: right;
   margin-left: 20px;
+  position: relative;
+  bottom: 55px;
+}
+
+.contest-item .name-cut {
+  overflow: hidden;
+  width: 40%;
 }
 
 .distance-choices [type="checkbox"] + label {
@@ -169,6 +176,7 @@ Base elements
 .registration-field:after {
   text-align: left;
   width: 300px;
+
 }
 
 #clock {
