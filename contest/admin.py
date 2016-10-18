@@ -11,6 +11,10 @@ from contest.models import (
     School,
     Contact,
     ContestFiles,
+    Style,
+    Distance,
+    ContestantScore,
+    ContestStyleDistances,
 )
 from contest.utils import admin_utils
 
@@ -67,6 +71,11 @@ class RushUserAdmin(UnitAdminMixin, admin.ModelAdmin):
     filter_horizontal = ['user_permissions']
 
 
+class ContestantScoreInline(admin.StackedInline):
+    model = ContestantScore
+    extra = 0
+
+
 class ContestantInline(admin.StackedInline):
     model = Contestant
     extra = 0
@@ -86,9 +95,18 @@ class ContestAdmin(UnitAdminMixin, admin.ModelAdmin):
     )
     readonly_fields = ('unit_name_select',)
 
+
+class ContestantAdmin(UnitAdminMixin, admin.ModelAdmin):
+    inlines = [ContestantScoreInline]
+
+
 admin.site.register(RushUser, RushUserAdmin)
-admin.site.register(Contestant)
+admin.site.register(Contestant, ContestantAdmin)
 admin.site.register(Contest, ContestAdmin)
 admin.site.register(Club)
 admin.site.register(School)
 admin.site.register(Contact)
+admin.site.register(Style)
+admin.site.register(Distance)
+admin.site.register(ContestantScore)
+admin.site.register(ContestStyleDistances)

@@ -1,0 +1,37 @@
+[
+  {
+      "model": "contest.style",
+      "pk": 1,
+      "fields": {
+        "name": "Dowolny"
+      }
+  },
+  {
+      "model": "contest.style",
+      "pk": 2,
+      "fields": {
+        "name": "Motylkowy"
+      }
+  },
+  {
+      "model": "contest.style",
+      "pk": 3,
+      "fields": {
+        "name": "Zmienny"
+      }
+  },
+  {
+      "model": "contest.style",
+      "pk": 4,
+      "fields": {
+        "name": "Grzbietowy"
+      }
+  },
+  {
+      "model": "contest.style",
+      "pk": 5,
+      "fields": {
+        "name": "Klasyczny"
+      }
+  }
+]

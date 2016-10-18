@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 
@@ -8,9 +9,15 @@ from contest.models import (
     Club,
     Contact,
     Contest,
+    contest_directory_path,
     Contestant,
+    ContestFiles,
     RushUser,
     School,
+    ContestantScore,
+    Style,
+    Distance,
+    ContestStyleDistances
 )
 
 
@@ -31,6 +38,7 @@ class UserMethodTests(TestCase):
             password='P@ssw0rd'
         )
         self.user.is_active = True
+        self.user.notifications = True
         self.user.set_password('Password')
         self.user.save()
 
@@ -39,10 +47,12 @@ class UserMethodTests(TestCase):
         Checking status and informations for user.
         """
         user_test = RushUser.objects.get(email='test@xyz.pl')
+        user_test.cancel_notifications()
         self.assertEqual(user_test.get_full_name(), 'Name Last Name')
         self.assertEqual(user_test.get_short_name(), 'Last Name')
         self.assertFalse(user_test.has_perm('contest.add_contest'))
         self.assertTrue(user_test.has_module_perms(None))
+        self.assertEqual(user_test.notifications, False)
         self.assertFalse(user_test.is_staff)
         self.assertEqual(user_test.__unicode__(), 'test@xyz.pl')
         user_test.discard()
@@ -58,25 +68,49 @@ class UserMethodTests(TestCase):
 
 
 class ContestTestCase(TestCase):
-    fixtures = ['clubs.json']
+    fixtures = ['clubs.json', 'users.json']
 
     def setUp(self):
         self.now = timezone.now()
         self.contest = Contest.objects.create(
-            date=self.now, place='Szkoła', lowest_year=2005, highest_year=2000,
-            deadline=self.now
+            name='Zawody', date=self.now, place='Szkoła', lowest_year=2005,
+            highest_year=2000, deadline=self.now
         )
 
     def test_contest_methods(self):
-        expected_name = '{} - {}'.format(
-            'Szkoła', self.now.strftime('%d-%m-%Y')
+        expected_name = 'Zawody - Szkoła - {}'.format(
+            self.now.strftime('%d-%m-%Y')
         )
         self.assertEqual(self.contest.__unicode__(), expected_name)
 
+        expected_name = 'Wodnik - Szkoła - {}'.format(
+            self.now.strftime('%d-%m-%Y')
+        )
         self.contest.name = 'Wodnik'
         self.contest.save()
 
-        self.assertEqual(self.contest.__unicode__(), 'Wodnik')
+        self.assertEqual(self.contest.__unicode__(), expected_name)
+
+    def test_contest_directory_path(self):
+        filename = 'abcde' * 60
+        self.contest.name = 'ab' * 26
+        self.contest.save()
+
+        contest_file = ContestFiles.objects.create(
+            contest=self.contest,
+            uploaded_by=RushUser.objects.last(),
+            contest_file=SimpleUploadedFile('test_file.pdf', str(filename))
+        )
+
+        result = contest_directory_path(contest_file, filename)
+
+        self.assertEqual(
+            result, 'contest/{}/{}/{}'.format(
+                'ab' * 25,
+                contest_file.date_uploaded.strftime('%Y/%m/%d'),
+                'abcde' * 51
+            )
+        )
 
 
 class ContestantTestCase(TestCase):
@@ -86,7 +120,7 @@ class ContestantTestCase(TestCase):
         self.contestant = Contestant.objects.create(
             moderator=RushUser.objects.first(), first_name='Adam',
             last_name='Kowalski', gender='M', year_of_birth=2001, school='S',
-            styles=['D25', 'G50'], contest=Contest.objects.first()
+            contest=Contest.objects.first()
         )
 
     def test_contestant_methods(self):
@@ -137,8 +171,41 @@ class UnitModelsMixinTestCase(TestCase):
             contest.unit_name_select,
             '<select id="id_unit" name="unit"><option value="2_school" >'
             '[Szko\u0142a] Klub wodnika</option><br><option value="1_school" '
-            '>[Szko\u0142a] ZSP1 w Pile</option><option value="2_club" >'
-            '[Klub] Klub wodnika</option><br><option value="1_club" >[Klub] '
+            'selected>[Szko\u0142a] ZSP1 w Pile</option><option value="2_club"'
+            ' >[Klub] Klub wodnika</option><br><option value="1_club" >[Klub] '
             'ZSP1 w Pile</option></select>'
+        )
 
+
+class ContestantScoreTestCase(TestCase):
+    fixtures = [
+        'contestants.json', 'styles.json', 'contests.json',
+        'distances.json', 'users.json'
+    ]
+
+    def setUp(self):
+        self.score = ContestantScore.objects.create(
+            contestant=Contestant.objects.first(), style=Style.objects.first(),
+            distance=Distance.objects.first(), time_result=655111
+        )
+
+    def test_score_display(self):
+        self.assertEqual(
+            self.score.__unicode__(), 'Adam Kowalski: Dowolny 25m - 10:55.11s'
+        )
+
+
+class ContestStyleDistancesTestCase(TestCase):
+    fixtures = ['styles.json', 'distances.json']
+
+    def setUp(self):
+        self.style = ContestStyleDistances.objects.create(
+            style=Style.objects.first()
+        )
+        self.style.distances.set(Distance.objects.all()[:3])
+
+    def test_style_display(self):
+        self.assertEqual(
+            self.style.__unicode__(),
+            'Dowolny: [<Distance: 25m>, <Distance: 50m>, <Distance: 100m>]'
         )

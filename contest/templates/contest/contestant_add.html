@@ -21,12 +21,19 @@
               <div id="id_{{ form.prefix}}" class="contestant-form animation">
                 {{ form.as_p }}
                 <p id="style">Style:</p>
-                <p class="distance-choices">
-                {% for code, distance in styles %}
-                  <input type="checkbox" id="{{ code }}_{{ form.prefix }}" class="distance_{{ form.prefix }}">
-                  <label for="{{ code }}_{{ form.prefix }}">{{ distance }}</label>
+                <span class="distance-choices" id="style_{{ form.prefix }}">
+                {% for style in styles.all %}
+                  {% for distance in style.distances.all %}
+                    <input type="checkbox" id="{{ style.style.name }}_{{ distance.value }}_{{ form.prefix }}" class="distance_{{ form.prefix }}"
+                           onclick="showTimeField(this)">
+                    <label for="{{ style.style.name }}_{{ distance.value }}_{{ form.prefix }}">{{ style.style.name }} {{ distance.value }}</label>
+                    <div id="{{ style.style.name }}_{{ distance.value }}_{{ form.prefix }}_timefield" class="invisible">
+                      <label for="time_{{ style.style.name }}_{{ distance.value }}_{{ form.prefix }}">Najlepszy czas:</label>
+                      <input type="text" placeholder="00:00.00" id="time_{{ style.style.name }}_{{ distance.value }}_{{ form.prefix }}" class="time">
+                    </div>
+                  {% endfor %}
                 {% endfor %}
-                </p>
+                </span>
                 <a class="invisible" id="validation-start_{{ form.prefix }}" onclick="nextContestant('{{ form.prefix }}')"></a>
               </div>
             {% endfor %}
@@ -71,13 +78,20 @@
   <div id="empty_form" style="display: none;">
     <div id="id_{{ formset.empty_form.prefix }}" class="contestant-form animation">
       {{ formset.empty_form.as_p }}
-      <p class="style">Style:</p>
-      <p class="distance-choices">
-      {% for code, distance in styles %}
-        <input type="checkbox" id="{{ code }}_{{ formset.empty_form.prefix }}" class="distance_{{ formset.empty_form.prefix }}">
-        <label for="{{ code }}_{{ formset.empty_form.prefix }}">{{ distance }}</label>
+      <p id="style">Style:</p>
+      <span class="distance-choices" id="style_{{ formset.empty_form.prefix }}">
+      {% for style in styles.all %}
+        {% for distance in style.distances.all %}
+          <input type="checkbox" id="{{ style.style.name }}_{{ distance.value }}_{{ formset.empty_form.prefix }}" class="distance_{{ formset.empty_form.prefix }}"
+                 onclick="showTimeField(this)">
+          <label for="{{ style.style.name }}_{{ distance.value }}_{{ formset.empty_form.prefix }}">{{ style.style.name }} {{ distance.value }}</label>
+          <div id="{{ style.style.name }}_{{ distance.value }}_{{ formset.empty_form.prefix }}_timefield" class="invisible">
+            <label for="time_{{ style.style.name }}_{{ distance.value }}_{{ formset.empty_form.prefix }}">Najlepszy czas:</label>
+            <input type="text" placeholder="00:00.00" id="time_{{ style.style.name }}_{{ distance.value }}_{{ formset.empty_form.prefix }}" class="time">
+          </div>
+        {% endfor %}
       {% endfor %}
-      </p>
+      </span>
       <a class="invisible" id="validation-start_{{ formset.empty_form.prefix }}" onclick="nextContestant('{{ formset.empty_form.prefix }}')"></a>
     </div>
   </div>

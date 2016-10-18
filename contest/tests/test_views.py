@@ -38,6 +38,10 @@ from contest.models import (
     Contest,
     Contestant,
     RushUser,
+    ContestantScore,
+    Style,
+    Distance,
+    ContestStyleDistances
 )
 from contest.views import (
     RegisterView,
@@ -533,6 +537,30 @@ class AccountsViewTestCase(TestCase):
         self.assertEqual(response.status_code, 500)
 
 
+class CancelNotificationsViewTests(TestCase):
+    def test_get(self):
+        user = RushUser.objects.create(
+            email='test@aa.aa', first_name='Adam', last_name='NieAdmin',
+            is_active=True, username='user', is_admin=False
+        )
+        user.notifications = True
+        user.set_password('password123')
+        user.save()
+
+        self.client.login(username='user', password='password123')
+
+        response = self.client.get(reverse('contest:cancel-notification'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['msg'],
+            'Powiadomienia odnośnie nowych zawodów zostały wyłączone.'
+        )
+        user.delete()
+
+        response = self.client.get(reverse('contest:cancel-notification'))
+        self.assertEqual(response.status_code, 302)
+
+
 class RegisterViewTests(TestCase):
     def test_register_view(self):
         response = self.client.get(reverse('contest:register'))
@@ -637,7 +665,9 @@ class RegisterViewTests(TestCase):
 
 
 class ContestantAddViewTestCase(TestCase):
-    fixtures = ['clubs.json']
+    fixtures = [
+        'clubs.json', 'styles.json', 'distances.json', 'style_distances.json'
+    ]
 
     def setUp(self):
         self.user = RushUser(
@@ -656,14 +686,14 @@ class ContestantAddViewTestCase(TestCase):
             'form-0-gender': 'M',
             'form-0-last_name': 'Kowalski',
             'form-0-school': 'P',
-            'form-0-styles': ',D25,G25',
+            'form-0-styles': 'Dowolny,25m,00:39.11;Motylkowy,50m,01:00.00',
             'form-0-organization': self.user.unit,
             'form-1-year_of_birth': '2000',
             'form-1-first_name': 'Anna',
             'form-1-gender': 'F',
             'form-1-last_name': 'Nowak',
             'form-1-school': 'P',
-            'form-1-styles': ',K50,Z200',
+            'form-1-styles': 'Dowolny,50m,02:11.11;Motylkowy,200m,00:00.00',
             'form-1-organization': self.user.unit,
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
@@ -671,26 +701,26 @@ class ContestantAddViewTestCase(TestCase):
             'form-TOTAL_FORMS': '2'
         }
 
-        styles = ['D25', 'D50', 'G25', 'K50', 'K200', 'Z200']
+        contest_styles = ContestStyleDistances.objects.all()
 
         self.contest = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
             place='Szkoła', lowest_year=2000, highest_year=2005,
             description='Opis', deadline=make_aware(datetime(2048, 11, 20)),
-            styles=styles
         )
+        self.contest.styles.set(contest_styles)
         self.contest_done = Contest.objects.create(
             date=make_aware(datetime(2008, 12, 31)),
             place='Szkoła', lowest_year=2000, highest_year=2005,
             description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
-            styles=styles
         )
+        self.contest_done.styles.set(contest_styles)
         self.contest_deadline = Contest.objects.create(
             date=make_aware(datetime(2050, 12, 31)),
             place='Szkoła', lowest_year=2000, highest_year=2005,
             description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
-            styles=styles
         )
+        self.contest_deadline.styles.set(contest_styles)
 
     def test_get(self):
         response = self.client.get(
@@ -768,7 +798,7 @@ class ContestantAddViewTestCase(TestCase):
             'form-0-first_name': individual_user.first_name,
             'form-0-gender': 'M',
             'form-0-last_name': individual_user.last_name,
-            'form-0-styles': ',D25,G25',
+            'form-0-styles': 'Dowolny,50m,02:11.11;Motylkowy,200m,00:00.00',
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
             'form-MIN_NUM_FORMS': '0',
@@ -786,6 +816,17 @@ class ContestantAddViewTestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['message'],
+            'Dziękujemy! Potwierdzenie zapisów zostało wysłane na email '
+            'podany przy rejestracji. Życzymy powodzenia.'
+        )
+        contestant = Contestant.objects.get(last_name='Bbb')
+        self.assertEqual(contestant.contest, self.contest)
+        self.assertEqual(
+            contestant.contestantscore_set.first().__unicode__(),
+            'Aaa Bbb: Dowolny 50m - 02:11.11s'
+        )
 
         response = self.client.get(
             reverse(
@@ -928,8 +969,7 @@ class ContestantListViewTestCase(TestCase):
         )
         self.contestant = Contestant.objects.create(
             moderator=self.user, first_name='Adam', last_name='Nowak',
-            gender='M', year_of_birth=2002, school='S', styles=['M50', 'Z100'],
-            contest=self.contest
+            gender='M', year_of_birth=2002, school='S', contest=self.contest
         )
 
     def test_get(self):
@@ -945,7 +985,8 @@ class ContestantListViewTestCase(TestCase):
 
 class EditContestantViewTestCase(TestCase):
     fixtures = [
-        'contests.json', 'clubs.json', 'users.json',
+        'contests.json', 'clubs.json', 'users.json', 'styles.json',
+        'distances.json'
     ]
 
     def setUp(self):
@@ -961,9 +1002,12 @@ class EditContestantViewTestCase(TestCase):
             gender='M',
             year_of_birth=2002,
             school='P',
-            styles=',K200,D25',
             contest=Contest.objects.first(),
             moderator=self.user
+        )
+        self.score = ContestantScore.objects.create(
+            contestant=self.contestant, style=Style.objects.get(pk=1),
+            distance=Distance.objects.get(pk=1), time_result=131120
         )
 
         self.client.login(username='root', password='R@ootroot')
@@ -987,9 +1031,6 @@ class EditContestantViewTestCase(TestCase):
         self.assertEqual(
             response.context['form'].initial['year_of_birth'], 2002
         )
-        self.assertEqual(
-            response.context['form'].initial['year_of_birth'], 2002
-        )
 
     def test_post(self):
         response = self.client.post(
@@ -1000,22 +1041,19 @@ class EditContestantViewTestCase(TestCase):
             data={
                 'first_name': 'Karol', 'last_name': 'Kowalski',
                 'school': 'P', 'gender': 'F', 'year_of_birth': 2005,
+                'contestantscore_set-INITIAL_FORMS': '0',
+                'contestantscore_set-MAX_NUM_FORMS': '1000',
+                'contestantscore_set-MIN_NUM_FORMS': '0',
+                'contestantscore_set-TOTAL_FORMS': '0',
+                'csrfmiddlewaretoken': 'I2ZvMk7IZFd0hxZ3lIdZ1Kb8BVyA6uGW',
             }
         )
-        self.assertEqual(response.status_code, 200)
-
-        self.assertEqual(
-            response.context['form'].cleaned_data['first_name'], 'Karol'
-        )
-        self.assertEqual(
-            response.context['form'].cleaned_data['last_name'], 'Kowalski')
-        self.assertEqual(
-            response.context['form'].cleaned_data['school'], 'P'
-        )
-        self.assertEqual(response.context['form'].cleaned_data['gender'], 'F')
-        self.assertEqual(
-            response.context['form'].cleaned_data['year_of_birth'], 2005
-        )
+        self.assertEqual(response.status_code, 302)
+        contestant = Contestant.objects.get(id=self.contestant.id)
+        self.assertEqual(contestant.first_name, 'Karol')
+        self.assertEqual(contestant.last_name, 'Kowalski')
+        self.assertEqual(contestant.year_of_birth, 2005)
+        self.assertEqual(contestant.gender, 'F')
 
 
 class ContestResultsViewTestCase(TestCase):
@@ -1157,6 +1195,136 @@ class AddContestResultsViewTest(TestCase):
         self.assertEqual(contest.results, 'Wyniki')
 
 
+class ManageContestViewTestCase(TestCase):
+    fixtures = [
+        'contest_style_distances.json',
+    ]
+
+    def setUp(self):
+        self.admin = RushUser.objects.create_superuser(
+            email='xyz@xyz.pl', username='admin', password='Password'
+        )
+        styles_distances = list(ContestStyleDistances.objects.all())
+        styles_distances_first = styles_distances[0]
+        styles_distances_second = styles_distances[1]
+        self.contest = Contest.objects.create(
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła', lowest_year=1997, highest_year=2000,
+            description='Opis', deadline=make_aware(datetime(2008, 11, 20)),
+            created_by=self.admin
+        )
+        self.contest.styles.add(
+            styles_distances_first, styles_distances_second
+        )
+        self.client.login(username='admin', password='Password')
+
+    def test_get_msg_without_contestants(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-manage',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(
+            response.context['msg'],
+            'Zawodnicy nie zostali jeszcze dodani.'
+        )
+
+    def test_get_contestants(self):
+        self.contestant = Contestant.objects.create(
+            moderator=self.admin, first_name='Adam', last_name='Nowak',
+            gender='M', year_of_birth=2002, school='S', contest=self.contest
+        )
+        self.contestants = [self.contestant]
+        response = self.client.get(
+            reverse(
+                'contest:contest-manage',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['contestants'][0],
+            self.contestants[0]
+        )
+        self.assertEqual(
+            response.context['msg'],
+            ''
+        )
+
+
+class ContestEditViewTestCase(TestCase):
+    fixtures = [
+        'contest_style_distances.json',
+    ]
+
+    def setUp(self):
+        self.admin = RushUser.objects.create_superuser(
+            email='xyz@xyz.pl', username='admin', password='Password'
+        )
+
+        styles_distances = list(ContestStyleDistances.objects.all())
+        styles_distances_first = styles_distances[0]
+        styles_distances_second = styles_distances[1]
+        self.contest = Contest.objects.create(
+            name='abc',
+            date=make_aware(datetime(2008, 12, 31)),
+            place='Szkoła',
+            lowest_year=11,
+            highest_year=16,
+            description='Opis',
+            deadline=make_aware(datetime(2008, 11, 20)),
+            created_by=self.admin
+        )
+        self.contest.styles.add(
+            styles_distances_first, styles_distances_second
+        )
+
+        self.client.login(username='admin', password='Password')
+
+    def test_get(self):
+        response = self.client.get(
+            reverse(
+                'contest:contest-edit',
+                kwargs={'contest_id': self.contest.id}
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(isinstance(response.context['form'], ContestForm))
+        self.assertEqual(
+            response.context['form'].initial['lowest_year'], 11
+        )
+        self.assertEqual(
+            response.context['form'].initial['highest_year'], 16
+        )
+        self.assertEqual(
+            response.context['form'].initial['description'], 'Opis'
+        )
+        self.assertEqual(response.context['form'].initial['place'], 'Szkoła')
+
+    def test_post(self):
+        response = self.client.post(
+            reverse(
+                'contest:contest-edit',
+                kwargs={'contest_id': self.contest.id}
+            ),
+            data={
+                'lowest_year': 11, 'highest_year': 16,
+                'description': '', 'place': 'Piła',
+                'styles': ',D25,G50,K200,Z100',
+                'organization': 'szkoła',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            response.context['form'].cleaned_data['description'], ''
+        )
+        self.assertEqual(
+            response.context['form'].cleaned_data['place'], 'Piła'
+        )
+
+
 class ContestAddTestCase(TestCase):
     def setUp(self):
         self.user_1 = RushUser.objects.create_user(
@@ -1192,7 +1360,7 @@ class ContestAddTestCase(TestCase):
             'highest_year': 2002,
             'description': 'Zapraszamy na zawody!',
             'organization': self.user_1.unit,
-            'styles': ',D25,G50,K200,Z100',
+            'styles': 'D25,G50,K200,Z100',
             'file1': '',
             'file2': '',
             'file3': ''
@@ -1224,7 +1392,12 @@ class ContestAddTestCase(TestCase):
             response.context['message'],
             'Dziękujemy! Możesz teraz dodać zawodników.'
         )
-        self.assertTrue(Contest.objects.filter(place='Majorka').exists())
+        contest = Contest.objects.filter(place='Majorka')
+        self.assertTrue(contest.exists())
+        self.assertEqual(
+            contest[0].styles.last().__unicode__(),
+            'Zmienny: [<Distance: 100m>]'
+        )
 
     def test_post_errors(self):
         self.client.login(username='right', password='pass12')

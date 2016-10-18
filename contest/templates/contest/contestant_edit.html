@@ -9,13 +9,10 @@
           <form class="col s6" role="form" method="post" name="edit_form" >
             {% csrf_token %}
             {{ form.as_p }}
-            <p id="style">Style:</p>
-            <p class="distance-choices">
-              {% for code, distance in styles %}
-                <input type="checkbox" id="{{ code }}" class="distance">
-                <label for="{{ code }}">{{ distance }}</label>
-              {% endfor %}
-            </p>
+            {{ formset.management_form }}
+            {% for form in formset %}
+              {{ form.as_p }}
+            {% endfor %}
             <a  href="{% url 'contest:contestant-list' contest_id=contestant.contest.id %}" class="pull-left btn btn-primary">Anuluj</a>
             <button type="submit" class="pull-right btn btn-primary" onclick="return checkEditedStyles()">Zapisz</button>
           </form>

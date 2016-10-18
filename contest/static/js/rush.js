@@ -470,7 +470,7 @@ function getContestInfo(pk) {
 
             result += '<br> Opis: ' + (json['description'] ? json['description'] : 'Brak');
 
-            document.getElementById('text' + pk).innerHTML = result;
+            document.getElementById('text-' + pk).innerHTML = result;
         }
     });
 }
@@ -603,17 +603,23 @@ function parseContestantData(json) {
         ['Płeć', 'gender'],
         ['Wiek', 'year_of_birth'],
         ['Rodzaj Szkoły', 'school'],
-        ['Styl i dystans', 'style']
     ];
     var fragment = document.createDocumentFragment();
     var elementUl = document.createElement('ul');
     var elementLi;
+    var styles = '';
 
     fieldsNames.forEach(function(field) {
         elementLi = document.createElement('li');
         elementLi.appendChild(document.createTextNode(field[0] + ': ' + json[field[1]]));
         elementUl.appendChild(elementLi);
     });
+    json['score'].forEach(function(field) {
+        styles += ', ' + field['style']['name'] + ' ' + field['distance']['value'];
+    });
+    elementLi = document.createElement('li');
+    elementLi.appendChild(document.createTextNode('Style i dystanse: ' + styles.substr(2)));
+    elementUl.appendChild(elementLi);
     fragment.appendChild(elementUl);
 
     return fragment;
@@ -734,8 +740,10 @@ function validateStyles() {
         $('#klasyczny').is(':checked') || $('#motylkowy').is(':checked') ||
         $('#zmienny').is(':checked'))
     ) {
-        errorMessage = 'Co najmniej jeden styl musi zostać wybrany.'
-        $('#style').after('<p class="errorlist">' + errorMessage + '</p>');
+        if ($('#style-error').length === 0) {
+        	errorMessage = 'Co najmniej jeden styl musi zostać wybrany.';
+            $('#style').after('<p class="errorlist" id="style-error">' + errorMessage + '</p>');
+        }
         return false;
     }
 
@@ -823,14 +831,16 @@ function validateStyles() {
             'D25', 'D50', 'D100', 'D200', 'D400', 'D800', 'D1500', 'G25', 'G50', 'G100', 'G200',
             'K25', 'K50', 'K100', 'K200', 'M25', 'M50', 'M100', 'M200', 'Z100', 'Z200'
         ];
-        var result = '';
+        var chosen_styles = [];
+
         styles.forEach(function(item) {
             if ($('#' + item).is(':checked')) {
-                result += ',' + item;
+                chosen_styles.push(item);
             }
         });
-        $('#styles-summary').val('');
-        $('#styles-summary').val(result);
+
+        $('#styles-summary').val(chosen_styles.join());
+
         return true;
     }
     return false;
@@ -842,45 +852,90 @@ function validateStyles() {
 function checkStyles(prefix) {
     'use strict';
     var result = '';
+    var checkTime = RegExp('^\\d{2}:\\d{2}.\\d{2}$');
+    var isValidated = true;
+    var time;
     $('.distance_' + prefix).each(function() {
         if ($(this).is(':checked')) {
-            result += ',' + (this.id).split('_', 1);
+            time = $('#time_' + this.id).val();
+            result += ';' + (this.id).split('_', 2) + ',' + (time ? time : '00:00.00');
+            if(!checkTime.test(time) && time) {
+                if ($('#time-error').length === 0) {
+                    $('#style_' + prefix).before(
+                        '<span class="errorlist" id="time-error">W jedym z pól podano nieprawidłowy format czasu (mm:ss.00).'
+                        + ' Popraw te pole, albo pozostaw je puste.<br></span>'
+                    );
+                }
+                isValidated = false;
+            }
         }
     });
+
+    if (isValidated && $('#time-error').length) {
+        $('#time-error').remove();
+    }
+
     if (result) {
-        $('#id_' + prefix + '-styles').val(result);
+        if (isValidated) {
+            $('#id_' + prefix + '-styles').val(result.substr(1));
+        }
         $('#distance-error').remove();
-        return true;
     }
     else {
         if ($('#distance-error').length === 0) {
-            $('#validation-start_' + prefix).before('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.</span>');
+            $('#style_' + prefix).before('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.<br></span>');
         }
-        return false;
+        isValidated = false;
     }
+    return isValidated;
 }
 
 /*
- * Check if user took at least 1 distance (edit_contestant form).
+ * Show/hide time field for checked distance (add_contestant).
  */
-function checkEditedStyles() {
+function showTimeField(input) {
     'use strict';
-    var result = '';
-    $('.distance').each(function() {
-        if ($(this).is(':checked')) {
-            result += ',' + this.id
-        }
-    });
-    if (result) {
-        $('#id_styles').val('');
-        $('#id_styles').val(result.substr(1));
-        $('#distance-error').remove();
-        return true;
+    var id = input.id + '_timefield';
+
+    if ($('#' + id).attr('class') == 'invisible') {
+        $('#' + id).removeClass('invisible');
+    } else {
+        $('#' + id).addClass('invisible');
     }
-    else {
-        if ($('#distance-error').length === 0) {
-            $('#style').after('<span class="errorlist" id="distance-error">Nie wybrano żadnego dystansu.</span>');
+}
+
+function getTimeRemaining(endtime) {
+    var total = Date.parse(endtime) - Date.parse(new Date());
+    var seconds = Math.floor((total / 1000) % 60);
+    var minutes = Math.floor((total / 1000 / 60) % 60);
+    var hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+    var days = Math.floor(total / (1000 * 60 * 60 * 24));
+    return {
+        'total': total,
+        'days': days,
+        'hours': hours,
+        'minutes': minutes,
+        'seconds': seconds
+    };
+}
+
+function initializeClock(id, endtime) {
+    var clock = document.getElementById(id);
+    var daysSpan = clock.querySelector('.days');
+    var hoursSpan = clock.querySelector('.hours');
+    var minutesSpan = clock.querySelector('.minutes');
+    var secondsSpan = clock.querySelector('.seconds');
+    var timeinterval = setInterval(updateClock, 1000);
+
+    function updateClock() {
+        var total = getTimeRemaining(endtime);
+        daysSpan.innerHTML = total.days;
+        hoursSpan.innerHTML = ('0' + total.hours).slice(-2);
+        minutesSpan.innerHTML = ('0' + total.minutes).slice(-2);
+        secondsSpan.innerHTML = ('0' + total.seconds).slice(-2);
+
+        if (total.total <= 0) {
+            clearInterval(timeinterval);
         }
-        return false;
     }
 }

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import uuid
+from collections import OrderedDict
 from datetime import datetime
+import uuid
 
 from django import forms
 from django.conf import settings
@@ -14,6 +15,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import RegexValidator
+from django.db.models.aggregates import Count
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -24,6 +26,9 @@ from contest.models import (
     ContestFiles,
     RushUser,
     School,
+    Style,
+    Distance,
+    ContestStyleDistances,
 )
 
 INDIVIDUAL_CONTESTANTS_GROUP = Group.objects.get(name='Individual contestants')
@@ -279,7 +284,7 @@ class ContestantForm(forms.ModelForm):
     organization = forms.CharField(
         label='Klub/Szkoła', max_length=100, required=False
     )
-    styles = forms.CharField(max_length=128, widget=forms.HiddenInput())
+    styles = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         self.contest = kwargs.pop('contest_id')
@@ -308,14 +313,8 @@ class ContestantForm(forms.ModelForm):
             'Zawodnik nie mieści się w wymaganym przedziale wiekowym.'
         )
 
-    def clean_styles(self):
-        styles = self.cleaned_data.get('styles')
-        return styles.split(',')
-
     def save(self, commit=True):
         contestant = super(ContestantForm, self).save(commit=False)
-
-        contestant.styles = self.cleaned_data['styles']
 
         if commit:
             contestant.save()
@@ -403,6 +402,43 @@ class ContestForm(forms.ModelForm):
         styles = self.cleaned_data.get('styles')
         return styles.split(',')
 
+    @staticmethod
+    def get_styles_array(raw_styles):
+        shortcuts = {
+            'D': 'Dowolny', 'G': 'Grzbietowy', 'K': 'Klasyczny',
+            'M': 'Motylkowy', 'Z': 'Zmienny'
+        }
+        styles_counter = OrderedDict(
+            [('D', 0), ('G', 0), ('K', 0), ('M', 0), ('Z', 0)]
+        )
+        distances = []
+        styles = []
+        for style in raw_styles:
+            styles_counter[style[0]] += 1
+            distances.append(
+                Distance.objects.get(value=style[1:] + 'm')
+            )
+        for style, value in styles_counter.items():
+            if value == 0:
+                continue
+            contest_style = ContestStyleDistances.objects.annotate(
+                c=Count('distances')
+            ).filter(
+                c=value, style__name=shortcuts[style],
+                distances__in=distances[:value]
+            )
+            if not contest_style:
+                contest_style = ContestStyleDistances.objects.create(
+                    style=Style.objects.get(name=shortcuts[style])
+                )
+                contest_style.distances = distances[:value]
+                contest_style.save()
+                styles.append(contest_style)
+            else:
+                styles.append(contest_style[0])
+            del distances[:value]
+        return styles
+
     def clean_highest_year(self):
         lowest_year = self.cleaned_data.get('lowest_year')
         highest_year = self.cleaned_data.get('highest_year')
@@ -471,9 +507,10 @@ class ContestForm(forms.ModelForm):
         contest.created_by = self.user
         contest.content_type = self.user.content_type
         contest.object_id = self.user.object_id
-        contest.styles = self.cleaned_data['styles']
-
         if commit:
+            contest.save()
+            styles = self.get_styles_array(self.cleaned_data['styles'])
+            contest.styles.add(*styles)
             contest.save()
             self._save_uploaded_files()
 

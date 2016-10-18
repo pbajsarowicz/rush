@@ -1,0 +1,51 @@
+[
+  {
+      "model": "contest.distance",
+      "pk": 1,
+      "fields": {
+        "value": "25m"
+      }
+  },
+  {
+      "model": "contest.distance",
+      "pk": 2,
+      "fields": {
+        "value": "50m"
+      }
+  },
+  {
+      "model": "contest.distance",
+      "pk": 3,
+      "fields": {
+        "value": "100m"
+      }
+  },
+  {
+      "model": "contest.distance",
+      "pk": 4,
+      "fields": {
+        "value": "200m"
+      }
+  },
+  {
+      "model": "contest.distance",
+      "pk": 5,
+      "fields": {
+        "value": "400m"
+      }
+  },
+  {
+      "model": "contest.distance",
+      "pk": 6,
+      "fields": {
+        "value": "800m"
+      }
+  },
+  {
+      "model": "contest.distance",
+      "pk": 7,
+      "fields": {
+        "value": "1500m"
+      }
+  }
+]
