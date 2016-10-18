@@ -438,7 +438,8 @@ class ContestResultsAddView(View):
         """
         return (
             self._is_contest_organizer(user, contest) or
-            self._is_contest_moderator(user, contest)
+            self._is_contest_moderator(user, contest) or
+            user.is_staff
         )
 
     def get(self, request, contest_id, *args, **kwargs):
