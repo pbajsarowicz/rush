@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 
@@ -8,7 +9,9 @@ from contest.models import (
     Club,
     Contact,
     Contest,
+    contest_directory_path,
     Contestant,
+    ContestFiles,
     RushUser,
     School,
 )
@@ -58,7 +61,7 @@ class UserMethodTests(TestCase):
 
 
 class ContestTestCase(TestCase):
-    fixtures = ['clubs.json']
+    fixtures = ['clubs.json', 'users.json']
 
     def setUp(self):
         self.now = timezone.now()
@@ -77,6 +80,27 @@ class ContestTestCase(TestCase):
         self.contest.save()
 
         self.assertEqual(self.contest.__unicode__(), 'Wodnik')
+
+    def test_contest_directory_path(self):
+        filename = 'abcde' * 60
+        self.contest.name = 'ab' * 26
+        self.contest.save()
+
+        contest_file = ContestFiles.objects.create(
+            contest=self.contest,
+            uploaded_by=RushUser.objects.last(),
+            contest_file=SimpleUploadedFile('test_file.pdf', str(filename))
+        )
+
+        result = contest_directory_path(contest_file, filename)
+
+        self.assertEqual(
+            result, 'contest/{}/{}/{}'.format(
+                'ab' * 25,
+                contest_file.date_uploaded.strftime('%Y/%m/%d'),
+                'abcde' * 51
+            )
+        )
 
 
 class ContestantTestCase(TestCase):

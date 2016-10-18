@@ -300,13 +300,10 @@ class Contest(UnitModelsMixin, models.Model):
 
 def contest_directory_path(instance, filename):
     date_uploaded = instance.date_uploaded.strftime('%Y/%m/%d')
-    max_length = 50
-    directory = instance.contest.name
-    if(len(directory) > max_length):
-        truncation = len(directory) - max_length
-        directory = directory[:-truncation]
+    filename = filename[:255]
+
     return 'contest/{}/{}/{}'.format(
-        directory, date_uploaded, filename
+        instance.contest.name[:50], date_uploaded, filename
     )
 
 
