@@ -470,7 +470,7 @@ function getContestInfo(pk) {
 
             result += '<br> Opis: ' + (json['description'] ? json['description'] : 'Brak');
 
-            document.getElementById('text' + pk).innerHTML = result;
+            document.getElementById('text-' + pk).innerHTML = result;
         }
     });
 }
