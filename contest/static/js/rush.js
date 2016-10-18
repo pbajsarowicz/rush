@@ -470,7 +470,7 @@ function getContestInfo(pk) {
 
             result += '<br> Opis: ' + (json['description'] ? json['description'] : 'Brak');
 
-            document.getElementById('text' + pk).innerHTML = result;
+            document.getElementById('text-' + pk).innerHTML = result;
         }
     });
 }
@@ -885,4 +885,40 @@ function checkEditedStyles() {
         }
         return false;
     }
+}
+
+function getTimeRemaining(endtime) {
+    var total = Date.parse(endtime) - Date.parse(new Date());
+    var seconds = Math.floor((total / 1000) % 60);
+    var minutes = Math.floor((total / 1000 / 60) % 60);
+    var hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+    var days = Math.floor(total / (1000 * 60 * 60 * 24));
+    return {
+        'total': total,
+        'days': days,
+        'hours': hours,
+        'minutes': minutes,
+        'seconds': seconds
+    };
+}
+
+function initializeClock(id, endtime) {
+    var clock = document.getElementById(id);
+    var daysSpan = clock.querySelector('.days');
+    var hoursSpan = clock.querySelector('.hours');
+    var minutesSpan = clock.querySelector('.minutes');
+    var secondsSpan = clock.querySelector('.seconds');
+    var timeinterval = setInterval(updateClock, 1000);
+
+    function updateClock() {
+        var total = getTimeRemaining(endtime);
+        daysSpan.innerHTML = total.days;
+        hoursSpan.innerHTML = ('0' + total.hours).slice(-2);
+        minutesSpan.innerHTML = ('0' + total.minutes).slice(-2);
+        secondsSpan.innerHTML = ('0' + total.seconds).slice(-2);
+
+        if (total.total <= 0) {
+            clearInterval(timeinterval);
+        }
+    }    
 }

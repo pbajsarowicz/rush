@@ -525,3 +525,70 @@ class CompletedContestView(View):
                 {'msg': 'Nie znaleziono konkursu.'}
             )
         return render(request, self.template_name, {'contest': contest})
+
+
+class ManageContestView(View):
+    """
+    Organizer's panel.
+    """
+    template_name = 'contest/organizer_panel.html'
+
+    @staticmethod
+    def _get_contestants(contest, request):
+        """
+        Returns a contestans queryset.
+        """
+        return contest.contestant_set.all()
+
+    @staticmethod
+    def _get_msg(contestants=None):
+        """
+        Returns a message.
+        """
+        if not contestants:
+            return 'Zawodnicy nie zostali jeszcze dodani.'
+        return ''
+
+    def get(self, request, contest_id, *args, **kwargs):
+        """
+        Return contest details.
+        """
+        contest = Contest.objects.get(pk=contest_id)
+        contestants = self._get_contestants(contest, request)
+        msg = self._get_msg(contestants)
+        context = {
+            'contest': contest,
+            'contestants': contestants,
+            'msg': msg,
+        }
+        return render(request, self.template_name, context)
+
+
+class ContestEditView(View):
+    permission_required = 'contest.add_contest'
+    template_name = 'contest/contest_edit.html'
+    form_class = ContestForm
+
+    def get(self, request, contest_id, *args, **kwargs):
+        """
+        Return clear form.
+        """
+        contest = Contest.objects.get(id=contest_id)
+        form = self.form_class(user=request.user, instance=contest)
+        return render(
+            request, self.template_name, {'form': form, 'contest': contest}
+        )
+
+    def post(self, request, contest_id, *args, **kwargs):
+        """
+        Edit Contest.
+        """
+        contest = Contest.objects.get(id=contest_id)
+        form = self.form_class(
+            request.POST, request.FILES, instance=contest, user=request.user
+        )
+        if form.is_valid():
+            form = form.save()
+            msg = 'Zawody zostały edytowane.'
+            return render(request, self.template_name, {'message': msg})
+        return render(request, self.template_name, {'form': form})

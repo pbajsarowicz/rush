@@ -170,3 +170,26 @@ Base elements
   text-align: left;
   width: 300px;
 }
+
+#clock {
+  display: inline-block;
+  text-align: center;
+}
+
+#clock > div {
+  display: inline-block;
+}
+
+#clock div > span {
+  padding: 15px;
+  display: inline-block;
+}
+
+.text_container {
+  display: inline-block;
+  text-align: left;
+}
+
+.listdots {
+  list-style-type: disc;
+}
