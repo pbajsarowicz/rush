@@ -16,28 +16,28 @@
       </div>
       <div class="col s7">
         <div class="center-align">
-	        <div class="textcontainer">
+	        <div class="text_container">
 	          <p>Do zamknięcia listy zapisów pozostało:</p>
-	          <div id="clockdiv">
-	            <div>
+	          <ul id="clock">
+              <div>
 	              <span class="days"></span>
-	              <div>Dni</div>
-	            </div>
-	            <div>
+	              <li>Dni</li>
+              </div>
+              <div>
 	              <span class="hours"></span>
-	              <div>Godzin</div>
-	            </div>
-	            <div>
+	              <li>Godzin</li>
+              </div>
+              <div>
 	              <span class="minutes"></span>
-	              <div>Minut</div>
-	            </div>
-	            <div>
+	              <li>Minut</li>
+              </div>
+              <div>
 	              <span class="seconds"></span>
-	              <div>Sekund</div>
-	            </div>
-	          </div>
+	              <li>Sekund</li>
+              </div>
+	          </ul>
 	          <br><br><a class="pull-right btn btn-primary" href="#">Wygeneruj listy startowe</a><br><br>
-	          <div id="text{{ contest.pk }}"></div><br>
+	          <div id="text-{{ contest.pk }}"></div><br>
 	          <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
 	          <a class="pull-right btn btn-primary" href="{% url 'contest:contest-edit' contest_id=contest.pk %}">Edytuj</a>
 	        </div>
@@ -49,7 +49,7 @@
     {{ block.super }}
     <script type="text/javascript">
       var deadline = '{{ contest.deadline|date:"c"}}';
-      initializeClock('clockdiv', deadline);
+      initializeClock('clock', deadline);
       getContestInfo({{ contest.pk }});
     </script>
   {% endblock scripts %}
