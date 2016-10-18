@@ -36,8 +36,8 @@
 	              <li>Sekund</li>
               </div>
 	          </ul>
-	          <br><br><a class="pull-right btn btn-primary" href="#">Wygeneruj listy startowe</a><br><br>
-	          <div id="text-{{ contest.pk }}"></div><br>
+	          <br><a class="pull-right btn btn-primary" href="#">Wygeneruj listy startowe</a><br>
+	          <p id="text-{{ contest.pk }}"></p>
 	          <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
 	          <a class="pull-right btn btn-primary" href="{% url 'contest:contest-edit' contest_id=contest.pk %}">Edytuj</a>
 	        </div>
