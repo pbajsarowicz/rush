@@ -886,13 +886,13 @@ function checkEditedStyles() {
 }
 
 function getTimeRemaining(endtime) {
-    var t = Date.parse(endtime) - Date.parse(new Date());
-    var seconds = Math.floor((t / 1000) % 60);
-    var minutes = Math.floor((t / 1000 / 60) % 60);
-    var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
-    var days = Math.floor(t / (1000 * 60 * 60 * 24));
+    var total = Date.parse(endtime) - Date.parse(new Date());
+    var seconds = Math.floor((total / 1000) % 60);
+    var minutes = Math.floor((total / 1000 / 60) % 60);
+    var hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+    var days = Math.floor(total / (1000 * 60 * 60 * 24));
     return {
-        'total': t,
+        'total': total,
         'days': days,
         'hours': hours,
         'minutes': minutes,
@@ -906,19 +906,17 @@ function initializeClock(id, endtime) {
     var hoursSpan = clock.querySelector('.hours');
     var minutesSpan = clock.querySelector('.minutes');
     var secondsSpan = clock.querySelector('.seconds');
+    var timeinterval = setInterval(updateClock, 1000);
 
     function updateClock() {
-        var t = getTimeRemaining(endtime);
-        daysSpan.innerHTML = t.days;
-        hoursSpan.innerHTML = ('0' + t.hours).slice(-2);
-        minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
-        secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
+        var total = getTimeRemaining(endtime);
+        daysSpan.innerHTML = total.days;
+        hoursSpan.innerHTML = ('0' + total.hours).slice(-2);
+        minutesSpan.innerHTML = ('0' + total.minutes).slice(-2);
+        secondsSpan.innerHTML = ('0' + total.seconds).slice(-2);
 
-        if (t.total <= 0) {
+        if (total.total <= 0) {
             clearInterval(timeinterval);
         }
-    }
-
-    updateClock();
-    var timeinterval = setInterval(updateClock, 1000);
+    }    
 }
