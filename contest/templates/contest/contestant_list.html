@@ -31,6 +31,27 @@
         </ul>
       {% endfor %}
     {% endif %}
+    {% if contestants.has_other_pages %}
+      <ul class="pagination">
+        {% if contestants.has_previous %}
+          <li class="waves-effect"><a href="?page={{ contestants.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+        {% else %}
+          <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+        {% endif %}
+        {% for page in contestants.paginator.page_range %}
+          {% if contestants.number == page %}
+            <li class="active"><a href="#">{{ page }}</a></li>
+          {% else %}
+            <li><a href="?page={{ page }}">{{ page }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if contestants.has_next %}
+          <li class="waves-effect"><a href="?page={{ contestants.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+        {% else %}
+          <li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
+        {% endif %}
+      </ul>
+    {% endif %}
     <div class="section center-align">
       <a class="pull-right btn btn-primary" href="{% url 'contest:home' %}">Powrót</a>
       <a class="pull-right btn btn-primary" href="{% url 'contest:contestant-add' contest_id=contest.pk %}">Dodaj</a>

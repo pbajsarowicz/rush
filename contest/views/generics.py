@@ -5,6 +5,7 @@ from urlparse import urljoin
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMessage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.forms import (
     formset_factory,
@@ -253,6 +254,14 @@ class ContestantListView(View):
             is_contest_organizer, contest, request
         )
         msg = self._get_msg(is_contest_organizer, contestants)
+        page = request.GET.get('page', 1)
+        paginator = Paginator(contestants, 8)
+        try:
+            contestants = paginator.page(page)
+        except PageNotAnInteger:
+            contestants = paginator.page(1)
+        except EmptyPage:
+            contestants = paginator.page(paginator.num_pages)
 
         context = {
             'contest': contest,
