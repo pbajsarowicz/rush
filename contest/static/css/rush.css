@@ -201,3 +201,8 @@ Base elements
 .listdots {
   list-style-type: disc;
 }
+
+.scroll_bar {
+  max-height: 100%;
+  overflow: auto;
+}
