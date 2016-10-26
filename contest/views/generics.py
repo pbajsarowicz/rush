@@ -364,22 +364,44 @@ class ContestAddView(PermissionRequiredMixin, View):
             'http://{}'.format(request.get_host()),
             reverse('contest:cancel-notification')
         )
-        body = loader.render_to_string(
+        organizers_panel_link = urljoin(
+            'http://{}'.format(request.get_host()),
+            reverse(
+                'contest:contest-manage', kwargs={'contest_id': contest.pk}
+            )
+        )
+        notification_body = loader.render_to_string(
             'email/new_contest_notification.html', {
                 'link': cancel_notifications_link,
                 'contest': contest,
                 'add_contestant_link': add_contestant_link,
-                'files_list': files_list
+                'files_list': files_list,
             },
         )
-        msg = EmailMessage(
-            subject='Stworzono nowe zawody',
-            body=body,
-            from_email=settings.SUPPORT_EMAIL,
-            bcc=recipient_list,
+        confirmation_body = loader.render_to_string(
+            'email/new_contest_confirmation.html', {
+                'link': organizers_panel_link,
+                'contest': contest,
+                'files_list': files_list,
+            },
         )
-        msg.content_subtype = 'html'
-        msg.send()
+        notification_msg = EmailMessage(
+            subject='Stworzono nowe zawody',
+            body=notification_body,
+            from_email=settings.SUPPORT_EMAIL,
+            to=recipient_list,
+        )
+        confirmation_msg = EmailMessage(
+            subject='Potwierdzenie dodania zawodów',
+            body=confirmation_body,
+            from_email=settings.SUPPORT_EMAIL,
+            to=[contest.created_by.email],
+        )
+
+        notification_msg.content_subtype = 'html'
+        notification_msg.send()
+        confirmation_msg.content_subtype = 'html'
+        confirmation_msg.send()
 
     def get(self, request):
         """

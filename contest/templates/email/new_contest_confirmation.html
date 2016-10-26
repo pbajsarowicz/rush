@@ -4,11 +4,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   </head>
   <body>
-    <h2>{{ contest.name }}</h2>
+    <h2>Witaj</h2>
     <div>
       <hr/>
+      Twoje zawody zostały dodane. Oto dostarczone przez Ciebie informacje:
       <p>Nazwa: {{ contest.name }}</p>
-      <p>Organizator: {{ contest.organization}}</p>
       <p>Data: {{ contest.date }}</p>
       <p>Miejsce: {{ contest.place }}</p>
       <p>Dozwolone roczniki: od {{ contest.lowest_year }} do {{ contest.highest_year }}</p>
@@ -36,9 +36,8 @@
           {% endfor %}
         </ul>
       {% endif %}
-    </div><br>
-    <a href="{{ add_contest_link }}">Dołącz do zawodów</a>
-    <p>Jeśli nie chcesz otrzymywać powiadomień odnośnie nowych zawodów kliknij w poniższy link:</p>
+    </div>
+    <p>W razie potrzeby możesz dokonać koniecznych zmian w panelu organizatora, który znajduje się pod tym linkiem:</p>
     <a href="{{ link }}">{{ link }}</a>
   </body>
 </html>
