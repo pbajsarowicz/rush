@@ -214,6 +214,7 @@ class ContestantListView(View):
     View with list of added contestants.
     """
     template_name = 'contest/contestant_list.html'
+    paginate_by = 1
 
     @staticmethod
     def _is_contest_organizer(request, contest):
@@ -223,15 +224,24 @@ class ContestantListView(View):
         """
         return request.user.object_id == contest.object_id
 
-    @staticmethod
-    def _get_contestants(is_contest_organizer, contest, request):
-        """
-        Returns a contestans queryset.
-        """
-        return (
+    def _paginate(self, contestants):
+        page = self.request.GET.get('page', 1)
+        paginator = Paginator(contestants, self.paginate_by)
+
+        try:
+            return paginator.page(page)
+        except PageNotAnInteger:
+            return paginator.page(1)
+        except EmptyPage:
+            return paginator.page(paginator.num_pages)
+
+    def _get_contestants(self, contest, is_contest_organizer):
+        contestants = (
             contest.contestant_set.all() if is_contest_organizer else
-            contest.contestant_set.filter(moderator=request.user)
+            contest.contestant_set.filter(moderator=self.request.user)
         )
+
+        return self._paginate(contestants)
 
     @staticmethod
     def _get_msg(is_contest_organizer, contestants=None):
@@ -249,23 +259,14 @@ class ContestantListView(View):
         Get contestants data.
         """
         contest = Contest.objects.get(pk=contest_id)
-        is_contest_organizer = self._is_contest_organizer(request, contest)
-        contestants = self._get_contestants(
-            is_contest_organizer, contest, request
+        is_contest_organizer = self._is_contest_organizer(
+            self.request, contest
         )
+        contestants = self._get_contestants(contest, is_contest_organizer)
         msg = self._get_msg(is_contest_organizer, contestants)
-        page = request.GET.get('page', 1)
-        paginator = Paginator(contestants, 8)
-        try:
-            contestants = paginator.page(page)
-        except PageNotAnInteger:
-            contestants = paginator.page(1)
-        except EmptyPage:
-            contestants = paginator.page(paginator.num_pages)
-
         context = {
             'contest': contest,
-            'contestants': contestants,
+            'contestants': self._get_contestants(contest, contestants),
             'msg': msg,
         }
 
